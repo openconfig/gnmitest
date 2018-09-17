@@ -1,0 +1,194 @@
+/*
+Copyright 2018 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+syntax = "proto3";
+
+import "github.com/openconfig/gnmi/proto/gnmi/gnmi.proto";
+
+package tests;
+
+// Default message to use if test doesn't need any arguments. Default message
+// will be type of the field in the message. The name of the field discriminates
+// one test from another.
+message Default{}
+
+// Message that contains all the information specific to a gnmi Subscribe RPC.
+message SubscribeTest {
+  // Request to use by framework during gnmi Subscribe RPC. If test is part of
+  // an extension list, a real subscription isn't created, but the query is
+  // registered to receive updates corresponding to its path from subscription
+  // of parent test.
+  gnmi.SubscribeRequest request = 1;
+  oneof args {
+    string fake_test = 10;
+    Default path_validation = 11;
+    HasKeys has_keys = 12;
+  }
+}
+
+// Test specifies a gNMI test. The type indicates the form of test that is
+// being performed.
+//
+// The authentication for the RPC(s) used in the test is specified in
+// username_key and password_key. These values are references to an external
+// storage of authentication data that can be retrieved by the framework.
+message Test {
+  // Description of the individual test to use for reporting purposes.
+  string description = 1;
+  // Amount of time in seconds test is allowed to run before cancelled.
+  int32 timeout = 2;
+  // The compiled schema that should be used within the test.
+  string schema = 3;
+  // Connection parameters to dial into target. If not specified, the one
+  // specified by Suite proto is used.
+  Connection connection = 4;
+
+  // Can be extended to include other gNMI RPCs.
+  oneof type {
+    SubscribeTest subscribe = 10;
+    GetSetTest get_set = 11;
+    // fake_test is used to verify the functionality of the test running
+    // framework.
+    FakeTest fake_test = 12;
+  }
+}
+
+// Credentials to use while connecting to target.
+message Credentials {
+  // Resolver value is used to determine which credentials resolver to pick
+  // while resolving username and password to use during gNMI connection. By
+  // default, plaintext resolver is used if nothing is specified here. If a
+  // special resolver is needed, it needs to be registered into global resolvers
+  // table.
+  string resolver = 1;
+  string username = 2;
+  string password = 3;
+}
+
+// Connection contains required information to be able to dial into a target.
+message Connection {
+  // The name of the target to be set in gNMI messages. For gNMI implementations
+  // that can be address multiple targets, this value can be used to specify
+  // which one should be the device under test.
+  string target = 1;
+  // Address is used while dialing into gNMI server under test. It needs to be
+  // in the form "host:port" or it should resolve to a "host:port".
+  string address = 2;
+  Credentials credentials = 3;
+  // Dial timeout in seconds while connecting to gNMI server under test.
+  int32 timeout = 4;
+}
+
+// FakeTest is the configuration used for a fake test within the framework.
+message FakeTest {
+  // pass indicates whether the faked test should pass or fail.
+  bool pass = 1;
+}
+
+// HasKeys defines the input for a test that checks that a particular list
+// in the schema has a specified set of keys in the list. It can be used
+// to check for data completeness of a particular list within the schema.
+message HasKeys {
+  // Item defines an entry in the list.
+  message Item {
+    map<string,string> key = 1;
+  }
+  // Path to the list that should be checked.
+  gnmi.Path path = 1;
+  // Items that should be found in the list.
+  repeated Item item = 2;
+}
+
+// GetSetTest contains all the information specific to a configuration
+// test - which is expected to use RPCs to interact with configuration. Set is
+// used to change the configuration, and Get or Subscribe can be used to
+// retrieve configuration values to verify the target's initial or final states.
+message GetSetTest {
+  oneof args {
+    GetSetValidationTest oper_validation = 10;
+  }
+}
+
+// GetSetValidationTest describes a test that validates configuration sets
+// on a target. It does not validate the underlying behaviour of the system,
+// but restricts itself to validating that setting and retrieving configuration
+// returns the expected result.
+//
+// The expected test methodology is as follows:
+//   1. Set the configuration of the target to a "known good" initial state.
+//   2. Validate that the configuration running on the target matches this
+//      state.
+//   3. Perform an update or replace operation on the configuration.
+//   4. Validate that the new state of the target matches that which is
+//      expected.
+message GetSetValidationTest {
+  // initialise_oper is the operation to initialise the target. It may consist
+  // of a configuration to be set and/or get request that validates the target's
+  // current state.
+  GetSetValidationOper initialise_oper = 1;
+  // test_oper is the operation that is under test in the validation test.  The
+  // Get and/or Set operations may be set within the operation such that the
+  // test can validate a set, a set followed by a get, or solely a get
+  // operation.
+  GetSetValidationOper test_oper = 2;
+}
+
+// GetSetValidationOper describes an individual operation within a
+// GetSetValidationTest. If the message consists of:
+//
+//  * Solely a SetRequest - the SetRequest is sent to the test target, and the
+//    result checked against the expected error status in set_ok.
+//  * Solely a GetRequest - the GetRequest is sent to the test target, and the
+//    result checked against the expected GetResponse.
+//  * Both a SetRequest and a GetRequest - the SetRequest is sent to the test
+//    target, and the return value compared against set_ok. Subsequently, the
+//    GetRequest is sent to the test target, the return code compared to get_ok
+//    and the GetResponse compared to the expected GetResponse.
+message GetSetValidationOper {
+  // OperResult specifies the expected result of an operation. By
+  // default an operation is expected to succeed.
+  enum OperResult {
+    NO_ERROR = 0;
+    FAILED = 1;
+  }
+  oneof setrequest {
+    // set specifies a SetRequest to be sent to the target.
+    gnmi.SetRequest set = 1;
+    // common_setrequest specifies a key within the Suite common_setrequests
+    // to be used.
+    string common_setrequest = 2;
+  }
+  // set_ok specifies whether the Set RPC should be successful.
+  OperResult set_ok = 10;
+
+  oneof getrequest {
+    // get specifies a GetRequest to be sent to the target.
+    gnmi.GetRequest get = 11;
+    // common_getrequest specifies a key within the Suite common_getrequests
+    // to be used.
+    string common_getrequest = 12;
+  }
+  OperResult get_ok = 20;
+
+  oneof getresponse {
+    // get_response specifies the GetResponse that is expected from
+    // the target.
+    gnmi.GetResponse get_response = 21;
+    // common_getresponse specifies a key within the Suite common_getresponses
+    // to be used.
+    string common_getresponse = 22;
+  }
+}
