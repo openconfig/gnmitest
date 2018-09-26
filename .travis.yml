@@ -1,12 +1,12 @@
 language: go
 go:
-	- 1.8.x
-	- 1.9.x
-	- 1.10.x
-	- 1.11.x
-	- master
+    - 1.8.x
+    - 1.9.x
+    - 1.10.x
+    - 1.11.x
+    - master
 script:
-	- go test ./...
-	- go test -race ./...
-	- go tool vet ./...
-	- find . -type d  | while read l; do diff -u <(echo -n) <(gofmt -d -s $l); done
+    - go test ./...
+    - go test -race ./...
+    - go tool vet ./...
+    - find . -type d  | while read l; do diff -u <(echo -n) <(gofmt -d -s $l); done
