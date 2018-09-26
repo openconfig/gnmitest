@@ -42,9 +42,9 @@ import (
 
 	"context"
 	"github.com/golang/protobuf/proto"
+	"github.com/openconfig/gnmitest/common"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/openconfig/gnmitest/common"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	rpb "github.com/openconfig/gnmitest/proto/report"

@@ -19,8 +19,8 @@ package openconfig
 
 import (
 	log "github.com/golang/glog"
-	"github.com/openconfig/gnmitest/schemas/openconfig"
 	"github.com/openconfig/gnmitest/schemas"
+	"github.com/openconfig/gnmitest/schemas/openconfig"
 )
 
 // Key is used as the key in GoStructs lookup table.

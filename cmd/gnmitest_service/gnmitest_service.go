@@ -27,15 +27,14 @@ import (
 	"path/filepath"
 	"regexp"
 
-	
-	log "github.com/golang/glog"
 	"context"
+	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"github.com/openconfig/gnmi/client/gnmi"
 	"github.com/openconfig/gnmi/testing/fake/gnmi"
 	"github.com/openconfig/gnmitest/service"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	fpb "github.com/openconfig/gnmi/testing/fake/proto"

@@ -26,10 +26,10 @@ import (
 	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/kylelemons/godebug/pretty"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmi/unimplemented"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 )

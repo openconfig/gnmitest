@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"context"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	tpb "github.com/openconfig/gnmi/client"
 	gpb "github.com/openconfig/gnmi/proto/gnmi"

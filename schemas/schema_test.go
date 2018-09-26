@@ -20,9 +20,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmitest/schemas/openconfig"
+	"github.com/openconfig/goyang/pkg/yang"
 )
 
 func reset() {

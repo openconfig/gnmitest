@@ -22,11 +22,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"flag"
 	"context"
+	"flag"
 	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc"
 	"github.com/openconfig/gnmitest/common/report"
+	"google.golang.org/grpc"
 
 	gtpb "github.com/openconfig/gnmitest/proto/gnmitest"
 	rpb "github.com/openconfig/gnmitest/proto/report"

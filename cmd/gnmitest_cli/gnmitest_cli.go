@@ -19,7 +19,7 @@ package main
 
 import (
 	"flag"
-	
+
 	log "github.com/golang/glog"
 	"github.com/openconfig/gnmitest/cmd/gnmitest_cli/common"
 )

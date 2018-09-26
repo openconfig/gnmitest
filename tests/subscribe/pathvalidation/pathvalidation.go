@@ -23,12 +23,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/openconfig/goyang/pkg/yang"
-	"github.com/openconfig/ygot/ygot"
-	"github.com/openconfig/ygot/ytypes"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/schemas"
 	"github.com/openconfig/gnmitest/subscribe"
+	"github.com/openconfig/goyang/pkg/yang"
+	"github.com/openconfig/ygot/ygot"
+	"github.com/openconfig/ygot/ytypes"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	tpb "github.com/openconfig/gnmitest/proto/tests"
