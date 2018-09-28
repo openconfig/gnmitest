@@ -9,13 +9,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build a simple Docker image with supervisord which runs the gnmitest_service
+# Build a simple Docker image with supervisord which runs the gnmitest_demo
 # binary.
 
 FROM alpine:3.7
 RUN apk update && apk add -u python py-pip
 RUN pip install supervisor
 ADD supervisord.conf /etc/supervisord.conf
-ADD gnmitest_service /
+ADD gnmitest_demo /
 
 ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]

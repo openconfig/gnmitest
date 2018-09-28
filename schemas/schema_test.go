@@ -36,35 +36,49 @@ func TestSingleSchema(t *testing.T) {
 	schemaTree := map[string]*yang.Entry{
 		"x": &yang.Entry{},
 	}
+	schemaTreeFn := func() (map[string]*yang.Entry, error) {
+		return map[string]*yang.Entry{
+			"x": &yang.Entry{},
+		}, nil
+	}
 
-	if err := Set(key, rootStruct, schemaTree, gostructs.Unmarshal); err != nil {
-		t.Fatalf("Schema(%v, %v, %v) got error %v", key, rootStruct, schemaTree, err)
+	if err := Set(key, rootStruct, schemaTreeFn, nil); err != nil {
+		t.Fatalf("Schema(%v, %v, schemaTreeFn, nil): got error %v, want no error", key, rootStruct, err)
 	}
 
 	c, err := Get(key)
 	if err != nil {
-		t.Fatalf("got %v, want no error", err)
+		t.Fatalf("Get(%q): got %v, want no error", key, err)
 	}
 
 	if nr := c.NewRoot(); nr == rootStruct {
-		t.Error("NewRoot, got identical ygot.GoStruct, want not the same")
+		t.Error("NewRoot(): got identical ygot.GoStruct, want not the same")
 	} else if !reflect.DeepEqual(nr, rootStruct) {
-		t.Error("NewRoot, got not equal ygot.GoStruct, want equal")
+		t.Error("NewRoot(): got not equal ygot.GoStruct, want equal")
+	}
+
+	for k := range schemaTree {
+		if ns, _ := c.Schema(k); ns == schemaTree[k] {
+			t.Errorf("Schema(%q): got identical *yang.Entry, want not the same", k)
+		} else if !reflect.DeepEqual(ns, schemaTree[k]) {
+			t.Errorf("Schema(%q): got not equal *yang.Entry, want equal", k)
+		}
 	}
 }
 
 func TestMultipleSchema(t *testing.T) {
 	defer reset()
-	if err := Set("oc", &gostructs.Device{}, gostructs.SchemaTree, gostructs.Unmarshal); err != nil {
-		t.Fatalf("got %v, want nil", err)
+	k1, k2 := "oc", "oc2"
+	if err := Set(k1, nil, nil, nil); err != nil {
+		t.Fatalf("Set(%q, nil, nil, nil): got %v, want nil", k1, err)
 	}
 
-	if err := Set("oc", &gostructs.Device{}, gostructs.SchemaTree, gostructs.Unmarshal); err == nil {
-		t.Fatalf("got nil, want err")
+	if err := Set(k1, nil, nil, nil); err == nil {
+		t.Fatalf("Set(%q, nil, nil, nil): got nil, want err", k1)
 	}
 
-	if err := Set("oc2", &gostructs.Device{}, gostructs.SchemaTree, gostructs.Unmarshal); err != nil {
-		t.Fatalf("got %v, want nil", err)
+	if err := Set(k2, nil, nil, nil); err != nil {
+		t.Fatalf("Set(%q, nil, nil, nil): got %v, want nil", k2, err)
 	}
 }
 
@@ -76,16 +90,47 @@ func TestGet(t *testing.T) {
 	wantErr := "no schema found corresponding to"
 	_, err := Get(key)
 	if diff := errdiff.Substring(err, wantErr); diff != "" {
-		t.Fatalf("got %v, want %v", err, wantErr)
+		t.Fatalf("Get(%q): got %v, want %v", key, err, wantErr)
 	}
 
 	// register a schema
-	if err := Set(key, &gostructs.Device{}, gostructs.SchemaTree, gostructs.Unmarshal); err != nil {
-		t.Fatalf("got %v, want nil", err)
+	if err := Set(key, nil, nil, nil); err != nil {
+		t.Fatalf("Set(%q, nil, nil, nil): got %v, want nil", key, err)
 	}
 
 	// "arbitrary" key is now registered, Get must succeed
 	if _, err := Get(key); err != nil {
-		t.Fatalf("got %v, want no error", err)
+		t.Fatalf("Get(%q): got %v, want no error", key, err)
+	}
+}
+
+func TestIntegration(t *testing.T) {
+	defer reset()
+
+	key := "arbitrary"
+	if err := Set(key, &gostructs.Device{}, gostructs.UnzipSchema, gostructs.Unmarshal); err != nil {
+		t.Fatalf("Set: registering schema failed for %q; %v", key, err)
+	}
+
+	gs, err := Get(key)
+	if err != nil {
+		t.Fatalf("Get(%q): got %v, want no error", key, err)
+	}
+
+	// Device GoStruct is the root container within generated GoStructs.
+	destStruct := gs.NewRoot()
+	tn := reflect.TypeOf(destStruct).Elem().Name()
+
+	// gs.Schema returns a copy of schema tree.
+	sch, err := gs.Schema(tn)
+	if err != nil {
+		t.Fatalf("Schema(%v): got %v, want no error", tn, err)
+	}
+	if sch == nil {
+		t.Fatalf("Schema(%v): got nil schema", tn)
+	}
+
+	if !reflect.DeepEqual(gostructs.SchemaTree[tn], sch) {
+		t.Errorf("\ngot %v, \nwant %v", gostructs.SchemaTree[tn], sch)
 	}
 }

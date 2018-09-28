@@ -61,9 +61,9 @@ func newTest(st *tpb.Test) (subscribe.Subscribe, error) {
 	}
 	root := goStruct.NewRoot()
 	tn := reflect.TypeOf(root).Elem().Name()
-	schema := goStruct.Schema(tn)
-	if schema == nil {
-		return nil, fmt.Errorf("schema not found; %v", tn)
+	schema, err := goStruct.Schema(tn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get schema for %q; %v", tn, err)
 	}
 
 	paths, err := completePaths(st.GetSubscribe())

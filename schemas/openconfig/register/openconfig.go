@@ -27,7 +27,7 @@ import (
 const Key = "openconfig"
 
 func init() {
-	if err := schema.Set(Key, &gostructs.Device{}, gostructs.SchemaTree, gostructs.Unmarshal); err != nil {
+	if err := schema.Set(Key, &gostructs.Device{}, gostructs.UnzipSchema, gostructs.Unmarshal); err != nil {
 		log.Fatal(err)
 	}
 }

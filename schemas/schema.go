@@ -32,19 +32,30 @@ import (
 // ygot generated code.
 type unmarshalFunc func([]byte, ygot.GoStruct, ...ytypes.UnmarshalOpt) error
 
-// goStruct stores the factory function to create a new root as well as the
-// keyed list of schemas that is shared across the test infrastructure for all
-// tests.
+// schemaTreeFunc defines a type which represents the UnzipSchema function in
+// ygot generated code.
+type schemaTreeFunc func() (map[string]*yang.Entry, error)
+
+// goStruct stores the information related to generated GoStruct.
 type goStruct struct {
 	// root stores the GoStruct which is the root of the tree.
 	root ygot.GoStruct
-	// schemaTree stores a map, keyed by Go type name, to the yang.Entry schema
-	// that describes the struct.
-	schemaTree map[string]*yang.Entry
+	// schemaTreeFn can be used to get a copy of schema tree from the generated
+	// code.
+	schemaTreeFn schemaTreeFunc
 	// unmarshalFunc defines the function that can be used to JSON unmarshal
 	// into the tree.
 	unmarshal unmarshalFunc
 }
+
+var (
+	// mu is used to synchronize registration of multiple GoStruct
+	// into goStructs table.
+	mu sync.Mutex
+	// goStructs is the lookup table that maintains different goStructs
+	// to choose from.
+	goStructs = make(map[string]goStruct)
+)
 
 // TestGoStruct stores a cached copy of the global schema tree that is local to
 // a given test so as to prevent the possiblity of cross-test schema contamination.
@@ -59,41 +70,39 @@ func (s *TestGoStruct) NewRoot() ygot.GoStruct {
 }
 
 // Schema returns the *yang.Entry corresponding to given key.
-func (s *TestGoStruct) Schema(k string) *yang.Entry {
-	if _, ok := s.localSchemaTree[k]; !ok {
-		// TODO(yusufsn): return a copy of the *yang.Entry.
-		s.localSchemaTree[k] = s.schemaTree[k]
+func (s *TestGoStruct) Schema(k string) (*yang.Entry, error) {
+	if s.localSchemaTree == nil {
+		var err error
+		// Create a copy of schema tree and use it in subsequent calls to
+		// Schema function.
+		if s.localSchemaTree, err = s.schemaTreeFn(); err != nil {
+			return nil, fmt.Errorf("failed to get schema tree for %q; %v", k, err)
+		}
 	}
-	return s.localSchemaTree[k]
+	if _, ok := s.localSchemaTree[k]; !ok {
+		return nil, fmt.Errorf("cannot find schema for %q", k)
+	}
+	return s.localSchemaTree[k], nil
 }
-
-var (
-	// mu is used to synchronize registration of multiple GoStruct
-	// into goStructs table.
-	mu sync.Mutex
-	// goStructs is the lookup table that maintains different goStructs
-	// to choose from.
-	goStructs = make(map[string]goStruct)
-)
 
 // Set registers given key and GoStruct into the registration table.
 // If key already exists, it doesn't register GoStruct and returns an error.
-func Set(key string, root ygot.GoStruct, schemaTree map[string]*yang.Entry, ufn unmarshalFunc) error {
+func Set(key string, root ygot.GoStruct, stfn schemaTreeFunc, ufn unmarshalFunc) error {
 	mu.Lock()
 	defer mu.Unlock()
 	if _, ok := goStructs[key]; ok {
 		return fmt.Errorf("another schema is registered with the key %v", key)
 	}
 	goStructs[key] = goStruct{
-		root:       root,
-		schemaTree: schemaTree,
-		unmarshal:  ufn,
+		root:         root,
+		schemaTreeFn: stfn,
+		unmarshal:    ufn,
 	}
 	return nil
 }
 
-// Get returns reference to testGoStruct so that test can
-// have access to underlying schema corresponding to given key.
+// Get returns reference to testGoStruct so that test can have access to
+// underlying schema corresponding to given key.
 func Get(key string) (*TestGoStruct, error) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -102,7 +111,6 @@ func Get(key string) (*TestGoStruct, error) {
 		return nil, fmt.Errorf("no schema found corresponding to %q key", key)
 	}
 	return &TestGoStruct{
-		goStruct:        gs,
-		localSchemaTree: make(map[string]*yang.Entry),
+		goStruct: gs,
 	}, nil
 }

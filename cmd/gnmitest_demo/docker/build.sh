@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2017 Google Inc.
+# Copyright 2018 Google Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,8 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file launches a Docker image of gnmitest service. By default gnmitest
-# service listens on port tcp/55555 which is forwarded to the host.
+# This file builds a simple docker image for the gnmitest_demo
+# based on Alpine Linux.
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-docker run -d -v $DIR/../testdata:/testdata -p 55555:55555 gnmitest_service
+(cd $GOPATH/src/github.com/openconfig/gnmitest/cmd/gnmitest_demo && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo .)
+cp $GOPATH/src/github.com/openconfig/gnmitest/cmd/gnmitest_demo/gnmitest_demo .
+docker build -t gnmitest_demo -f Dockerfile .
