@@ -131,42 +131,5 @@ func (t *test) Check() error {
 // message is received, it validates that the specified keys exist within the dataTree
 // that has been built.
 func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	validatePath := func(p *gpb.Path) error {
-		node, sch, err := ytypes.GetOrCreateNode(t.schema, t.dataTree, p)
-		if err != nil {
-			return err
-		}
-		if sch.IsLeaf() || sch.IsLeafList() {
-			return nil
-		}
-		return fmt.Errorf("path doesn't point to a leaf node; %T", node)
-	}
-	switch v := sr.Response.(type) {
-	case *gpb.SubscribeResponse_Update:
-		var pe []*gpb.PathElem
-		// Join prefix path and update/delete path.
-		if v.Update.Prefix != nil {
-			pe = append(pe, v.Update.Prefix.Elem...)
-		}
-		for _, u := range v.Update.Update {
-			if u != nil && u.Path != nil {
-				if err := validatePath(&gpb.Path{Elem: append(pe, u.Path.GetElem()...)}); err != nil {
-					return subscribe.Running, err
-				}
-			}
-		}
-		for _, d := range v.Update.Delete {
-			if d != nil {
-				if err := validatePath(&gpb.Path{Elem: append(pe, d.GetElem()...)}); err != nil {
-					return subscribe.Running, err
-				}
-			}
-		}
-		return subscribe.Running, nil
-	case *gpb.SubscribeResponse_SyncResponse:
-		// Once the subscription has received all paths at least once - i.e., sync_response
-		// is sent, then complete the test.
-		return subscribe.Complete, nil
-	}
-	return subscribe.Running, fmt.Errorf("unexpected message; %T", sr.Response)
+	return subscribe.OneShotGetOrCreate(t.schema, t.dataTree, sr)
 }

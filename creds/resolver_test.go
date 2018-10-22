@@ -21,10 +21,11 @@ import (
 	"github.com/openconfig/gnmi/errdiff"
 )
 
+var resetFunc = func() { rs = map[string]Resolver{} }
+
 func TestGet(t *testing.T) {
-	defer func() {
-		rs = map[string]Resolver{}
-	}()
+	defer resetFunc()
+
 	rs["arbitrary"] = nil
 	rs[""] = nil
 
@@ -59,9 +60,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
-	defer func() {
-		rs = map[string]Resolver{}
-	}()
+	defer resetFunc()
 
 	firstResolver := "first"
 	if err := Set(firstResolver, nil); err != nil {

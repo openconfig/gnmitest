@@ -21,20 +21,22 @@ limitations under the License.
 package runner
 
 import (
+	"crypto/tls"
 	"fmt"
-	"log"
 	"time"
 
 	"context"
+	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmi/client"
 	"github.com/openconfig/gnmi/match"
 	"github.com/openconfig/gnmi/path"
+	"github.com/openconfig/gnmitest/common"
 	"github.com/openconfig/gnmitest/common/report"
 	"github.com/openconfig/gnmitest/config"
-	"github.com/openconfig/gnmitest/creds"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/subscribe"
+	"github.com/openconfig/gnmitest/tests/getsetv/getsetv"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	rpb "github.com/openconfig/gnmitest/proto/report"
@@ -49,6 +51,7 @@ type PartialReportFunc func(*rpb.InstanceGroup)
 // Inlined functions are overridden in the tests.
 var (
 	createSubscription = func(ctx context.Context, sr *gpb.SubscribeRequest, pHandler client.ProtoHandler, conn *tpb.Connection, clientType string) error {
+		log.Infof("creating Subscribe client subscription with %s", proto.MarshalTextString(sr))
 		q, err := client.NewQuery(sr)
 		if err != nil {
 			return err
@@ -57,18 +60,22 @@ var (
 		q.Timeout = time.Duration(conn.GetTimeout()) * time.Second
 		q.ProtoHandler = pHandler
 
-		r, err := resolver.Get(conn.GetCredentials().GetResolver())
+		creds, err := common.ResolveCredentials(ctx, conn)
 		if err != nil {
 			return err
 		}
-		credentials, err := r.Credentials(ctx, conn.GetCredentials())
-		if err != nil {
-			return err
-		}
-		if credentials != nil {
+
+		if creds != nil {
 			q.Credentials = &client.Credentials{
-				Username: credentials.Username,
-				Password: credentials.Password,
+				Username: creds.Username,
+				Password: creds.Password,
+			}
+
+			// If credentials are specified, we must run TLS.
+			q.TLS = &tls.Config{
+				// Always assume that the certificate should not be
+				// verified.
+				InsecureSkipVerify: true,
 			}
 		}
 
@@ -81,18 +88,15 @@ var (
 // Runner object encapsulates the config, report and logging to run
 // a Suite of tests.
 type Runner struct {
-	*log.Logger // logger is used to log framework events and errors.
-
 	cfg    *config.Config    // object that contains the Suite proto.
 	report PartialReportFunc // used to update caller incrementally.
 }
 
 // New creates an instance of runner. It receives;
-// - logger to log framework events
 // - config that contains the Suite proto
 // - update function to notify caller about the partial results
-func New(l *log.Logger, cfg *config.Config, r PartialReportFunc) *Runner {
-	return &Runner{Logger: l, cfg: cfg, report: r}
+func New(cfg *config.Config, r PartialReportFunc) *Runner {
+	return &Runner{cfg: cfg, report: r}
 }
 
 // Start runs all the tests in the Suite. Start blocks caller until all tests
@@ -155,6 +159,8 @@ func (r *Runner) runTest(ctx context.Context, ins *spb.Instance, ir *rpb.Instanc
 		return r.runFakeTest(ins, ir)
 	case *tpb.Test_Subscribe:
 		return r.runSubscribeTest(ctx, ins, ir)
+	case *tpb.Test_GetSet:
+		return r.runGetSetTest(ctx, ins, ir)
 	default:
 		return fmt.Errorf("runner doesn't know how to run %T test", v)
 	}
@@ -171,6 +177,33 @@ func (r *Runner) runFakeTest(ins *spb.Instance, res *rpb.Instance) error {
 		res.Test = &rpb.TestResult{Result: rpb.Status_FAIL}
 	}
 	return nil
+}
+
+// runGetSetTest runs a Get/Set Validation test specified by the input instance, outputting
+// the result to the supplied report Instance.
+func (r *Runner) runGetSetTest(ctx context.Context, ins *spb.Instance, insRes *rpb.Instance) error {
+	log.Infof("running GetSetTest, with %s", proto.MarshalTextString(ins.GetTest().GetGetSet()))
+	ts := ins.GetTest().GetGetSet()
+	if ts == nil {
+		return fmt.Errorf("invalid nil test specification received in test %s", ins.Description)
+	}
+
+	c := ins.GetTest().GetConnection()
+	if c == nil {
+		return fmt.Errorf("invalid nil connection received in test %s", ins.Description)
+	}
+
+	switch ts.GetArgs().(type) {
+	case *tpb.GetSetTest_OperValidation:
+		return getsetv.GetSetValidate(ctx, ts.GetOperValidation(), &getsetv.Specification{
+			Connection:     c,
+			Instance:       ins,
+			Result:         insRes,
+			CommonRequests: r.cfg.Suite.GetCommon(),
+		})
+	default:
+		return fmt.Errorf("cannot run GetSet test of type %T", ts.GetArgs())
+	}
 }
 
 func (r *Runner) runSubscribeTest(ctx context.Context, ins *spb.Instance, insRes *rpb.Instance) error {
@@ -207,13 +240,14 @@ func (r *Runner) runSubscribeTest(ctx context.Context, ins *spb.Instance, insRes
 
 	// add parent test into match tree as well, but with glob query path
 	// note that parent has a callback to cancel context when it is done.
-	pt := &parentTest{ti: ti, subRes: subRes, finish: cancel}
+	pt := &parentTest{ti: ti, subRes: subRes, finish: cancel, logResponses: ins.GetTest().GetSubscribe().GetLogResponses()}
 	m.AddQuery([]string{"*"}, pt)
 	err = createSubscription(tCtx, v.Request, func(msg proto.Message) error {
 		sr, ok := msg.(*gpb.SubscribeResponse)
 		if !ok {
 			return fmt.Errorf("update has unknown type: %T", msg)
 		}
+
 		p, err := getQueryPath(sr)
 		if err != nil {
 			return fmt.Errorf("query path couldn't be extracted for %v: %v", sr, err)
@@ -232,7 +266,10 @@ func (r *Runner) runSubscribeTest(ctx context.Context, ins *spb.Instance, insRes
 		subRes.Status = rpb.CompletionStatus_TIMEOUT
 	case err != nil:
 		subRes.Status = rpb.CompletionStatus_RPC_ERROR
-		return err
+		subRes.Error = fmt.Sprintf("%v", err)
+		// We still return nil, so that the overall test execution is not
+		// fatal, and we continue with other tests.
+		return nil
 	}
 
 	// end the extensions that haven't ended before.
@@ -289,7 +326,7 @@ func setExtensions(m *match.Match, extensions *spb.ExtensionList, insRes *rpb.In
 					Test: e,
 					Type: &rpb.TestResult_Subscribe{Subscribe: extRes},
 				})
-				et := &extensionTest{t: ti, r: extRes}
+				et := &extensionTest{t: ti, r: extRes, logResponses: e.GetSubscribe().GetLogResponses()}
 				extTests = append(extTests, et)
 				addSubscription(m, v.Subscribe.Request.GetSubscribe(), et)
 			}
@@ -326,6 +363,9 @@ type extensionTest struct {
 	r *rpb.SubscribeTestResult
 	// Indicates whether extension test is done with receiving updates.
 	done bool
+	// logResponses indicates whether SubscribeResponses should be logged
+	// in the report proto.
+	logResponses bool
 }
 
 // Update function is used to deliver gNMI message to matching test.
@@ -345,7 +385,10 @@ func (e *extensionTest) Update(l interface{}) {
 	if err != nil {
 		srr.Error = err.Error()
 	}
-	e.r.Responses = append(e.r.Responses, srr)
+
+	if e.logResponses {
+		e.r.Responses = append(e.r.Responses, srr)
+	}
 
 	if status == subscribe.Complete {
 		if err := e.t.Check(); err != nil {
@@ -372,9 +415,10 @@ func (e *extensionTest) End() {
 }
 
 type parentTest struct {
-	ti     subscribe.Subscribe
-	subRes *rpb.SubscribeTestResult
-	finish func()
+	ti           subscribe.Subscribe
+	subRes       *rpb.SubscribeTestResult
+	logResponses bool
+	finish       func()
 }
 
 func (p *parentTest) Update(l interface{}) {
@@ -386,7 +430,10 @@ func (p *parentTest) Update(l interface{}) {
 	if err != nil {
 		srr.Error = err.Error()
 	}
-	p.subRes.Responses = append(p.subRes.Responses, srr)
+
+	if p.logResponses {
+		p.subRes.Responses = append(p.subRes.Responses, srr)
+	}
 
 	if status == subscribe.Complete {
 		p.subRes.Status = rpb.CompletionStatus_EARLY_FINISHED

@@ -19,6 +19,12 @@ limitations under the License.
 package subscribe
 
 import (
+	"fmt"
+
+	"github.com/openconfig/goyang/pkg/yang"
+	"github.com/openconfig/ygot/ygot"
+	"github.com/openconfig/ygot/ytypes"
+
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
@@ -66,4 +72,51 @@ func (s *Test) GetRequest() *gpb.SubscribeRequest {
 // SetRequest stores the gnmi SubscribeRequest in the struct.
 func (s *Test) SetRequest(sr *gpb.SubscribeRequest) {
 	s.sr = sr
+}
+
+// OneShotGetOrCreate calls GetOrCreate for each Notification that is received
+// with a value - deserialising the value into the supplied GoStruct using the
+// specified schema.  It returns Complete when the sync_response message is
+// received. It is called in tests that require deserialisation of
+// Notifications into a ygot struct without validation of the data value.
+func OneShotGetOrCreate(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeResponse) (Status, error) {
+	handler := func(p *gpb.Path) error {
+		node, sch, err := ytypes.GetOrCreateNode(schema, root, p)
+		if err != nil {
+			return err
+		}
+
+		if sch.IsLeaf() || sch.IsLeafList() {
+			return nil
+		}
+
+		return fmt.Errorf("path doesn't point to leaf node, %T", node)
+	}
+
+	switch v := sr.Response.(type) {
+	case *gpb.SubscribeResponse_Update:
+		pe := v.Update.GetPrefix().GetElem()
+		for _, u := range v.Update.Update {
+			if u != nil && u.Path != nil {
+				if err := handler(&gpb.Path{Elem: append(pe, u.Path.GetElem()...)}); err != nil {
+					return Running, err
+				}
+			}
+		}
+
+		for _, d := range v.Update.Delete {
+			if d != nil {
+				if err := handler(&gpb.Path{Elem: append(pe, d.GetElem()...)}); err != nil {
+					return Running, err
+				}
+			}
+		}
+
+		return Running, nil
+	case *gpb.SubscribeResponse_SyncResponse:
+		//Once the subscription has received all paths at least once - i.e., sync_response is
+		//sent by the target, then complete the test.
+		return Complete, nil
+	}
+	return Running, fmt.Errorf("unexpected message: %T", sr.Response)
 }

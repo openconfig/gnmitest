@@ -18,6 +18,7 @@ syntax = "proto3";
 
 import "github.com/openconfig/gnmi/proto/gnmi/gnmi.proto";
 import "github.com/openconfig/gnmitest/proto/tests/tests.proto";
+import "google/rpc/status.proto";
 
 package report;
 
@@ -67,6 +68,44 @@ enum Status {
   FAIL = 2;
 }
 
+// GetSetTestResult is the result of a GetSet test towards a target.
+message GetSetTestResult {
+  tests.Test test = 1;
+  // Result of running the test.
+  Status result = 2;
+  // Result of the initialisation operation specified in the input test.
+  GetSetOperResult initialise_oper = 3;
+  // Result of the test operation specified in the input test.
+  GetSetOperResult test_oper = 4;
+}
+
+// MatchResult enumerates the outcome of a match comparison.
+enum MatchResult {
+  MR_UNSET = 0;
+  MR_EQUAL = 1;
+  MR_UNEQUAL = 2;
+}
+
+// GetSetOperResult is the result of an individual operation within the
+// GetSetTest.
+message GetSetOperResult {
+  // Result of the operation.
+  Status result = 1;
+  // set_responses is the SetResponse message received from the target.
+  gnmi.SetResponse set_response = 2;
+  // set_status is the status.proto message received from the target in
+  // response to the Set RPC within the operation.
+  google.rpc.Status set_status = 3;
+  // get_response is the GetResponse received from the target.
+  gnmi.GetResponse get_response = 4;
+  // get_status is the status.proto message received from the target in
+  // response to the Get RPC within the operation.
+  google.rpc.Status get_status = 5;
+  // get_response_matched indicates whether the GetResponse received from
+  // the target matched that specified in the test.
+  MatchResult get_response_matched = 6;
+}
+
 // Test is used to pair a tests.Test and its result.
 message TestResult {
   tests.Test test = 1;
@@ -75,6 +114,7 @@ message TestResult {
   // Oneof field can be expanded to include results of other gnmi RPCs.
   oneof type {
     SubscribeTestResult subscribe = 10;
+    GetSetTestResult getset = 11;
   }
 }
 

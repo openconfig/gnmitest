@@ -28,7 +28,6 @@ import (
 	"github.com/openconfig/gnmitest/subscribe"
 	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/ygot"
-	"github.com/openconfig/ygot/ytypes"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	tpb "github.com/openconfig/gnmitest/proto/tests"
@@ -73,41 +72,5 @@ func newTest(st *tpb.Test) (subscribe.Subscribe, error) {
 // Process function is the interface function for subscribe.Test. It checks whether
 // received gNMI SubscribeResponse is OpenConfig compliant.
 func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	validatePath := func(p *gpb.Path) error {
-		node, sch, err := ytypes.GetOrCreateNode(t.schema, t.destStruct, p)
-		if err != nil {
-			return err
-		}
-		if sch.IsLeaf() || sch.IsLeafList() {
-			return nil
-		}
-		return fmt.Errorf("path doesn't point to a leaf node; %T", node)
-	}
-	switch v := sr.Response.(type) {
-	case *gpb.SubscribeResponse_Update:
-		var pe []*gpb.PathElem
-		// Join prefix path and update/delete path.
-		if v.Update.Prefix != nil {
-			pe = append(pe, v.Update.Prefix.Elem...)
-		}
-		for _, u := range v.Update.Update {
-			if u != nil && u.Path != nil {
-				if err := validatePath(&gpb.Path{Elem: append(pe, u.Path.GetElem()...)}); err != nil {
-					return subscribe.Running, err
-				}
-			}
-		}
-		for _, d := range v.Update.Delete {
-			if d != nil {
-				if err := validatePath(&gpb.Path{Elem: append(pe, d.GetElem()...)}); err != nil {
-					return subscribe.Running, err
-				}
-			}
-		}
-		return subscribe.Running, nil
-	case *gpb.SubscribeResponse_SyncResponse:
-		// Sync response isn't used by this test, so just ignore it.
-		return subscribe.Running, nil
-	}
-	return subscribe.Running, fmt.Errorf("unexpected message; %T", sr.Response)
+	return subscribe.OneShotGetOrCreate(t.schema, t.destStruct, sr)
 }

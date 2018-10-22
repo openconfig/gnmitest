@@ -70,7 +70,7 @@ func (test1) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
 	return subscribe.Running, nil
 }
 
-func createTest(test, target string, sub *gpb.Path, mode gpb.SubscriptionList_Mode) *tpb.Test {
+func createTest(test, target string, sub *gpb.Path, mode gpb.SubscriptionList_Mode, logResponses bool) *tpb.Test {
 	return &tpb.Test{
 		Description: test,
 		Type: &tpb.Test_Subscribe{
@@ -86,6 +86,7 @@ func createTest(test, target string, sub *gpb.Path, mode gpb.SubscriptionList_Mo
 						},
 					},
 				},
+				LogResponses: logResponses,
 				Args: &tpb.SubscribeTest_FakeTest{
 					FakeTest: test,
 				},
@@ -146,7 +147,7 @@ func TestRunnerSequentialInstances(t *testing.T) {
 							{
 								Description:   "instance with query path a",
 								ExtensionList: []string{"exts"},
-								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_ONCE),
+								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_ONCE, true),
 							},
 						},
 					},
@@ -154,8 +155,8 @@ func TestRunnerSequentialInstances(t *testing.T) {
 				ExtensionList: map[string]*spb.ExtensionList{
 					"exts": {
 						Extension: []*tpb.Test{
-							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM),
-							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM),
+							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
 						},
 					},
 				},
@@ -179,6 +180,46 @@ func TestRunnerSequentialInstances(t *testing.T) {
 			comSt:   rpb.CompletionStatus_FINISHED,
 		},
 		{
+			desc: "test finishes before timeout - no logging",
+			spb: &spb.Suite{
+				Name:       "",
+				Connection: &tpb.Connection{},
+				Timeout:    4,
+				InstanceGroupList: []*spb.InstanceGroup{
+					{
+						Description: "instance group",
+						Instance: []*spb.Instance{
+							{
+								Description:   "instance with query path a",
+								ExtensionList: []string{"exts"},
+								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_ONCE, false),
+							},
+						},
+					},
+				},
+				ExtensionList: map[string]*spb.ExtensionList{
+					"exts": {
+						Extension: []*tpb.Test{
+							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, false),
+							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, false),
+						},
+					},
+				},
+			},
+			upd: []*gpb.SubscribeResponse{
+				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "c"}}, false),
+				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "d"}}, false),
+				createNoti("dev1", &gpb.Path{Element: []string{"a", "c", "d"}}, false),
+				createNoti("dev1", nil, true),
+			},
+			want: map[string][]*gpb.SubscribeResponse{
+				"test11": {},
+				"test12": {},
+			},
+			timeout: 2,
+			comSt:   rpb.CompletionStatus_FINISHED,
+		},
+		{
 			desc: "test timeouts",
 			spb: &spb.Suite{
 				Timeout:    2,
@@ -190,7 +231,7 @@ func TestRunnerSequentialInstances(t *testing.T) {
 							{
 								Description:   "instance with query path a",
 								ExtensionList: []string{"exts"},
-								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM),
+								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
 							},
 						},
 					},
@@ -198,8 +239,8 @@ func TestRunnerSequentialInstances(t *testing.T) {
 				ExtensionList: map[string]*spb.ExtensionList{
 					"exts": {
 						Extension: []*tpb.Test{
-							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM),
-							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM),
+							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
 						},
 					},
 				},
@@ -244,7 +285,7 @@ func TestRunnerSequentialInstances(t *testing.T) {
 				return nil
 			}
 			var reports []*rpb.InstanceGroup
-			r := New(nil, cfg, func(ir *rpb.InstanceGroup) {
+			r := New(cfg, func(ir *rpb.InstanceGroup) {
 				reports = append(reports, ir)
 			})
 			if err := r.Start(context.Background()); err != nil {
@@ -341,7 +382,7 @@ func TestParentResult(t *testing.T) {
 							{
 								Description:   "instance with query path a",
 								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM),
+								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
 							},
 						},
 					},
@@ -349,10 +390,10 @@ func TestParentResult(t *testing.T) {
 				ExtensionList: map[string]*spb.ExtensionList{
 					"exts": {
 						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM),
+							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
 						},
 					},
 				},
@@ -373,7 +414,7 @@ func TestParentResult(t *testing.T) {
 							{
 								Description:   "instance with query path a",
 								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM),
+								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
 							},
 						},
 					},
@@ -381,10 +422,10 @@ func TestParentResult(t *testing.T) {
 				ExtensionList: map[string]*spb.ExtensionList{
 					"exts": {
 						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM),
+							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
 						},
 					},
 				},
@@ -406,7 +447,7 @@ func TestParentResult(t *testing.T) {
 							{
 								Description:   "instance with query path a",
 								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM),
+								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
 							},
 						},
 					},
@@ -414,10 +455,10 @@ func TestParentResult(t *testing.T) {
 				ExtensionList: map[string]*spb.ExtensionList{
 					"exts": {
 						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM),
+							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
 						},
 					},
 				},
@@ -439,7 +480,7 @@ func TestParentResult(t *testing.T) {
 							{
 								Description:   "instance with query path a",
 								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM),
+								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
 							},
 						},
 					},
@@ -447,10 +488,10 @@ func TestParentResult(t *testing.T) {
 				ExtensionList: map[string]*spb.ExtensionList{
 					"exts": {
 						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM),
+							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
+							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
 						},
 					},
 				},
@@ -486,7 +527,7 @@ func TestParentResult(t *testing.T) {
 				return ctx.Err()
 			}
 			var reports []*rpb.InstanceGroup
-			r := New(nil, cfg, func(ir *rpb.InstanceGroup) {
+			r := New(cfg, func(ir *rpb.InstanceGroup) {
 				reports = append(reports, ir)
 			})
 			processHook = processHookGenerator(tt.inStats, tt.stateful)
@@ -673,7 +714,7 @@ func TestSimpleRunner(t *testing.T) {
 			}
 
 			got := &rpb.Report{}
-			r := New(nil, cfg, func(ig *rpb.InstanceGroup) {
+			r := New(cfg, func(ig *rpb.InstanceGroup) {
 				got.Results = append(got.Results, ig)
 			})
 

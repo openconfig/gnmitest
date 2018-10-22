@@ -32,6 +32,8 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
+	"github.com/openconfig/gnmitest/creds"
+	tpb "github.com/openconfig/gnmitest/proto/tests"
 )
 
 var (
@@ -56,16 +58,16 @@ func TestConnect(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		inArgs           *ConnectionArgs
+		inArgs           *tpb.Connection
 		wantMsg          *gpb.GetResponse
 		wantErrSubstring string
 	}{{
 		name:    "successful connection",
 		wantMsg: testMsg,
-		inArgs:  &ConnectionArgs{Address: fmt.Sprintf("localhost:%d", tcpPort), Timeout: 2},
+		inArgs:  &tpb.Connection{Address: fmt.Sprintf("localhost:%d", tcpPort), Timeout: 2},
 	}, {
 		name:             "failed connection",
-		inArgs:           &ConnectionArgs{},
+		inArgs:           &tpb.Connection{},
 		wantErrSubstring: "an address must be specified",
 	}}
 
@@ -122,4 +124,80 @@ func startGNMIServer(cert, key string) (uint64, func(), error) {
 	gpb.RegisterGNMIServer(server, &gnmiServer{})
 	go server.Serve(l)
 	return tcpPort, server.Stop, nil
+}
+
+type testResolver struct{}
+
+func (r *testResolver) Credentials(_ context.Context, _ *tpb.Credentials) (*resolver.Credentials, error) {
+	return &resolver.Credentials{
+		Username: "testuser",
+		Password: "testpassword",
+	}, nil
+}
+
+func TestResolveCredentials(t *testing.T) {
+	if err := resolver.Set("test", &testResolver{}); err != nil {
+		t.Fatalf("cannot register test resolver, %v", err)
+	}
+
+	tests := []struct {
+		name             string
+		in               *tpb.Connection
+		want             *resolver.Credentials
+		wantErrSubstring string
+	}{{
+		name: "nil connection",
+	}, {
+		name: "missing resolver",
+		in: &tpb.Connection{
+			Credentials: &tpb.Credentials{
+				Resolver: "invalid",
+			},
+		},
+		wantErrSubstring: `creds resolver with "invalid" key doesn't exist`,
+	}, {
+		name: "resolver called",
+		in: &tpb.Connection{
+			Credentials: &tpb.Credentials{
+				Resolver: "test",
+			},
+		},
+		want: &resolver.Credentials{
+			Username: "testuser",
+			Password: "testpassword",
+		},
+	}, {
+		name: "credentails in proto",
+		in: &tpb.Connection{
+			Credentials: &tpb.Credentials{
+				Username: "robjs",
+				Password: "robjs",
+			},
+		},
+		want: &resolver.Credentials{
+			Username: "robjs",
+			Password: "robjs",
+		},
+	}, {
+		name: "no credentials",
+		in:   &tpb.Connection{},
+	}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ResolveCredentials(context.Background(), tt.in)
+
+			if diff := errdiff.Substring(err, tt.wantErrSubstring); diff != "" {
+				t.Fatalf("did not get expected error, %s", diff)
+			}
+
+			if err != nil {
+				return
+			}
+
+			if diff := pretty.Compare(got, tt.want); diff != "" {
+				t.Fatalf("did not get expected result, diff(-go,+want):\n%s", diff)
+			}
+		})
+	}
 }

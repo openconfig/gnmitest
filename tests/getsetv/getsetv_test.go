@@ -17,18 +17,19 @@ limitations under the License.
 package getsetv
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"context"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"
-	"github.com/openconfig/gnmi/testing/fake/gnmi"
-	"github.com/openconfig/gnmitest/common"
+	"github.com/openconfig/gnmitest/schemafake/schemafake"
+	"github.com/openconfig/gnmitest/schemas/openconfig"
 	"github.com/openconfig/ygot/ygot"
+	"github.com/openconfig/ygot/ytypes"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
-	fpb "github.com/openconfig/gnmi/testing/fake/proto"
 	rpb "github.com/openconfig/gnmitest/proto/report"
 	spb "github.com/openconfig/gnmitest/proto/suite"
 	tpb "github.com/openconfig/gnmitest/proto/tests"
@@ -130,6 +131,25 @@ func TestResolveOper(t *testing.T) {
 			},
 		},
 	}, {
+		name: "resolve common getresponse",
+		inOper: &tpb.GetSetValidationOper{
+			Getresponse: &tpb.GetSetValidationOper_CommonGetresponse{"getres"},
+		},
+		inLib: &spb.CommonMessages{
+			GetResponses: map[string]*gpb.GetResponse{
+				"getres": {
+					Notification: []*gpb.Notification{},
+				},
+			},
+		},
+		want: &tpb.GetSetValidationOper{
+			Getresponse: &tpb.GetSetValidationOper_GetResponse{
+				&gpb.GetResponse{
+					Notification: []*gpb.Notification{},
+				},
+			},
+		},
+	}, {
 		name: "missing setrequest",
 		inOper: &tpb.GetSetValidationOper{
 			Setrequest: &tpb.GetSetValidationOper_CommonSetrequest{"invalid"},
@@ -160,22 +180,25 @@ func TestResolveOper(t *testing.T) {
 }
 
 func TestGetSetValidateInternal(t *testing.T) {
-	a, err := gnmi.New(&fpb.Config{
-		Target: "test",
-	}, nil)
+	schemafake.Timestamp = func() int64 { return 42 }
+
+	ocSchema, err := gostructs.Schema()
 	if err != nil {
-		t.Fatalf("cannot start fake gNMI server, %v", err)
+		t.Fatalf("cannot extract gostructs schema, got err: %v", err)
 	}
 
-	go func() {
-		if err := a.Serve(); err != nil {
-			t.Fatalf("gNMI agent failed, err: %v", err)
-		}
-	}()
-	defer a.Close()
+	fg, err := schemafake.New(map[string]*ytypes.Schema{"openconfig": ocSchema})
+	if err != nil {
+		t.Fatalf("cannot init schema-aware fake, %v", err)
+	}
+	port, stop, err := fg.Start("testdata/cert.crt", "testdata/key.key")
+	if err != nil {
+		t.Fatalf("cannot start fake, %v", err)
+	}
+	defer stop()
 
-	commonConnectionArgs := &common.ConnectionArgs{
-		Address: a.Address(),
+	commonConnectionArgs := &tpb.Connection{
+		Address: fmt.Sprintf("localhost:%d", port),
 		Timeout: 3,
 	}
 
@@ -183,10 +206,11 @@ func TestGetSetValidateInternal(t *testing.T) {
 		name             string
 		inTestInst       *tpb.GetSetValidationTest
 		inSpec           *Specification
+		inDataFile       string
 		wantResult       *rpb.Instance
 		wantErrSubstring string
 	}{{
-		name: "simple get failed - fake does not support Get",
+		name: "empty interfaces",
 		inTestInst: &tpb.GetSetValidationTest{
 			TestOper: &tpb.GetSetValidationOper{
 				Getrequest: &tpb.GetSetValidationOper_Get{
@@ -196,15 +220,91 @@ func TestGetSetValidateInternal(t *testing.T) {
 						},
 					},
 				},
+				Getresponse: &tpb.GetSetValidationOper_GetResponse{
+					&gpb.GetResponse{
+						Notification: []*gpb.Notification{{
+							Timestamp: 42,
+							Update: []*gpb.Update{{
+								Path: mustPath("/interfaces"),
+							}},
+						}},
+					},
+				},
 			},
 		},
 		inSpec: &Specification{
-			Target: commonConnectionArgs,
-			Result: &rpb.Instance{},
+			Connection: commonConnectionArgs,
+			Result:     &rpb.Instance{},
+		},
+		wantResult: &rpb.Instance{
+			Test: &rpb.TestResult{
+				Result: rpb.Status_SUCCESS,
+				Type: &rpb.TestResult_Getset{
+					&rpb.GetSetTestResult{
+						Result: rpb.Status_SUCCESS,
+						TestOper: &rpb.GetSetOperResult{
+							Result: rpb.Status_SUCCESS,
+							GetResponse: &gpb.GetResponse{
+								Notification: []*gpb.Notification{{
+									Timestamp: 42,
+									Update: []*gpb.Update{{
+										Path: mustPath("/interfaces"),
+									}},
+								}},
+							},
+							GetResponseMatched: rpb.MatchResult_MR_EQUAL,
+						},
+					},
+				},
+			},
+		},
+	}, {
+		name: "non-matching interfaces",
+		inTestInst: &tpb.GetSetValidationTest{
+			TestOper: &tpb.GetSetValidationOper{
+				Getrequest: &tpb.GetSetValidationOper_Get{
+					&gpb.GetRequest{
+						Path: []*gpb.Path{
+							mustPath("/interfaces"),
+						},
+					},
+				},
+				Getresponse: &tpb.GetSetValidationOper_GetResponse{
+					&gpb.GetResponse{
+						Notification: []*gpb.Notification{{
+							Timestamp: 42,
+							Update: []*gpb.Update{{
+								Path: mustPath("/INVALID"),
+							}},
+						}},
+					},
+				},
+			},
+		},
+		inSpec: &Specification{
+			Connection: commonConnectionArgs,
+			Result:     &rpb.Instance{},
 		},
 		wantResult: &rpb.Instance{
 			Test: &rpb.TestResult{
 				Result: rpb.Status_FAIL,
+				Type: &rpb.TestResult_Getset{
+					&rpb.GetSetTestResult{
+						Result: rpb.Status_FAIL,
+						TestOper: &rpb.GetSetOperResult{
+							Result: rpb.Status_FAIL,
+							GetResponse: &gpb.GetResponse{
+								Notification: []*gpb.Notification{{
+									Timestamp: 42,
+									Update: []*gpb.Update{{
+										Path: mustPath("/interfaces"),
+									}},
+								}},
+							},
+							GetResponseMatched: rpb.MatchResult_MR_UNEQUAL,
+						},
+					},
+				},
 			},
 		},
 	}}
@@ -214,7 +314,7 @@ func TestGetSetValidateInternal(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			if err := getSetValidationInternal(ctx, tt.inTestInst, tt.inSpec); err != nil {
+			if err := GetSetValidate(ctx, tt.inTestInst, tt.inSpec); err != nil {
 				if diff := errdiff.Substring(err, tt.wantErrSubstring); diff != "" {
 					t.Fatalf("did not get expected error, %s", diff)
 				}

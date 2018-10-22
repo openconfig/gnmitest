@@ -41,8 +41,10 @@ import (
 	"fmt"
 
 	"context"
+	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmitest/common"
+	"github.com/openconfig/ygot/testutil"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -54,17 +56,25 @@ import (
 
 // Specification defines the parameters for a GetSetValidate test.
 type Specification struct {
-	Target         *common.ConnectionArgs // Target defines the connection to the target to be used.
-	Instance       *spb.Instance          // Instance is the test instance that is being executed.
-	Result         *rpb.Instance          // Result is the result of the test instance that should be written to.
-	CommonRequests *spb.CommonMessages    // CommonRequests is the library of common messages that can be referenced by the test.
+	Connection     *tpb.Connection     // Connection specifies the target to be connected to.
+	Instance       *spb.Instance       // Instance is the test instance that is being executed.
+	Result         *rpb.Instance       // Result is the result of the test instance that should be written to.
+	CommonRequests *spb.CommonMessages // CommonRequests is the library of common messages that can be referenced by the test.
 }
 
-// getSetValidationInternal runs the GetSetValidate test specified in testInst
+// GetSetValidate runs the GetSetValidate test specified in testInst
 // using the specification provided.  It returns an error if encountered in the
 // test, and writes it result to the Instance protobuf in the Specification.
-func getSetValidationInternal(ctx context.Context, testInst *tpb.GetSetValidationTest, spec *Specification) error {
-	conn, cleanup, err := common.Connect(ctx, spec.Target)
+func GetSetValidate(ctx context.Context, testInst *tpb.GetSetValidationTest, spec *Specification) error {
+	log.Infof("connecting to target %s", spec.Connection.Address)
+
+	creds, err := common.ResolveCredentials(ctx, spec.Connection)
+	if err != nil {
+		return fmt.Errorf("cannot resolve credentials, %v", err)
+	}
+	ctx = common.ContextWithAuth(ctx, creds)
+
+	conn, cleanup, err := common.Connect(ctx, spec.Connection)
 	if err != nil {
 		return fmt.Errorf("cannot connect to target: %v", err)
 	}
@@ -84,28 +94,33 @@ func getSetValidationInternal(ctx context.Context, testInst *tpb.GetSetValidatio
 	ti.InitialiseOper = o
 	ti.TestOper = t
 
-	iRes, err := doOper(ctx, conn, ti.InitialiseOper)
+	iRes, iPass, err := doOper(ctx, conn, ti.InitialiseOper)
 	if err != nil {
 		return fmt.Errorf("cannot run initialise oper, got error: %v", err)
 	}
 
-	tRes, err := doOper(ctx, conn, ti.TestOper)
+	tRes, tPass, err := doOper(ctx, conn, ti.TestOper)
 	if err != nil {
 		return fmt.Errorf("cannot run test oper, got err: %v", err)
 	}
 
-	var res rpb.Status
-	// TODO(robjs): Report more status of the test in the result.
-	switch {
-	case iRes.isPass() && tRes.isPass():
-		res = rpb.Status_SUCCESS
-	case !iRes.isPass() || !tRes.isPass():
-		res = rpb.Status_FAIL
+	passRes := func(a, b bool) rpb.Status {
+		if a && b {
+			return rpb.Status_SUCCESS
+		}
+		return rpb.Status_FAIL
 	}
 
 	spec.Result.Test = &rpb.TestResult{
 		Test:   spec.Instance.GetTest(),
-		Result: res,
+		Result: passRes(iPass, tPass),
+		Type: &rpb.TestResult_Getset{
+			&rpb.GetSetTestResult{
+				Result:         passRes(iPass, tPass),
+				InitialiseOper: iRes,
+				TestOper:       tRes,
+			},
+		},
 	}
 
 	return nil
@@ -117,10 +132,12 @@ func getSetValidationInternal(ctx context.Context, testInst *tpb.GetSetValidatio
 func resolveOper(oper *tpb.GetSetValidationOper, lib *spb.CommonMessages) (*tpb.GetSetValidationOper, error) {
 	gn := oper.GetCommonGetrequest()
 	sn := oper.GetCommonSetrequest()
+	gr := oper.GetCommonGetresponse()
+
 	switch {
-	case gn == "" && sn == "":
+	case gn == "" && sn == "" && gr == "":
 		return oper, nil
-	case (gn != "" || sn != "") && lib == nil:
+	case (gn != "" || sn != "" || gr != "") && lib == nil:
 		return nil, fmt.Errorf("cannot look up common requests (Get: %s, Set: %s), nil library", gn, sn)
 	case gn != "" && lib.GetRequests == nil:
 		return nil, fmt.Errorf("cannot look up common GetRequest %s, nil GetRequest library", gn)
@@ -144,39 +161,79 @@ func resolveOper(oper *tpb.GetSetValidationOper, lib *spb.CommonMessages) (*tpb.
 		}
 		rt.Setrequest = &tpb.GetSetValidationOper_Set{req}
 	}
+
+	if gr != "" {
+		res, ok := lib.GetResponses[gr]
+		if !ok {
+			return nil, fmt.Errorf("common GetResponse %s does not exist", gr)
+		}
+		rt.Getresponse = &tpb.GetSetValidationOper_GetResponse{res}
+	}
+
 	return rt, nil
 }
 
-// operResult records the result of a GetValidationOper sub-test.
-type operResult struct {
-	getResult   codes.Code       // getResult records the RPC return of the Get within the operation.
-	getResponse *gpb.GetResponse // getResponse stores the gNMI GetResponse received from the target.
-	setResult   codes.Code       // setResult records the RPC return of the Set within the operation.
-	setResponse *gpb.SetResponse // setResponse stores the gNMI SetResponse received from the target.
-}
-
-// isPass specifies whether a particular operation has passed or failed.
-func (o *operResult) isPass() bool {
-	return o.getResult == codes.OK && o.setResult == codes.OK
-}
-
-// doOper runs the specified oper test operation, and returns its result.
-func doOper(ctx context.Context, conn gpb.GNMIClient, oper *tpb.GetSetValidationOper) (*operResult, error) {
-	// TODO(robjs): Enhance doOper to store the GetResponse and SetResponse. This
-	// initial implementation only stores the error codes to allow for an initial
-	// test to be implemented.
-	r := &operResult{}
-	if g := oper.GetGet(); g != nil {
-		_, err := conn.Get(ctx, g)
-		r.getResult = toCode(err)
+// doOper runs the specified oper test operation, and returns its result, along with a boolean
+// which indicates whether the overall test was successful.
+func doOper(ctx context.Context, conn gpb.GNMIClient, oper *tpb.GetSetValidationOper) (*rpb.GetSetOperResult, bool, error) {
+	if oper.GetSet() == nil && oper.GetGet() == nil {
+		return nil, true, nil
 	}
+
+	log.Infof("running operation %s", proto.MarshalTextString(oper))
+
+	r := &rpb.GetSetOperResult{}
+	pass := true
 
 	if s := oper.GetSet(); s != nil {
-		_, err := conn.Set(ctx, s)
-		r.setResult = toCode(err)
+		sr, err := conn.Set(ctx, s)
+		r.SetResponse = sr
+		if err != nil {
+			if oper.SetOk != tpb.GetSetValidationOper_FAILED {
+				r.Result = rpb.Status_FAIL
+				pass = false
+			}
+			if s, ok := status.FromError(err); ok {
+				r.SetStatus = s.Proto()
+			}
+		}
+
+		if r.Result == rpb.Status_UNSET {
+			r.Result = rpb.Status_SUCCESS
+		}
 	}
 
-	return r, nil
+	if g := oper.GetGet(); g != nil {
+		gr, err := conn.Get(ctx, g)
+		r.GetResponse = gr
+		if err != nil {
+			if oper.GetOk != tpb.GetSetValidationOper_FAILED {
+				r.Result = rpb.Status_FAIL
+				pass = false
+			}
+
+			if s, ok := status.FromError(err); ok {
+				r.GetStatus = s.Proto()
+			}
+		}
+
+		if wantRes := oper.GetGetResponse(); err == nil && wantRes != nil {
+			switch tr := testutil.GetResponseEqual(gr, wantRes); tr {
+			case false:
+				r.Result = rpb.Status_FAIL
+				r.GetResponseMatched = rpb.MatchResult_MR_UNEQUAL
+				pass = false
+			default:
+				r.GetResponseMatched = rpb.MatchResult_MR_EQUAL
+			}
+		}
+
+		if r.Result == rpb.Status_UNSET {
+			r.Result = rpb.Status_SUCCESS
+		}
+	}
+
+	return r, pass, nil
 }
 
 // toCode returns the error supplied as a status code. If the error is not a

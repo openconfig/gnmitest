@@ -35,7 +35,10 @@ import (
 )
 
 var (
-	servicePort = flag.Int("port", 11601, "Test service port.")
+	gnmiTestPort = 11601
+	gnmiTestBind = "localhost"
+	servicePort  = flag.Int("port", gnmiTestPort, "Test service port.")
+	bind         = flag.String("bind", gnmiTestBind, "Test service host to bind on.")
 )
 
 // runTestService starts gnmitest service. If a port isn't provided, function
@@ -51,7 +54,7 @@ func runTestService(ctx context.Context) error {
 	pb.RegisterGNMITestServer(srv, testSrv)
 
 	// Register listening port and start serving.
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *servicePort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *bind, *servicePort))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}

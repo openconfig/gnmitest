@@ -29,14 +29,11 @@ import (
 	// Register openconfig schema as the default schema.
 	_ "github.com/openconfig/gnmitest/schemas/openconfig/register"
 
-	// Register plaintext credentials resolver. If any other custom resolvers
-	// to be used, they need to be registered into test framework.
-	_ "github.com/openconfig/gnmitest/creds/plaintext"
-
 	// Tests below register themselves to test framework. They can be used while
 	// composing Suite proto.
 	_ "github.com/openconfig/gnmitest/tests/subscribe/haskeys"
 	_ "github.com/openconfig/gnmitest/tests/subscribe/pathvalidation"
+	_ "github.com/openconfig/gnmitest/tests/subscribe/schemapathc/schemapathc"
 
 	rpb "github.com/openconfig/gnmitest/proto/report"
 	spb "github.com/openconfig/gnmitest/proto/suite"
@@ -70,8 +67,7 @@ func (s *Server) Run(ctx context.Context, suite *spb.Suite) (*rpb.Report, error)
 	}
 
 	report := &rpb.Report{}
-	// TODO(yusufsn): Consider moving logger to Config or removing it completely.
-	r := runner.New(nil, cfg, func(ir *rpb.InstanceGroup) {
+	r := runner.New(cfg, func(ir *rpb.InstanceGroup) {
 		report.Results = append(report.Results, ir)
 	})
 
