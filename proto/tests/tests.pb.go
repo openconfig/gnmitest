@@ -41,7 +41,7 @@ func (x GetSetValidationOper_OperResult) String() string {
 	return proto.EnumName(GetSetValidationOper_OperResult_name, int32(x))
 }
 func (GetSetValidationOper_OperResult) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{9, 0}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{11, 0}
 }
 
 // Default message to use if test doesn't need any arguments. Default message
@@ -57,7 +57,7 @@ func (m *Default) Reset()         { *m = Default{} }
 func (m *Default) String() string { return proto.CompactTextString(m) }
 func (*Default) ProtoMessage()    {}
 func (*Default) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{0}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{0}
 }
 func (m *Default) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Default.Unmarshal(m, b)
@@ -83,11 +83,16 @@ type SubscribeTest struct {
 	// an extension list, a real subscription isn't created, but the query is
 	// registered to receive updates corresponding to its path from subscription
 	// of parent test.
-	Request *gnmi.SubscribeRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
+	Request *gnmi.SubscribeRequest `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+	// log_responses indicates to the test whether it should log all
+	// SubscribeResponse messages that are received from the target.
+	LogResponses bool `protobuf:"varint,2,opt,name=log_responses,json=logResponses" json:"log_responses,omitempty"`
 	// Types that are valid to be assigned to Args:
 	//	*SubscribeTest_FakeTest
 	//	*SubscribeTest_PathValidation
 	//	*SubscribeTest_HasKeys
+	//	*SubscribeTest_SchemapathComplete
+	//	*SubscribeTest_DataTreePaths
 	Args                 isSubscribeTest_Args `protobuf_oneof:"args"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
@@ -98,7 +103,7 @@ func (m *SubscribeTest) Reset()         { *m = SubscribeTest{} }
 func (m *SubscribeTest) String() string { return proto.CompactTextString(m) }
 func (*SubscribeTest) ProtoMessage()    {}
 func (*SubscribeTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{1}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{1}
 }
 func (m *SubscribeTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscribeTest.Unmarshal(m, b)
@@ -118,6 +123,39 @@ func (m *SubscribeTest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SubscribeTest proto.InternalMessageInfo
 
+type isSubscribeTest_Args interface {
+	isSubscribeTest_Args()
+}
+
+type SubscribeTest_FakeTest struct {
+	FakeTest string `protobuf:"bytes,10,opt,name=fake_test,json=fakeTest,oneof"`
+}
+type SubscribeTest_PathValidation struct {
+	PathValidation *Default `protobuf:"bytes,11,opt,name=path_validation,json=pathValidation,oneof"`
+}
+type SubscribeTest_HasKeys struct {
+	HasKeys *HasKeys `protobuf:"bytes,12,opt,name=has_keys,json=hasKeys,oneof"`
+}
+type SubscribeTest_SchemapathComplete struct {
+	SchemapathComplete *SchemaPathComplete `protobuf:"bytes,13,opt,name=schemapath_complete,json=schemapathComplete,oneof"`
+}
+type SubscribeTest_DataTreePaths struct {
+	DataTreePaths *DataTreePaths `protobuf:"bytes,14,opt,name=data_tree_paths,json=dataTreePaths,oneof"`
+}
+
+func (*SubscribeTest_FakeTest) isSubscribeTest_Args()           {}
+func (*SubscribeTest_PathValidation) isSubscribeTest_Args()     {}
+func (*SubscribeTest_HasKeys) isSubscribeTest_Args()            {}
+func (*SubscribeTest_SchemapathComplete) isSubscribeTest_Args() {}
+func (*SubscribeTest_DataTreePaths) isSubscribeTest_Args()      {}
+
+func (m *SubscribeTest) GetArgs() isSubscribeTest_Args {
+	if m != nil {
+		return m.Args
+	}
+	return nil
+}
+
 func (m *SubscribeTest) GetRequest() *gnmi.SubscribeRequest {
 	if m != nil {
 		return m.Request
@@ -125,33 +163,11 @@ func (m *SubscribeTest) GetRequest() *gnmi.SubscribeRequest {
 	return nil
 }
 
-type isSubscribeTest_Args interface {
-	isSubscribeTest_Args()
-}
-
-type SubscribeTest_FakeTest struct {
-	FakeTest string `protobuf:"bytes,10,opt,name=fake_test,json=fakeTest,proto3,oneof"`
-}
-
-type SubscribeTest_PathValidation struct {
-	PathValidation *Default `protobuf:"bytes,11,opt,name=path_validation,json=pathValidation,proto3,oneof"`
-}
-
-type SubscribeTest_HasKeys struct {
-	HasKeys *HasKeys `protobuf:"bytes,12,opt,name=has_keys,json=hasKeys,proto3,oneof"`
-}
-
-func (*SubscribeTest_FakeTest) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_PathValidation) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_HasKeys) isSubscribeTest_Args() {}
-
-func (m *SubscribeTest) GetArgs() isSubscribeTest_Args {
+func (m *SubscribeTest) GetLogResponses() bool {
 	if m != nil {
-		return m.Args
+		return m.LogResponses
 	}
-	return nil
+	return false
 }
 
 func (m *SubscribeTest) GetFakeTest() string {
@@ -175,12 +191,28 @@ func (m *SubscribeTest) GetHasKeys() *HasKeys {
 	return nil
 }
 
+func (m *SubscribeTest) GetSchemapathComplete() *SchemaPathComplete {
+	if x, ok := m.GetArgs().(*SubscribeTest_SchemapathComplete); ok {
+		return x.SchemapathComplete
+	}
+	return nil
+}
+
+func (m *SubscribeTest) GetDataTreePaths() *DataTreePaths {
+	if x, ok := m.GetArgs().(*SubscribeTest_DataTreePaths); ok {
+		return x.DataTreePaths
+	}
+	return nil
+}
+
 // XXX_OneofFuncs is for the internal use of the proto package.
 func (*SubscribeTest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _SubscribeTest_OneofMarshaler, _SubscribeTest_OneofUnmarshaler, _SubscribeTest_OneofSizer, []interface{}{
 		(*SubscribeTest_FakeTest)(nil),
 		(*SubscribeTest_PathValidation)(nil),
 		(*SubscribeTest_HasKeys)(nil),
+		(*SubscribeTest_SchemapathComplete)(nil),
+		(*SubscribeTest_DataTreePaths)(nil),
 	}
 }
 
@@ -199,6 +231,16 @@ func _SubscribeTest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *SubscribeTest_HasKeys:
 		b.EncodeVarint(12<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.HasKeys); err != nil {
+			return err
+		}
+	case *SubscribeTest_SchemapathComplete:
+		b.EncodeVarint(13<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.SchemapathComplete); err != nil {
+			return err
+		}
+	case *SubscribeTest_DataTreePaths:
+		b.EncodeVarint(14<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.DataTreePaths); err != nil {
 			return err
 		}
 	case nil:
@@ -234,6 +276,22 @@ func _SubscribeTest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.
 		err := b.DecodeMessage(msg)
 		m.Args = &SubscribeTest_HasKeys{msg}
 		return true, err
+	case 13: // args.schemapath_complete
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(SchemaPathComplete)
+		err := b.DecodeMessage(msg)
+		m.Args = &SubscribeTest_SchemapathComplete{msg}
+		return true, err
+	case 14: // args.data_tree_paths
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(DataTreePaths)
+		err := b.DecodeMessage(msg)
+		m.Args = &SubscribeTest_DataTreePaths{msg}
+		return true, err
 	default:
 		return false, nil
 	}
@@ -257,6 +315,16 @@ func _SubscribeTest_OneofSizer(msg proto.Message) (n int) {
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
+	case *SubscribeTest_SchemapathComplete:
+		s := proto.Size(x.SchemapathComplete)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *SubscribeTest_DataTreePaths:
+		s := proto.Size(x.DataTreePaths)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -272,14 +340,14 @@ func _SubscribeTest_OneofSizer(msg proto.Message) (n int) {
 // storage of authentication data that can be retrieved by the framework.
 type Test struct {
 	// Description of the individual test to use for reporting purposes.
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Description string `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
 	// Amount of time in seconds test is allowed to run before cancelled.
-	Timeout int32 `protobuf:"varint,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout int32 `protobuf:"varint,2,opt,name=timeout" json:"timeout,omitempty"`
 	// The compiled schema that should be used within the test.
-	Schema string `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
+	Schema string `protobuf:"bytes,3,opt,name=schema" json:"schema,omitempty"`
 	// Connection parameters to dial into target. If not specified, the one
 	// specified by Suite proto is used.
-	Connection *Connection `protobuf:"bytes,4,opt,name=connection,proto3" json:"connection,omitempty"`
+	Connection *Connection `protobuf:"bytes,4,opt,name=connection" json:"connection,omitempty"`
 	// Can be extended to include other gNMI RPCs.
 	//
 	// Types that are valid to be assigned to Type:
@@ -296,7 +364,7 @@ func (m *Test) Reset()         { *m = Test{} }
 func (m *Test) String() string { return proto.CompactTextString(m) }
 func (*Test) ProtoMessage()    {}
 func (*Test) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{2}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{2}
 }
 func (m *Test) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Test.Unmarshal(m, b)
@@ -315,6 +383,31 @@ func (m *Test) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_Test proto.InternalMessageInfo
+
+type isTest_Type interface {
+	isTest_Type()
+}
+
+type Test_Subscribe struct {
+	Subscribe *SubscribeTest `protobuf:"bytes,10,opt,name=subscribe,oneof"`
+}
+type Test_GetSet struct {
+	GetSet *GetSetTest `protobuf:"bytes,11,opt,name=get_set,json=getSet,oneof"`
+}
+type Test_FakeTest struct {
+	FakeTest *FakeTest `protobuf:"bytes,12,opt,name=fake_test,json=fakeTest,oneof"`
+}
+
+func (*Test_Subscribe) isTest_Type() {}
+func (*Test_GetSet) isTest_Type()    {}
+func (*Test_FakeTest) isTest_Type()  {}
+
+func (m *Test) GetType() isTest_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
 
 func (m *Test) GetDescription() string {
 	if m != nil {
@@ -340,35 +433,6 @@ func (m *Test) GetSchema() string {
 func (m *Test) GetConnection() *Connection {
 	if m != nil {
 		return m.Connection
-	}
-	return nil
-}
-
-type isTest_Type interface {
-	isTest_Type()
-}
-
-type Test_Subscribe struct {
-	Subscribe *SubscribeTest `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
-}
-
-type Test_GetSet struct {
-	GetSet *GetSetTest `protobuf:"bytes,11,opt,name=get_set,json=getSet,proto3,oneof"`
-}
-
-type Test_FakeTest struct {
-	FakeTest *FakeTest `protobuf:"bytes,12,opt,name=fake_test,json=fakeTest,proto3,oneof"`
-}
-
-func (*Test_Subscribe) isTest_Type() {}
-
-func (*Test_GetSet) isTest_Type() {}
-
-func (*Test_FakeTest) isTest_Type() {}
-
-func (m *Test) GetType() isTest_Type {
-	if m != nil {
-		return m.Type
 	}
 	return nil
 }
@@ -494,9 +558,9 @@ type Credentials struct {
 	// default, plaintext resolver is used if nothing is specified here. If a
 	// special resolver is needed, it needs to be registered into global resolvers
 	// table.
-	Resolver             string   `protobuf:"bytes,1,opt,name=resolver,proto3" json:"resolver,omitempty"`
-	Username             string   `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Password             string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	Resolver             string   `protobuf:"bytes,1,opt,name=resolver" json:"resolver,omitempty"`
+	Username             string   `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
+	Password             string   `protobuf:"bytes,3,opt,name=password" json:"password,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -506,7 +570,7 @@ func (m *Credentials) Reset()         { *m = Credentials{} }
 func (m *Credentials) String() string { return proto.CompactTextString(m) }
 func (*Credentials) ProtoMessage()    {}
 func (*Credentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{3}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{3}
 }
 func (m *Credentials) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Credentials.Unmarshal(m, b)
@@ -552,13 +616,13 @@ type Connection struct {
 	// The name of the target to be set in gNMI messages. For gNMI implementations
 	// that can be address multiple targets, this value can be used to specify
 	// which one should be the device under test.
-	Target string `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
+	Target string `protobuf:"bytes,1,opt,name=target" json:"target,omitempty"`
 	// Address is used while dialing into gNMI server under test. It needs to be
 	// in the form "host:port" or it should resolve to a "host:port".
-	Address     string       `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Credentials *Credentials `protobuf:"bytes,3,opt,name=credentials,proto3" json:"credentials,omitempty"`
+	Address     string       `protobuf:"bytes,2,opt,name=address" json:"address,omitempty"`
+	Credentials *Credentials `protobuf:"bytes,3,opt,name=credentials" json:"credentials,omitempty"`
 	// Dial timeout in seconds while connecting to gNMI server under test.
-	Timeout              int32    `protobuf:"varint,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout              int32    `protobuf:"varint,4,opt,name=timeout" json:"timeout,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -568,7 +632,7 @@ func (m *Connection) Reset()         { *m = Connection{} }
 func (m *Connection) String() string { return proto.CompactTextString(m) }
 func (*Connection) ProtoMessage()    {}
 func (*Connection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{4}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{4}
 }
 func (m *Connection) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Connection.Unmarshal(m, b)
@@ -619,7 +683,7 @@ func (m *Connection) GetTimeout() int32 {
 // FakeTest is the configuration used for a fake test within the framework.
 type FakeTest struct {
 	// pass indicates whether the faked test should pass or fail.
-	Pass                 bool     `protobuf:"varint,1,opt,name=pass,proto3" json:"pass,omitempty"`
+	Pass                 bool     `protobuf:"varint,1,opt,name=pass" json:"pass,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -629,7 +693,7 @@ func (m *FakeTest) Reset()         { *m = FakeTest{} }
 func (m *FakeTest) String() string { return proto.CompactTextString(m) }
 func (*FakeTest) ProtoMessage()    {}
 func (*FakeTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{5}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{5}
 }
 func (m *FakeTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FakeTest.Unmarshal(m, b)
@@ -661,9 +725,9 @@ func (m *FakeTest) GetPass() bool {
 // to check for data completeness of a particular list within the schema.
 type HasKeys struct {
 	// Path to the list that should be checked.
-	Path *gnmi.Path `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path *gnmi.Path `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	// Items that should be found in the list.
-	Item                 []*HasKeys_Item `protobuf:"bytes,2,rep,name=item,proto3" json:"item,omitempty"`
+	Item                 []*HasKeys_Item `protobuf:"bytes,2,rep,name=item" json:"item,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -673,7 +737,7 @@ func (m *HasKeys) Reset()         { *m = HasKeys{} }
 func (m *HasKeys) String() string { return proto.CompactTextString(m) }
 func (*HasKeys) ProtoMessage()    {}
 func (*HasKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{6}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{6}
 }
 func (m *HasKeys) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasKeys.Unmarshal(m, b)
@@ -709,7 +773,7 @@ func (m *HasKeys) GetItem() []*HasKeys_Item {
 
 // Item defines an entry in the list.
 type HasKeys_Item struct {
-	Key                  map[string]string `protobuf:"bytes,1,rep,name=key,proto3" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Key                  map[string]string `protobuf:"bytes,1,rep,name=key" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -719,7 +783,7 @@ func (m *HasKeys_Item) Reset()         { *m = HasKeys_Item{} }
 func (m *HasKeys_Item) String() string { return proto.CompactTextString(m) }
 func (*HasKeys_Item) ProtoMessage()    {}
 func (*HasKeys_Item) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{6, 0}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{6, 0}
 }
 func (m *HasKeys_Item) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasKeys_Item.Unmarshal(m, b)
@@ -746,6 +810,527 @@ func (m *HasKeys_Item) GetKey() map[string]string {
 	return nil
 }
 
+// DataTreePaths specifies a test which allows for checks for the
+// existence of particular data within the data tree. It allows recursion
+// into lists, or simple queries for data tree paths.
+//
+// A test which performs a simple check for a data tree path consists
+// of a single TestQuery, which specifies the path to be queried. For example,
+// to query for the existence of the
+// /interfaces/interface[name=eth0]/state/counters/{in,out}-pkts leaves in the
+// received data a query specifying:
+//
+// {
+//   steps { name: "interfaces" }
+//   steps { name: "interface" key { name: "name" value: "eth0" } }
+//   required_paths {
+//     prefix {
+//       elem { name: "state" }
+//       elem { name: "counters" }
+//     }
+//     paths { elem { name: "in-pkts" } }
+//     paths { elem { name: "out-pkts" } }
+//   }
+// }
+//
+// is specified. This query is simply expanded to check for the specified paths.
+//
+// The test also supports querying recursively down the data tree using the
+// GetListKeys message within a particular TestQuery. Such a query specifies
+// that the query described by the "steps" repeated should be made, and the
+// resulting key values of the list found should be assigned into an array.
+// Subsequent nested queries can then refer to a value within that array using
+// the variable name specified.
+//
+// For example, if a test wishes to performn a check for
+// each interface within the data tree, then nested TestQuery
+// messages are required. The first retrieves the keys of the
+// /interfaces/interface list from the data tree - and calls a nested TestQuery
+// for each key within the /interfaces/interface list (referred to as
+// %%interface%%) which performs the actual check:
+//
+// {
+//   steps { name: "interfaces" }
+//   steps { name: "interface"  }
+//   get_list_keys { var_name: "%%interface%%" }
+//   next_query {
+//     steps { name: "interfaces" }
+//     steps { name: "interface" key_name: "%%interface%%" }
+//     required_paths {
+//      prefix: {
+//        elem: "state"
+//        elem: "counters"
+//      }
+//      paths { elem { name: "in-pkts" } }
+//      paths { elem { name: "out-pkts" } }
+//    }
+//   }
+// }
+//
+// Will execute first a query for /interfaces/interface and assign the
+// results to the %%interface%% variable. The child operation will execute
+// for each element of the %%interface%% list, and subsequently make a query
+// for /interfaces/interface[%%interface%%] where %%interface%% is an individual
+// key found in the parent query (e.g., "name=eth0"). The child operation
+// checks for the required paths at state/counters/{in,out}-pkts relative to
+// the query made in the ListQuery operation.
+//
+// Where multiple get_list_keys queries are nested, each next_query is called
+// for each value of its parent query, such that it is possible to express
+// nested list traversals such as:
+//
+// foreach interface in /interfaces/interface:
+//   foreach subinterface of that interface:
+//     foreach ipv4 address of that subinterface:
+//       ... etc ...
+//
+//  using nested queries:
+//
+//  {
+//    steps { name: "interfaces" }
+//    steps { name: "interface" }
+//    get_list_keys { var_name: "%%interface%%" }
+//    next_query {
+//      steps { name: "interfaces" }
+//      steps { name: "interface" key_name: "%%interface%%" }
+//      steps { name: "subinterfaces" }
+//      steps { name: "subinterface" }
+//      get_list_keys { var_name: "%%subinterface%%" }
+//      next_query {
+//        steps { name: "interfaces" }
+//        steps { name: "interface" key_name: "%%interface%%" }
+//        steps { name: "subinterfaces" }
+//        steps { name: "subinterface" key_name: "%%subinterface%%" }
+//        steps { name: "ipv4" }
+//        steps { name: "addresses" }
+//        steps { name: "address" }
+//        get_list_keys { var_name: "%%v4address%%" }
+//        next_query {
+//          steps { name: "interfaces" }
+//          steps { name: "interface" key_name: "%%interface%%" }
+//          steps { name: "subinterfaces" }
+//          steps { name: "subinterface" key_name: "%%subinterface%%" }
+//          steps { name: "ipv4" }
+//          steps { name: "addresses" }
+//          steps { name: "address"  key_name: "%%v4address%%" }
+//          required_paths {
+//            ... actual test with required paths ...
+//          }
+//        }
+//      }
+//    }
+//  }
+type DataTreePaths struct {
+	// test_oper is the operation to be performed for the test.
+	TestOper             *DataTreePaths_TestQuery `protobuf:"bytes,1,opt,name=test_oper,json=testOper" json:"test_oper,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
+}
+
+func (m *DataTreePaths) Reset()         { *m = DataTreePaths{} }
+func (m *DataTreePaths) String() string { return proto.CompactTextString(m) }
+func (*DataTreePaths) ProtoMessage()    {}
+func (*DataTreePaths) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7}
+}
+func (m *DataTreePaths) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataTreePaths.Unmarshal(m, b)
+}
+func (m *DataTreePaths) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataTreePaths.Marshal(b, m, deterministic)
+}
+func (dst *DataTreePaths) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataTreePaths.Merge(dst, src)
+}
+func (m *DataTreePaths) XXX_Size() int {
+	return xxx_messageInfo_DataTreePaths.Size(m)
+}
+func (m *DataTreePaths) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataTreePaths.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataTreePaths proto.InternalMessageInfo
+
+func (m *DataTreePaths) GetTestOper() *DataTreePaths_TestQuery {
+	if m != nil {
+		return m.TestOper
+	}
+	return nil
+}
+
+// QueryStep defines a query against the gNMI path of a data tree element.
+type DataTreePaths_QueryStep struct {
+	// name specifies a name that should be explicitly matched in the
+	// gnmi.PathElem the QueryStep is being compared to.
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// key specifies the key map which should be explicitly matched in
+	// the gnmi.PathElem the QueryStep is being compared to.
+	Key map[string]string `protobuf:"bytes,2,rep,name=key" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// key_name specifies the name of a variable that has been written to
+	// by a previous stage of the test. The value of the key map in the
+	// PathElem is substituted for the value currently being iterated over
+	// for the variable.
+	KeyName              string   `protobuf:"bytes,3,opt,name=key_name,json=keyName" json:"key_name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DataTreePaths_QueryStep) Reset()         { *m = DataTreePaths_QueryStep{} }
+func (m *DataTreePaths_QueryStep) String() string { return proto.CompactTextString(m) }
+func (*DataTreePaths_QueryStep) ProtoMessage()    {}
+func (*DataTreePaths_QueryStep) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 0}
+}
+func (m *DataTreePaths_QueryStep) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataTreePaths_QueryStep.Unmarshal(m, b)
+}
+func (m *DataTreePaths_QueryStep) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataTreePaths_QueryStep.Marshal(b, m, deterministic)
+}
+func (dst *DataTreePaths_QueryStep) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataTreePaths_QueryStep.Merge(dst, src)
+}
+func (m *DataTreePaths_QueryStep) XXX_Size() int {
+	return xxx_messageInfo_DataTreePaths_QueryStep.Size(m)
+}
+func (m *DataTreePaths_QueryStep) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataTreePaths_QueryStep.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataTreePaths_QueryStep proto.InternalMessageInfo
+
+func (m *DataTreePaths_QueryStep) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *DataTreePaths_QueryStep) GetKey() map[string]string {
+	if m != nil {
+		return m.Key
+	}
+	return nil
+}
+
+func (m *DataTreePaths_QueryStep) GetKeyName() string {
+	if m != nil {
+		return m.KeyName
+	}
+	return ""
+}
+
+// TestQuery specifies a single stage of a query within the test.
+type DataTreePaths_TestQuery struct {
+	// steps specifies the set of QuerySteps that should be made against the
+	// data tree to retrieve the data for the operation being performed.
+	Steps []*DataTreePaths_QueryStep `protobuf:"bytes,1,rep,name=steps" json:"steps,omitempty"`
+	// Types that are valid to be assigned to Type:
+	//	*DataTreePaths_TestQuery_GetListKeys
+	//	*DataTreePaths_TestQuery_RequiredPaths
+	Type                 isDataTreePaths_TestQuery_Type `protobuf_oneof:"type"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
+	XXX_unrecognized     []byte                         `json:"-"`
+	XXX_sizecache        int32                          `json:"-"`
+}
+
+func (m *DataTreePaths_TestQuery) Reset()         { *m = DataTreePaths_TestQuery{} }
+func (m *DataTreePaths_TestQuery) String() string { return proto.CompactTextString(m) }
+func (*DataTreePaths_TestQuery) ProtoMessage()    {}
+func (*DataTreePaths_TestQuery) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 1}
+}
+func (m *DataTreePaths_TestQuery) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataTreePaths_TestQuery.Unmarshal(m, b)
+}
+func (m *DataTreePaths_TestQuery) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataTreePaths_TestQuery.Marshal(b, m, deterministic)
+}
+func (dst *DataTreePaths_TestQuery) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataTreePaths_TestQuery.Merge(dst, src)
+}
+func (m *DataTreePaths_TestQuery) XXX_Size() int {
+	return xxx_messageInfo_DataTreePaths_TestQuery.Size(m)
+}
+func (m *DataTreePaths_TestQuery) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataTreePaths_TestQuery.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataTreePaths_TestQuery proto.InternalMessageInfo
+
+type isDataTreePaths_TestQuery_Type interface {
+	isDataTreePaths_TestQuery_Type()
+}
+
+type DataTreePaths_TestQuery_GetListKeys struct {
+	GetListKeys *DataTreePaths_ListQuery `protobuf:"bytes,2,opt,name=get_list_keys,json=getListKeys,oneof"`
+}
+type DataTreePaths_TestQuery_RequiredPaths struct {
+	RequiredPaths *DataTreePaths_RequiredPaths `protobuf:"bytes,3,opt,name=required_paths,json=requiredPaths,oneof"`
+}
+
+func (*DataTreePaths_TestQuery_GetListKeys) isDataTreePaths_TestQuery_Type()   {}
+func (*DataTreePaths_TestQuery_RequiredPaths) isDataTreePaths_TestQuery_Type() {}
+
+func (m *DataTreePaths_TestQuery) GetType() isDataTreePaths_TestQuery_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+func (m *DataTreePaths_TestQuery) GetSteps() []*DataTreePaths_QueryStep {
+	if m != nil {
+		return m.Steps
+	}
+	return nil
+}
+
+func (m *DataTreePaths_TestQuery) GetGetListKeys() *DataTreePaths_ListQuery {
+	if x, ok := m.GetType().(*DataTreePaths_TestQuery_GetListKeys); ok {
+		return x.GetListKeys
+	}
+	return nil
+}
+
+func (m *DataTreePaths_TestQuery) GetRequiredPaths() *DataTreePaths_RequiredPaths {
+	if x, ok := m.GetType().(*DataTreePaths_TestQuery_RequiredPaths); ok {
+		return x.RequiredPaths
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*DataTreePaths_TestQuery) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _DataTreePaths_TestQuery_OneofMarshaler, _DataTreePaths_TestQuery_OneofUnmarshaler, _DataTreePaths_TestQuery_OneofSizer, []interface{}{
+		(*DataTreePaths_TestQuery_GetListKeys)(nil),
+		(*DataTreePaths_TestQuery_RequiredPaths)(nil),
+	}
+}
+
+func _DataTreePaths_TestQuery_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*DataTreePaths_TestQuery)
+	// type
+	switch x := m.Type.(type) {
+	case *DataTreePaths_TestQuery_GetListKeys:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.GetListKeys); err != nil {
+			return err
+		}
+	case *DataTreePaths_TestQuery_RequiredPaths:
+		b.EncodeVarint(3<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.RequiredPaths); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("DataTreePaths_TestQuery.Type has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _DataTreePaths_TestQuery_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*DataTreePaths_TestQuery)
+	switch tag {
+	case 2: // type.get_list_keys
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(DataTreePaths_ListQuery)
+		err := b.DecodeMessage(msg)
+		m.Type = &DataTreePaths_TestQuery_GetListKeys{msg}
+		return true, err
+	case 3: // type.required_paths
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(DataTreePaths_RequiredPaths)
+		err := b.DecodeMessage(msg)
+		m.Type = &DataTreePaths_TestQuery_RequiredPaths{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _DataTreePaths_TestQuery_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*DataTreePaths_TestQuery)
+	// type
+	switch x := m.Type.(type) {
+	case *DataTreePaths_TestQuery_GetListKeys:
+		s := proto.Size(x.GetListKeys)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *DataTreePaths_TestQuery_RequiredPaths:
+		s := proto.Size(x.RequiredPaths)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+// ListQuery specifies an operation that retrieves the keys from a list.
+type DataTreePaths_ListQuery struct {
+	// var_name specifies the variable name by which the key values will
+	// be referred to in subsequent queries.
+	VarName string `protobuf:"bytes,1,opt,name=var_name,json=varName" json:"var_name,omitempty"`
+	// next_query specifies a query that should be run for each key that
+	// is retrieved by the ListQuery operation.
+	NextQuery            *DataTreePaths_TestQuery `protobuf:"bytes,2,opt,name=next_query,json=nextQuery" json:"next_query,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
+}
+
+func (m *DataTreePaths_ListQuery) Reset()         { *m = DataTreePaths_ListQuery{} }
+func (m *DataTreePaths_ListQuery) String() string { return proto.CompactTextString(m) }
+func (*DataTreePaths_ListQuery) ProtoMessage()    {}
+func (*DataTreePaths_ListQuery) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 2}
+}
+func (m *DataTreePaths_ListQuery) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataTreePaths_ListQuery.Unmarshal(m, b)
+}
+func (m *DataTreePaths_ListQuery) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataTreePaths_ListQuery.Marshal(b, m, deterministic)
+}
+func (dst *DataTreePaths_ListQuery) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataTreePaths_ListQuery.Merge(dst, src)
+}
+func (m *DataTreePaths_ListQuery) XXX_Size() int {
+	return xxx_messageInfo_DataTreePaths_ListQuery.Size(m)
+}
+func (m *DataTreePaths_ListQuery) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataTreePaths_ListQuery.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataTreePaths_ListQuery proto.InternalMessageInfo
+
+func (m *DataTreePaths_ListQuery) GetVarName() string {
+	if m != nil {
+		return m.VarName
+	}
+	return ""
+}
+
+func (m *DataTreePaths_ListQuery) GetNextQuery() *DataTreePaths_TestQuery {
+	if m != nil {
+		return m.NextQuery
+	}
+	return nil
+}
+
+// RequiredPaths specifies an operation that checks for paths within
+// the data tree.
+type DataTreePaths_RequiredPaths struct {
+	// prefix is a common prefix for the paths within the required_paths
+	// list.
+	Prefix *gnmi.Path `protobuf:"bytes,1,opt,name=prefix" json:"prefix,omitempty"`
+	// paths is the set of paths that are to be checked for.
+	Paths                []*gnmi.Path `protobuf:"bytes,2,rep,name=paths" json:"paths,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+
+func (m *DataTreePaths_RequiredPaths) Reset()         { *m = DataTreePaths_RequiredPaths{} }
+func (m *DataTreePaths_RequiredPaths) String() string { return proto.CompactTextString(m) }
+func (*DataTreePaths_RequiredPaths) ProtoMessage()    {}
+func (*DataTreePaths_RequiredPaths) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 3}
+}
+func (m *DataTreePaths_RequiredPaths) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataTreePaths_RequiredPaths.Unmarshal(m, b)
+}
+func (m *DataTreePaths_RequiredPaths) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataTreePaths_RequiredPaths.Marshal(b, m, deterministic)
+}
+func (dst *DataTreePaths_RequiredPaths) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataTreePaths_RequiredPaths.Merge(dst, src)
+}
+func (m *DataTreePaths_RequiredPaths) XXX_Size() int {
+	return xxx_messageInfo_DataTreePaths_RequiredPaths.Size(m)
+}
+func (m *DataTreePaths_RequiredPaths) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataTreePaths_RequiredPaths.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataTreePaths_RequiredPaths proto.InternalMessageInfo
+
+func (m *DataTreePaths_RequiredPaths) GetPrefix() *gnmi.Path {
+	if m != nil {
+		return m.Prefix
+	}
+	return nil
+}
+
+func (m *DataTreePaths_RequiredPaths) GetPaths() []*gnmi.Path {
+	if m != nil {
+		return m.Paths
+	}
+	return nil
+}
+
+// SchemaPathComplete defines the input for a test that checks that at least
+// one instance of a particular schema path is sent to the test framework. It
+// can be used to check for path coverage of a particular target.
+type SchemaPathComplete struct {
+	// prefix is a gNMI path that should be appended to each path in the
+	// paths list to form an absolute schema path.
+	Prefix *gnmi.Path `protobuf:"bytes,2,opt,name=prefix" json:"prefix,omitempty"`
+	// paths is the list of paths that are expected to be received by the
+	// test framework.
+	Path                 []*gnmi.Path `protobuf:"bytes,1,rep,name=path" json:"path,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+
+func (m *SchemaPathComplete) Reset()         { *m = SchemaPathComplete{} }
+func (m *SchemaPathComplete) String() string { return proto.CompactTextString(m) }
+func (*SchemaPathComplete) ProtoMessage()    {}
+func (*SchemaPathComplete) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{8}
+}
+func (m *SchemaPathComplete) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SchemaPathComplete.Unmarshal(m, b)
+}
+func (m *SchemaPathComplete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SchemaPathComplete.Marshal(b, m, deterministic)
+}
+func (dst *SchemaPathComplete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SchemaPathComplete.Merge(dst, src)
+}
+func (m *SchemaPathComplete) XXX_Size() int {
+	return xxx_messageInfo_SchemaPathComplete.Size(m)
+}
+func (m *SchemaPathComplete) XXX_DiscardUnknown() {
+	xxx_messageInfo_SchemaPathComplete.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SchemaPathComplete proto.InternalMessageInfo
+
+func (m *SchemaPathComplete) GetPrefix() *gnmi.Path {
+	if m != nil {
+		return m.Prefix
+	}
+	return nil
+}
+
+func (m *SchemaPathComplete) GetPath() []*gnmi.Path {
+	if m != nil {
+		return m.Path
+	}
+	return nil
+}
+
 // GetSetTest contains all the information specific to a configuration
 // test - which is expected to use RPCs to interact with configuration. Set is
 // used to change the configuration, and Get or Subscribe can be used to
@@ -763,7 +1348,7 @@ func (m *GetSetTest) Reset()         { *m = GetSetTest{} }
 func (m *GetSetTest) String() string { return proto.CompactTextString(m) }
 func (*GetSetTest) ProtoMessage()    {}
 func (*GetSetTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{7}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{9}
 }
 func (m *GetSetTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetTest.Unmarshal(m, b)
@@ -788,7 +1373,7 @@ type isGetSetTest_Args interface {
 }
 
 type GetSetTest_OperValidation struct {
-	OperValidation *GetSetValidationTest `protobuf:"bytes,10,opt,name=oper_validation,json=operValidation,proto3,oneof"`
+	OperValidation *GetSetValidationTest `protobuf:"bytes,10,opt,name=oper_validation,json=operValidation,oneof"`
 }
 
 func (*GetSetTest_OperValidation) isGetSetTest_Args() {}
@@ -878,12 +1463,12 @@ type GetSetValidationTest struct {
 	// initialise_oper is the operation to initialise the target. It may consist
 	// of a configuration to be set and/or get request that validates the target's
 	// current state.
-	InitialiseOper *GetSetValidationOper `protobuf:"bytes,1,opt,name=initialise_oper,json=initialiseOper,proto3" json:"initialise_oper,omitempty"`
+	InitialiseOper *GetSetValidationOper `protobuf:"bytes,1,opt,name=initialise_oper,json=initialiseOper" json:"initialise_oper,omitempty"`
 	// test_oper is the operation that is under test in the validation test.  The
 	// Get and/or Set operations may be set within the operation such that the
 	// test can validate a set, a set followed by a get, or solely a get
 	// operation.
-	TestOper             *GetSetValidationOper `protobuf:"bytes,2,opt,name=test_oper,json=testOper,proto3" json:"test_oper,omitempty"`
+	TestOper             *GetSetValidationOper `protobuf:"bytes,2,opt,name=test_oper,json=testOper" json:"test_oper,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -893,7 +1478,7 @@ func (m *GetSetValidationTest) Reset()         { *m = GetSetValidationTest{} }
 func (m *GetSetValidationTest) String() string { return proto.CompactTextString(m) }
 func (*GetSetValidationTest) ProtoMessage()    {}
 func (*GetSetValidationTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{8}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{10}
 }
 func (m *GetSetValidationTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetValidationTest.Unmarshal(m, b)
@@ -944,12 +1529,12 @@ type GetSetValidationOper struct {
 	//	*GetSetValidationOper_CommonSetrequest
 	Setrequest isGetSetValidationOper_Setrequest `protobuf_oneof:"setrequest"`
 	// set_ok specifies whether the Set RPC should be successful.
-	SetOk GetSetValidationOper_OperResult `protobuf:"varint,10,opt,name=set_ok,json=setOk,proto3,enum=tests.GetSetValidationOper_OperResult" json:"set_ok,omitempty"`
+	SetOk GetSetValidationOper_OperResult `protobuf:"varint,10,opt,name=set_ok,json=setOk,enum=tests.GetSetValidationOper_OperResult" json:"set_ok,omitempty"`
 	// Types that are valid to be assigned to Getrequest:
 	//	*GetSetValidationOper_Get
 	//	*GetSetValidationOper_CommonGetrequest
 	Getrequest isGetSetValidationOper_Getrequest `protobuf_oneof:"getrequest"`
-	GetOk      GetSetValidationOper_OperResult   `protobuf:"varint,20,opt,name=get_ok,json=getOk,proto3,enum=tests.GetSetValidationOper_OperResult" json:"get_ok,omitempty"`
+	GetOk      GetSetValidationOper_OperResult   `protobuf:"varint,20,opt,name=get_ok,json=getOk,enum=tests.GetSetValidationOper_OperResult" json:"get_ok,omitempty"`
 	// Types that are valid to be assigned to Getresponse:
 	//	*GetSetValidationOper_GetResponse
 	//	*GetSetValidationOper_CommonGetresponse
@@ -963,7 +1548,7 @@ func (m *GetSetValidationOper) Reset()         { *m = GetSetValidationOper{} }
 func (m *GetSetValidationOper) String() string { return proto.CompactTextString(m) }
 func (*GetSetValidationOper) ProtoMessage()    {}
 func (*GetSetValidationOper) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_0242cb6f512d7766, []int{9}
+	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{11}
 }
 func (m *GetSetValidationOper) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetValidationOper.Unmarshal(m, b)
@@ -986,22 +1571,54 @@ var xxx_messageInfo_GetSetValidationOper proto.InternalMessageInfo
 type isGetSetValidationOper_Setrequest interface {
 	isGetSetValidationOper_Setrequest()
 }
+type isGetSetValidationOper_Getrequest interface {
+	isGetSetValidationOper_Getrequest()
+}
+type isGetSetValidationOper_Getresponse interface {
+	isGetSetValidationOper_Getresponse()
+}
 
 type GetSetValidationOper_Set struct {
-	Set *gnmi.SetRequest `protobuf:"bytes,1,opt,name=set,proto3,oneof"`
+	Set *gnmi.SetRequest `protobuf:"bytes,1,opt,name=set,oneof"`
 }
-
 type GetSetValidationOper_CommonSetrequest struct {
-	CommonSetrequest string `protobuf:"bytes,2,opt,name=common_setrequest,json=commonSetrequest,proto3,oneof"`
+	CommonSetrequest string `protobuf:"bytes,2,opt,name=common_setrequest,json=commonSetrequest,oneof"`
+}
+type GetSetValidationOper_Get struct {
+	Get *gnmi.GetRequest `protobuf:"bytes,11,opt,name=get,oneof"`
+}
+type GetSetValidationOper_CommonGetrequest struct {
+	CommonGetrequest string `protobuf:"bytes,12,opt,name=common_getrequest,json=commonGetrequest,oneof"`
+}
+type GetSetValidationOper_GetResponse struct {
+	GetResponse *gnmi.GetResponse `protobuf:"bytes,21,opt,name=get_response,json=getResponse,oneof"`
+}
+type GetSetValidationOper_CommonGetresponse struct {
+	CommonGetresponse string `protobuf:"bytes,22,opt,name=common_getresponse,json=commonGetresponse,oneof"`
 }
 
-func (*GetSetValidationOper_Set) isGetSetValidationOper_Setrequest() {}
-
-func (*GetSetValidationOper_CommonSetrequest) isGetSetValidationOper_Setrequest() {}
+func (*GetSetValidationOper_Set) isGetSetValidationOper_Setrequest()                {}
+func (*GetSetValidationOper_CommonSetrequest) isGetSetValidationOper_Setrequest()   {}
+func (*GetSetValidationOper_Get) isGetSetValidationOper_Getrequest()                {}
+func (*GetSetValidationOper_CommonGetrequest) isGetSetValidationOper_Getrequest()   {}
+func (*GetSetValidationOper_GetResponse) isGetSetValidationOper_Getresponse()       {}
+func (*GetSetValidationOper_CommonGetresponse) isGetSetValidationOper_Getresponse() {}
 
 func (m *GetSetValidationOper) GetSetrequest() isGetSetValidationOper_Setrequest {
 	if m != nil {
 		return m.Setrequest
+	}
+	return nil
+}
+func (m *GetSetValidationOper) GetGetrequest() isGetSetValidationOper_Getrequest {
+	if m != nil {
+		return m.Getrequest
+	}
+	return nil
+}
+func (m *GetSetValidationOper) GetGetresponse() isGetSetValidationOper_Getresponse {
+	if m != nil {
+		return m.Getresponse
 	}
 	return nil
 }
@@ -1027,29 +1644,6 @@ func (m *GetSetValidationOper) GetSetOk() GetSetValidationOper_OperResult {
 	return GetSetValidationOper_NO_ERROR
 }
 
-type isGetSetValidationOper_Getrequest interface {
-	isGetSetValidationOper_Getrequest()
-}
-
-type GetSetValidationOper_Get struct {
-	Get *gnmi.GetRequest `protobuf:"bytes,11,opt,name=get,proto3,oneof"`
-}
-
-type GetSetValidationOper_CommonGetrequest struct {
-	CommonGetrequest string `protobuf:"bytes,12,opt,name=common_getrequest,json=commonGetrequest,proto3,oneof"`
-}
-
-func (*GetSetValidationOper_Get) isGetSetValidationOper_Getrequest() {}
-
-func (*GetSetValidationOper_CommonGetrequest) isGetSetValidationOper_Getrequest() {}
-
-func (m *GetSetValidationOper) GetGetrequest() isGetSetValidationOper_Getrequest {
-	if m != nil {
-		return m.Getrequest
-	}
-	return nil
-}
-
 func (m *GetSetValidationOper) GetGet() *gnmi.GetRequest {
 	if x, ok := m.GetGetrequest().(*GetSetValidationOper_Get); ok {
 		return x.Get
@@ -1069,29 +1663,6 @@ func (m *GetSetValidationOper) GetGetOk() GetSetValidationOper_OperResult {
 		return m.GetOk
 	}
 	return GetSetValidationOper_NO_ERROR
-}
-
-type isGetSetValidationOper_Getresponse interface {
-	isGetSetValidationOper_Getresponse()
-}
-
-type GetSetValidationOper_GetResponse struct {
-	GetResponse *gnmi.GetResponse `protobuf:"bytes,21,opt,name=get_response,json=getResponse,proto3,oneof"`
-}
-
-type GetSetValidationOper_CommonGetresponse struct {
-	CommonGetresponse string `protobuf:"bytes,22,opt,name=common_getresponse,json=commonGetresponse,proto3,oneof"`
-}
-
-func (*GetSetValidationOper_GetResponse) isGetSetValidationOper_Getresponse() {}
-
-func (*GetSetValidationOper_CommonGetresponse) isGetSetValidationOper_Getresponse() {}
-
-func (m *GetSetValidationOper) GetGetresponse() isGetSetValidationOper_Getresponse {
-	if m != nil {
-		return m.Getresponse
-	}
-	return nil
 }
 
 func (m *GetSetValidationOper) GetGetResponse() *gnmi.GetResponse {
@@ -1280,68 +1851,95 @@ func init() {
 	proto.RegisterType((*HasKeys)(nil), "tests.HasKeys")
 	proto.RegisterType((*HasKeys_Item)(nil), "tests.HasKeys.Item")
 	proto.RegisterMapType((map[string]string)(nil), "tests.HasKeys.Item.KeyEntry")
+	proto.RegisterType((*DataTreePaths)(nil), "tests.DataTreePaths")
+	proto.RegisterType((*DataTreePaths_QueryStep)(nil), "tests.DataTreePaths.QueryStep")
+	proto.RegisterMapType((map[string]string)(nil), "tests.DataTreePaths.QueryStep.KeyEntry")
+	proto.RegisterType((*DataTreePaths_TestQuery)(nil), "tests.DataTreePaths.TestQuery")
+	proto.RegisterType((*DataTreePaths_ListQuery)(nil), "tests.DataTreePaths.ListQuery")
+	proto.RegisterType((*DataTreePaths_RequiredPaths)(nil), "tests.DataTreePaths.RequiredPaths")
+	proto.RegisterType((*SchemaPathComplete)(nil), "tests.SchemaPathComplete")
 	proto.RegisterType((*GetSetTest)(nil), "tests.GetSetTest")
 	proto.RegisterType((*GetSetValidationTest)(nil), "tests.GetSetValidationTest")
 	proto.RegisterType((*GetSetValidationOper)(nil), "tests.GetSetValidationOper")
 	proto.RegisterEnum("tests.GetSetValidationOper_OperResult", GetSetValidationOper_OperResult_name, GetSetValidationOper_OperResult_value)
 }
 
-func init() { proto.RegisterFile("proto/tests/tests.proto", fileDescriptor_tests_0242cb6f512d7766) }
+func init() { proto.RegisterFile("proto/tests/tests.proto", fileDescriptor_tests_d7f4f41f086a4fc3) }
 
-var fileDescriptor_tests_0242cb6f512d7766 = []byte{
-	// 857 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0xdb, 0x8e, 0xe3, 0x44,
-	0x10, 0x8d, 0x9d, 0x4c, 0xe2, 0x94, 0xb3, 0x99, 0x4c, 0x33, 0x0c, 0x56, 0x80, 0x55, 0x64, 0xa1,
-	0x25, 0x12, 0xe0, 0x2c, 0x61, 0xb5, 0x5a, 0x90, 0x78, 0x60, 0x76, 0x2e, 0x59, 0x2d, 0x22, 0xa8,
-	0x07, 0xf1, 0x84, 0x14, 0x75, 0x9c, 0x1a, 0xc7, 0x4a, 0x7c, 0xc1, 0xdd, 0x1e, 0x94, 0x9f, 0xe0,
-	0x91, 0x7f, 0xe0, 0x37, 0xf8, 0x02, 0xbe, 0x87, 0x27, 0xd4, 0xed, 0xf6, 0x25, 0x62, 0x01, 0xed,
-	0x4b, 0xd4, 0xa7, 0xab, 0x4e, 0xd7, 0xf1, 0xa9, 0xae, 0x0e, 0xbc, 0x97, 0x66, 0x89, 0x48, 0x66,
-	0x02, 0xb9, 0xe0, 0xc5, 0xaf, 0xa7, 0x76, 0xc8, 0x89, 0x02, 0xe3, 0xa7, 0x41, 0x28, 0xb6, 0xf9,
-	0xda, 0xf3, 0x93, 0x68, 0x96, 0xa4, 0x18, 0xfb, 0x49, 0x7c, 0x1f, 0x06, 0xb3, 0x20, 0x8e, 0xc2,
-	0x59, 0x41, 0x55, 0x4b, 0xf9, 0x53, 0x10, 0xdd, 0x3e, 0xf4, 0xae, 0xf0, 0x9e, 0xe5, 0x7b, 0xe1,
-	0xfe, 0x69, 0xc0, 0xa3, 0xbb, 0x7c, 0xcd, 0xfd, 0x2c, 0x5c, 0xe3, 0x0f, 0xc8, 0x05, 0x79, 0x0a,
-	0xbd, 0x0c, 0x7f, 0xce, 0x91, 0x0b, 0xc7, 0x98, 0x18, 0x53, 0x7b, 0x7e, 0xe1, 0x29, 0x6a, 0x95,
-	0x45, 0x8b, 0x28, 0x2d, 0xd3, 0xc8, 0x87, 0xd0, 0xbf, 0x67, 0x3b, 0x5c, 0x49, 0x39, 0x0e, 0x4c,
-	0x8c, 0x69, 0x7f, 0xd1, 0xa2, 0x96, 0xdc, 0x52, 0x07, 0x7e, 0x09, 0xa7, 0x29, 0x13, 0xdb, 0xd5,
-	0x03, 0xdb, 0x87, 0x1b, 0x26, 0xc2, 0x24, 0x76, 0x6c, 0x75, 0xf0, 0xd0, 0x2b, 0xbe, 0x46, 0x6b,
-	0x59, 0xb4, 0xe8, 0x50, 0x26, 0xfe, 0x58, 0xe5, 0x91, 0x4f, 0xc0, 0xda, 0x32, 0xbe, 0xda, 0xe1,
-	0x81, 0x3b, 0x83, 0x23, 0xce, 0x82, 0xf1, 0xd7, 0x78, 0xe0, 0x8b, 0x16, 0xed, 0x6d, 0x8b, 0xe5,
-	0x65, 0x17, 0x3a, 0x2c, 0x0b, 0xb8, 0xfb, 0xbb, 0x09, 0x1d, 0x55, 0x78, 0x02, 0xf6, 0x06, 0xa5,
-	0xe6, 0x54, 0x15, 0x95, 0x5f, 0xd3, 0xa7, 0xcd, 0x2d, 0xe2, 0x40, 0x4f, 0x84, 0x11, 0x26, 0xb9,
-	0x70, 0xcc, 0x89, 0x31, 0x3d, 0xa1, 0x25, 0x24, 0x17, 0xd0, 0xe5, 0xfe, 0x16, 0x23, 0xe6, 0xb4,
-	0x15, 0x4d, 0x23, 0xf2, 0x39, 0x80, 0x9f, 0xc4, 0x31, 0xfa, 0xea, 0xc8, 0x8e, 0xd2, 0x74, 0xa6,
-	0x35, 0xbd, 0xac, 0x02, 0xb4, 0x91, 0x44, 0x9e, 0x41, 0x9f, 0x97, 0xde, 0x29, 0x7b, 0xec, 0xf9,
-	0xb9, 0x66, 0x1c, 0x39, 0xbf, 0x68, 0xd1, 0x3a, 0x91, 0x7c, 0x0a, 0xbd, 0x00, 0xc5, 0x8a, 0xa3,
-	0xd0, 0x6e, 0x95, 0x55, 0x6e, 0x51, 0xdc, 0xa1, 0xd0, 0x84, 0x6e, 0xa0, 0x10, 0xf1, 0x9a, 0x2d,
-	0x28, 0x9c, 0x3a, 0xd5, 0xf9, 0x37, 0xba, 0x0f, 0xcd, 0x9e, 0x48, 0xaf, 0xc4, 0x21, 0x45, 0x97,
-	0x81, 0xfd, 0x32, 0xc3, 0x0d, 0xc6, 0x22, 0x64, 0x7b, 0x4e, 0xc6, 0x60, 0x65, 0xc8, 0x93, 0xfd,
-	0x03, 0x66, 0xda, 0xae, 0x0a, 0xcb, 0x58, 0xce, 0x31, 0x8b, 0x59, 0x84, 0xca, 0xac, 0x3e, 0xad,
-	0xb0, 0x8c, 0xa5, 0x8c, 0xf3, 0x5f, 0x92, 0x6c, 0xa3, 0xfd, 0xaa, 0xb0, 0xfb, 0xab, 0x01, 0x50,
-	0x3b, 0x23, 0x8d, 0x15, 0x2c, 0x0b, 0x50, 0xe8, 0x02, 0x1a, 0xc9, 0x56, 0xb0, 0xcd, 0x26, 0x43,
-	0xce, 0xf5, 0xe9, 0x25, 0x24, 0xcf, 0xc0, 0xf6, 0x6b, 0x8d, 0xea, 0x7c, 0x7b, 0x4e, 0x4a, 0xcf,
-	0xeb, 0x08, 0x6d, 0xa6, 0x35, 0x5b, 0xdb, 0x39, 0x6a, 0xad, 0xfb, 0x18, 0xac, 0xd2, 0x13, 0x42,
-	0xa0, 0x23, 0x85, 0x2a, 0x2d, 0x16, 0x55, 0x6b, 0xf7, 0x0f, 0x03, 0x7a, 0xfa, 0x7a, 0x91, 0xc7,
-	0x32, 0x2e, 0xb6, 0x7a, 0x12, 0xa0, 0x98, 0x84, 0xef, 0x99, 0xd8, 0x52, 0xb5, 0x4f, 0x3e, 0x86,
-	0x4e, 0x28, 0x30, 0x72, 0xcc, 0x49, 0x7b, 0x6a, 0xcf, 0xdf, 0x39, 0xbe, 0x9c, 0xde, 0x2b, 0x81,
-	0x11, 0x55, 0x09, 0xe3, 0x18, 0x3a, 0x12, 0x11, 0x0f, 0xda, 0x3b, 0x3c, 0x38, 0x86, 0xca, 0xff,
-	0xe0, 0x0d, 0xf9, 0xde, 0x6b, 0x3c, 0x5c, 0xc7, 0x22, 0x3b, 0x50, 0x99, 0x38, 0x7e, 0x0e, 0x56,
-	0xb9, 0x41, 0x46, 0x25, 0x57, 0xda, 0x23, 0x97, 0xe4, 0x1c, 0x4e, 0x1e, 0xd8, 0x3e, 0x2f, 0x1b,
-	0x52, 0x80, 0xaf, 0xcc, 0x17, 0x86, 0xfb, 0x13, 0x40, 0x7d, 0x51, 0xc8, 0x0d, 0x9c, 0x26, 0x29,
-	0x66, 0xcd, 0x11, 0x2c, 0x2e, 0xe2, 0xfb, 0x47, 0x97, 0xaa, 0x9e, 0x3c, 0x7d, 0x61, 0x86, 0x92,
-	0x55, 0xef, 0x56, 0x23, 0xf6, 0x9b, 0x01, 0xe7, 0x6f, 0xa2, 0x90, 0x2b, 0x38, 0x0d, 0xe3, 0x50,
-	0x76, 0x20, 0xe4, 0xb8, 0x92, 0x6c, 0x6d, 0xdd, 0xbf, 0x15, 0x5a, 0xa6, 0x98, 0xd1, 0x61, 0xcd,
-	0x91, 0x98, 0xbc, 0x80, 0xbe, 0xcc, 0x2e, 0xf8, 0xe6, 0xff, 0xf3, 0x2d, 0x19, 0x93, 0x2b, 0xf7,
-	0xaf, 0xf6, 0x3f, 0x85, 0xa9, 0x23, 0x3f, 0x82, 0x36, 0xc7, 0xf2, 0x45, 0x1b, 0xe9, 0x17, 0x0d,
-	0x85, 0x7e, 0xcb, 0x16, 0x2d, 0x2a, 0xc3, 0xe4, 0x33, 0x38, 0xf3, 0x93, 0x28, 0x4a, 0x62, 0x39,
-	0x77, 0xe5, 0x2b, 0x68, 0xea, 0x17, 0x6d, 0x54, 0x84, 0xee, 0xaa, 0x08, 0xf9, 0x1a, 0xba, 0x1c,
-	0xc5, 0x2a, 0xd9, 0x29, 0x37, 0x87, 0xf3, 0x27, 0xff, 0x21, 0xd2, 0x53, 0x4a, 0x91, 0xe7, 0x7b,
-	0x41, 0x4f, 0x38, 0x8a, 0xe5, 0x4e, 0x6a, 0x0a, 0xaa, 0xf1, 0xd6, 0x9a, 0x6e, 0x6b, 0x4d, 0x06,
-	0x95, 0xe1, 0x86, 0xa6, 0xa0, 0xd6, 0x34, 0x50, 0x9a, 0x8c, 0x52, 0xd3, 0xed, 0x91, 0xa6, 0xa0,
-	0xd0, 0x74, 0xfe, 0x76, 0x9a, 0x02, 0xa5, 0xe9, 0x39, 0x0c, 0x24, 0x3d, 0x43, 0x9e, 0x26, 0x31,
-	0x47, 0xe7, 0x5d, 0xfd, 0xf6, 0xd4, 0xe2, 0x8a, 0xc0, 0xc2, 0xa4, 0x76, 0x50, 0x43, 0x32, 0x03,
-	0xd2, 0x54, 0xa9, 0xd9, 0x17, 0x4a, 0xa6, 0x49, 0xcf, 0x1a, 0x32, 0x8b, 0x90, 0xfb, 0x04, 0xa0,
-	0xae, 0x4e, 0x06, 0x60, 0x7d, 0xb7, 0x5c, 0x5d, 0x53, 0xba, 0xa4, 0xa3, 0x16, 0x01, 0xe8, 0xde,
-	0x7c, 0xf3, 0xea, 0xdb, 0xeb, 0xab, 0x91, 0x71, 0x39, 0x00, 0xa8, 0x7b, 0x21, 0x51, 0xed, 0xc2,
-	0xe5, 0x23, 0xb0, 0x1b, 0xd5, 0xd6, 0x5d, 0xf5, 0xef, 0xf6, 0xc5, 0xdf, 0x01, 0x00, 0x00, 0xff,
-	0xff, 0x40, 0x41, 0xee, 0x8e, 0x31, 0x07, 0x00, 0x00,
+var fileDescriptor_tests_d7f4f41f086a4fc3 = []byte{
+	// 1173 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0x5b, 0x6f, 0x1b, 0x45,
+	0x14, 0xf6, 0xfa, 0xee, 0xe3, 0x4b, 0xd2, 0x69, 0x28, 0x5b, 0x03, 0x91, 0xb5, 0xa0, 0x36, 0x12,
+	0xe0, 0x94, 0x10, 0x55, 0x2d, 0xa8, 0x48, 0xe4, 0xea, 0x2a, 0x51, 0x03, 0x93, 0x82, 0x78, 0x40,
+	0x5a, 0x4d, 0xec, 0x93, 0xf5, 0xca, 0xde, 0x4b, 0x77, 0xc6, 0xa1, 0x7e, 0xe6, 0x9d, 0x47, 0x24,
+	0x7e, 0x02, 0x0f, 0xfc, 0x09, 0x7e, 0x07, 0xbf, 0x84, 0x27, 0x34, 0x97, 0xbd, 0x58, 0x75, 0x83,
+	0xe0, 0x65, 0xb5, 0x67, 0xce, 0xed, 0x9b, 0xef, 0x9c, 0x33, 0x33, 0xf0, 0x6e, 0x9c, 0x44, 0x22,
+	0xda, 0x15, 0xc8, 0x05, 0xd7, 0xdf, 0xa1, 0x5a, 0x21, 0x35, 0x25, 0xf4, 0x1f, 0x79, 0xbe, 0x98,
+	0x2e, 0xae, 0x86, 0xe3, 0x28, 0xd8, 0x8d, 0x62, 0x0c, 0xc7, 0x51, 0x78, 0xed, 0x7b, 0xbb, 0x5e,
+	0x18, 0xf8, 0xbb, 0xda, 0x55, 0xfd, 0xca, 0x8f, 0x76, 0x74, 0x5a, 0xd0, 0x38, 0xc2, 0x6b, 0xb6,
+	0x98, 0x0b, 0xe7, 0xe7, 0x0a, 0x74, 0x2f, 0x17, 0x57, 0x7c, 0x9c, 0xf8, 0x57, 0xf8, 0x12, 0xb9,
+	0x20, 0x8f, 0xa0, 0x91, 0xe0, 0xab, 0x05, 0x72, 0x61, 0x5b, 0x03, 0x6b, 0xa7, 0xbd, 0x77, 0x6f,
+	0xa8, 0x5c, 0x33, 0x2b, 0xaa, 0xb5, 0x34, 0x35, 0x23, 0x1f, 0x42, 0x77, 0x1e, 0x79, 0x6e, 0x82,
+	0x3c, 0x8e, 0x42, 0x8e, 0xdc, 0x2e, 0x0f, 0xac, 0x9d, 0x26, 0xed, 0xcc, 0x23, 0x8f, 0xa6, 0x6b,
+	0xe4, 0x03, 0x68, 0x5d, 0xb3, 0x19, 0xba, 0x12, 0xb3, 0x0d, 0x03, 0x6b, 0xa7, 0x35, 0x2a, 0xd1,
+	0xa6, 0x5c, 0x52, 0x59, 0x9f, 0xc2, 0x46, 0xcc, 0xc4, 0xd4, 0xbd, 0x61, 0x73, 0x7f, 0xc2, 0x84,
+	0x1f, 0x85, 0x76, 0x5b, 0x65, 0xef, 0x0d, 0xf5, 0x96, 0x0d, 0xe0, 0x51, 0x89, 0xf6, 0xa4, 0xe1,
+	0xf7, 0x99, 0x1d, 0xf9, 0x18, 0x9a, 0x53, 0xc6, 0xdd, 0x19, 0x2e, 0xb9, 0xdd, 0x59, 0xf1, 0x19,
+	0x31, 0x7e, 0x86, 0x4b, 0x3e, 0x2a, 0xd1, 0xc6, 0x54, 0xff, 0x92, 0x73, 0xb8, 0xcb, 0xc7, 0x53,
+	0x0c, 0x98, 0xca, 0x36, 0x8e, 0x82, 0x78, 0x8e, 0x02, 0xed, 0xae, 0xf2, 0xbb, 0x6f, 0xfc, 0x2e,
+	0x95, 0xc5, 0x37, 0x4c, 0x4c, 0x0f, 0x8d, 0xc1, 0xa8, 0x44, 0x49, 0xee, 0x97, 0xae, 0x92, 0xaf,
+	0x60, 0x63, 0xc2, 0x04, 0x73, 0x45, 0x82, 0xe8, 0x4a, 0x0d, 0xb7, 0x7b, 0x2a, 0xd2, 0x56, 0x8a,
+	0x9a, 0x09, 0xf6, 0x32, 0x41, 0x94, 0xb1, 0x24, 0x8e, 0xee, 0xa4, 0xb8, 0x70, 0x50, 0x87, 0x2a,
+	0x4b, 0x3c, 0xee, 0xfc, 0x5e, 0x86, 0xaa, 0xa2, 0x61, 0x00, 0xed, 0x09, 0x4a, 0x9a, 0x63, 0x45,
+	0x81, 0x2c, 0x40, 0x8b, 0x16, 0x97, 0x88, 0x0d, 0x0d, 0xe1, 0x07, 0x18, 0x2d, 0x84, 0xa2, 0xb9,
+	0x46, 0x53, 0x91, 0xdc, 0x83, 0xba, 0x86, 0x68, 0x57, 0x94, 0x9b, 0x91, 0xc8, 0x67, 0x00, 0xe3,
+	0x28, 0x0c, 0x71, 0xac, 0x42, 0x56, 0x15, 0xbe, 0x3b, 0x06, 0xdf, 0x61, 0xa6, 0xa0, 0x05, 0x23,
+	0xb2, 0x0f, 0x2d, 0x9e, 0x96, 0x5b, 0x15, 0x2b, 0xdf, 0xd1, 0x4a, 0xb3, 0x8c, 0x4a, 0x34, 0x37,
+	0x24, 0x9f, 0x40, 0xc3, 0x43, 0xe1, 0x72, 0x14, 0xa6, 0x76, 0x69, 0x96, 0x53, 0x14, 0x97, 0x28,
+	0x8c, 0x43, 0xdd, 0x53, 0x12, 0x19, 0x16, 0x1b, 0x42, 0xd7, 0x6d, 0xc3, 0xd8, 0x9f, 0x98, 0xae,
+	0x28, 0x76, 0x88, 0xe4, 0x4a, 0x2c, 0x63, 0x74, 0x18, 0xb4, 0x0f, 0x13, 0x9c, 0x60, 0x28, 0x7c,
+	0x36, 0xe7, 0xa4, 0x0f, 0xcd, 0x04, 0x79, 0x34, 0xbf, 0xc1, 0xc4, 0xd0, 0x95, 0xc9, 0x52, 0xb7,
+	0xe0, 0x98, 0x84, 0x2c, 0x40, 0x45, 0x56, 0x8b, 0x66, 0xb2, 0xd4, 0xc5, 0x8c, 0xf3, 0x9f, 0xa2,
+	0x64, 0x62, 0xf8, 0xca, 0x64, 0xe7, 0x17, 0x0b, 0x20, 0x67, 0x46, 0x12, 0x2b, 0x58, 0xe2, 0xa1,
+	0x30, 0x09, 0x8c, 0x24, 0x4b, 0xc1, 0x26, 0x93, 0x04, 0x39, 0x37, 0xd1, 0x53, 0x91, 0xec, 0x43,
+	0x7b, 0x9c, 0x63, 0x54, 0xf1, 0xdb, 0x7b, 0x24, 0xe5, 0x3c, 0xd7, 0xd0, 0xa2, 0x59, 0xb1, 0xb4,
+	0xd5, 0x95, 0xd2, 0x3a, 0xdb, 0xd0, 0x4c, 0x39, 0x21, 0x04, 0xaa, 0x12, 0xa8, 0xc2, 0xd2, 0xa4,
+	0xea, 0xdf, 0xf9, 0xd3, 0x82, 0x86, 0x69, 0x76, 0xb2, 0x2d, 0xf5, 0x62, 0x6a, 0x86, 0x17, 0xf4,
+	0xf0, 0xca, 0x76, 0xa3, 0x6a, 0x9d, 0x3c, 0x84, 0xaa, 0x2f, 0x30, 0xb0, 0xcb, 0x83, 0xca, 0x4e,
+	0x7b, 0xef, 0xee, 0xea, 0xa8, 0x0c, 0x9f, 0x0b, 0x0c, 0xa8, 0x32, 0xe8, 0x87, 0x50, 0x95, 0x12,
+	0x19, 0x42, 0x65, 0x86, 0x4b, 0xdb, 0x52, 0xf6, 0xef, 0xaf, 0xb1, 0x1f, 0x9e, 0xe1, 0xf2, 0x38,
+	0x14, 0xc9, 0x92, 0x4a, 0xc3, 0xfe, 0x63, 0x68, 0xa6, 0x0b, 0x64, 0x33, 0xf5, 0x95, 0xf4, 0xc8,
+	0x5f, 0xb2, 0x05, 0xb5, 0x1b, 0x36, 0x5f, 0xa4, 0x05, 0xd1, 0xc2, 0x17, 0xe5, 0x27, 0x96, 0xf3,
+	0x5b, 0x0d, 0xba, 0x2b, 0xf3, 0x42, 0xbe, 0x84, 0x96, 0xcc, 0xe6, 0x46, 0xb1, 0x29, 0x6e, 0x7b,
+	0x6f, 0x7b, 0xdd, 0x60, 0x0d, 0x25, 0x31, 0xdf, 0x2e, 0x30, 0x59, 0xd2, 0xa6, 0x54, 0x5f, 0xc4,
+	0x98, 0xf4, 0xff, 0xb0, 0xa0, 0xa5, 0xd6, 0x2e, 0x05, 0xc6, 0x92, 0x35, 0xd5, 0x06, 0x1a, 0x89,
+	0xfa, 0x27, 0x4f, 0x35, 0x38, 0x4d, 0xc4, 0xc3, 0xb5, 0x81, 0xb3, 0x00, 0xab, 0x7b, 0x24, 0xf7,
+	0xa1, 0x39, 0xc3, 0xa5, 0xab, 0x42, 0xea, 0xee, 0x69, 0xcc, 0x70, 0xf9, 0x82, 0x05, 0xf8, 0x7f,
+	0xb7, 0xdf, 0xff, 0xcb, 0x82, 0x56, 0xb6, 0x0f, 0xb2, 0x0f, 0x35, 0x2e, 0x30, 0xe6, 0x86, 0xf6,
+	0xed, 0xdb, 0xd1, 0x51, 0x6d, 0x4c, 0x8e, 0xa0, 0x2b, 0x27, 0x70, 0xee, 0x73, 0xa1, 0xcf, 0xc3,
+	0xf2, 0x2d, 0xa4, 0x9d, 0xfb, 0x26, 0xd9, 0xa8, 0x44, 0xdb, 0x1e, 0x0a, 0x29, 0xab, 0x0e, 0x3a,
+	0x83, 0x9e, 0x3c, 0xda, 0xfd, 0x04, 0x27, 0xe6, 0x50, 0xd3, 0x0d, 0xec, 0xac, 0x0d, 0x43, 0x8d,
+	0x69, 0x76, 0xc4, 0x25, 0xc5, 0x85, 0x74, 0x6c, 0xfb, 0x08, 0xad, 0x2c, 0xa1, 0xa4, 0xef, 0x86,
+	0x25, 0x6e, 0xa1, 0x22, 0x8d, 0x1b, 0x96, 0x48, 0xfa, 0xc8, 0x33, 0x80, 0x10, 0x5f, 0x0b, 0xf7,
+	0x95, 0x34, 0xbc, 0x15, 0x7f, 0x5e, 0xf4, 0x96, 0xf4, 0x50, 0xbf, 0xfd, 0xef, 0xa0, 0xbb, 0x02,
+	0x88, 0x38, 0x50, 0x8f, 0x13, 0xbc, 0xf6, 0x5f, 0xaf, 0x19, 0x08, 0xa3, 0x21, 0x03, 0xa8, 0xe9,
+	0x7d, 0xea, 0x56, 0x28, 0x9a, 0x68, 0x85, 0xf3, 0x03, 0x90, 0x37, 0x2f, 0x85, 0x42, 0xec, 0xf2,
+	0x5b, 0x63, 0xe7, 0xe3, 0x58, 0x59, 0x37, 0x8e, 0xce, 0x8f, 0x00, 0xf9, 0xf1, 0x48, 0x4e, 0x60,
+	0x43, 0x36, 0x7b, 0xf1, 0x1a, 0xd4, 0xc7, 0xef, 0x7b, 0x2b, 0x47, 0x69, 0x7e, 0xfb, 0x99, 0x63,
+	0xb2, 0x27, 0xbd, 0xf2, 0xd5, 0xec, 0x62, 0xf9, 0xd5, 0x82, 0xad, 0x75, 0x2e, 0xe4, 0x08, 0x36,
+	0xfc, 0xd0, 0x97, 0xe7, 0x8e, 0xcf, 0xb1, 0x38, 0x60, 0x6f, 0x4b, 0x24, 0x67, 0x8a, 0xf6, 0x72,
+	0x1f, 0x29, 0x93, 0x27, 0xc5, 0x01, 0x2d, 0xff, 0xbb, 0x7f, 0x36, 0x9d, 0xce, 0xdf, 0x95, 0x37,
+	0x81, 0xa9, 0x90, 0x1f, 0x41, 0x85, 0x63, 0xfa, 0xf4, 0xd8, 0x34, 0x4f, 0x0f, 0x14, 0xe6, 0xd1,
+	0x31, 0x2a, 0x51, 0xa9, 0x26, 0x9f, 0xc2, 0x9d, 0x71, 0x14, 0x04, 0x51, 0x28, 0x6f, 0x9b, 0xf4,
+	0xb9, 0x52, 0x36, 0xaf, 0x8a, 0x4d, 0xad, 0xba, 0xcc, 0x34, 0xe4, 0x19, 0xd4, 0x39, 0x0a, 0x37,
+	0x9a, 0x29, 0x36, 0x7b, 0x7b, 0x0f, 0x6e, 0x01, 0x39, 0x54, 0x48, 0x91, 0x2f, 0xe6, 0x82, 0xd6,
+	0x38, 0x8a, 0x8b, 0x99, 0xc4, 0xe4, 0x65, 0x97, 0x9a, 0xc1, 0x74, 0x9a, 0x63, 0xb2, 0xa8, 0x54,
+	0x17, 0x30, 0x79, 0x39, 0xa6, 0x8e, 0xc2, 0x64, 0xa5, 0x98, 0x4e, 0x57, 0x30, 0x79, 0x1a, 0xd3,
+	0xd6, 0x7f, 0xc3, 0xe4, 0x29, 0x4c, 0x8f, 0xa1, 0x23, 0xdd, 0xd3, 0x47, 0x97, 0xfd, 0x8e, 0xb9,
+	0x71, 0x73, 0x70, 0x5a, 0x31, 0x2a, 0xab, 0xe1, 0x4e, 0x45, 0xb2, 0x0b, 0xa4, 0x88, 0xd2, 0x78,
+	0xdf, 0x53, 0x30, 0xcb, 0xf4, 0x4e, 0x01, 0xa6, 0x56, 0x39, 0x0f, 0x00, 0xf2, 0xec, 0xa4, 0x03,
+	0xcd, 0x17, 0x17, 0xee, 0x31, 0xa5, 0x17, 0x74, 0xb3, 0x44, 0x00, 0xea, 0x27, 0x5f, 0x3f, 0x3f,
+	0x3f, 0x3e, 0xda, 0xb4, 0x0e, 0x3a, 0x00, 0x79, 0x2d, 0xa4, 0x94, 0xb3, 0x70, 0xd0, 0x85, 0x76,
+	0x21, 0xdb, 0x55, 0x5d, 0x3d, 0x43, 0x3f, 0xff, 0x27, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x20, 0xf7,
+	0x7b, 0xda, 0x0a, 0x00, 0x00,
 }

@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='proto/tests/tests.proto',
   package='tests',
   syntax='proto3',
-  serialized_pb=_b('\n\x17proto/tests/tests.proto\x12\x05tests\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\"\t\n\x07\x44\x65\x66\x61ult\"\xa4\x01\n\rSubscribeTest\x12\'\n\x07request\x18\x01 \x01(\x0b\x32\x16.gnmi.SubscribeRequest\x12\x13\n\tfake_test\x18\n \x01(\tH\x00\x12)\n\x0fpath_validation\x18\x0b \x01(\x0b\x32\x0e.tests.DefaultH\x00\x12\"\n\x08has_keys\x18\x0c \x01(\x0b\x32\x0e.tests.HasKeysH\x00\x42\x06\n\x04\x61rgs\"\xe2\x01\n\x04Test\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\x0f\n\x07timeout\x18\x02 \x01(\x05\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12%\n\nconnection\x18\x04 \x01(\x0b\x32\x11.tests.Connection\x12)\n\tsubscribe\x18\n \x01(\x0b\x32\x14.tests.SubscribeTestH\x00\x12$\n\x07get_set\x18\x0b \x01(\x0b\x32\x11.tests.GetSetTestH\x00\x12$\n\tfake_test\x18\x0c \x01(\x0b\x32\x0f.tests.FakeTestH\x00\x42\x06\n\x04type\"C\n\x0b\x43redentials\x12\x10\n\x08resolver\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"g\n\nConnection\x12\x0e\n\x06target\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\'\n\x0b\x63redentials\x18\x03 \x01(\x0b\x32\x12.tests.Credentials\x12\x0f\n\x07timeout\x18\x04 \x01(\x05\"\x18\n\x08\x46\x61keTest\x12\x0c\n\x04pass\x18\x01 \x01(\x08\"\xa5\x01\n\x07HasKeys\x12\x18\n\x04path\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12!\n\x04item\x18\x02 \x03(\x0b\x32\x13.tests.HasKeys.Item\x1a]\n\x04Item\x12)\n\x03key\x18\x01 \x03(\x0b\x32\x1c.tests.HasKeys.Item.KeyEntry\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"L\n\nGetSetTest\x12\x36\n\x0foper_validation\x18\n \x01(\x0b\x32\x1b.tests.GetSetValidationTestH\x00\x42\x06\n\x04\x61rgs\"|\n\x14GetSetValidationTest\x12\x34\n\x0finitialise_oper\x18\x01 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\x12.\n\ttest_oper\x18\x02 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\"\x9e\x03\n\x14GetSetValidationOper\x12\x1f\n\x03set\x18\x01 \x01(\x0b\x32\x10.gnmi.SetRequestH\x00\x12\x1b\n\x11\x63ommon_setrequest\x18\x02 \x01(\tH\x00\x12\x36\n\x06set_ok\x18\n \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12\x1f\n\x03get\x18\x0b \x01(\x0b\x32\x10.gnmi.GetRequestH\x01\x12\x1b\n\x11\x63ommon_getrequest\x18\x0c \x01(\tH\x01\x12\x36\n\x06get_ok\x18\x14 \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12)\n\x0cget_response\x18\x15 \x01(\x0b\x32\x11.gnmi.GetResponseH\x02\x12\x1c\n\x12\x63ommon_getresponse\x18\x16 \x01(\tH\x02\"&\n\nOperResult\x12\x0c\n\x08NO_ERROR\x10\x00\x12\n\n\x06\x46\x41ILED\x10\x01\x42\x0c\n\nsetrequestB\x0c\n\ngetrequestB\r\n\x0bgetresponseb\x06proto3')
+  serialized_pb=_b('\n\x17proto/tests/tests.proto\x12\x05tests\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\"\t\n\x07\x44\x65\x66\x61ult\"\xa6\x02\n\rSubscribeTest\x12\'\n\x07request\x18\x01 \x01(\x0b\x32\x16.gnmi.SubscribeRequest\x12\x15\n\rlog_responses\x18\x02 \x01(\x08\x12\x13\n\tfake_test\x18\n \x01(\tH\x00\x12)\n\x0fpath_validation\x18\x0b \x01(\x0b\x32\x0e.tests.DefaultH\x00\x12\"\n\x08has_keys\x18\x0c \x01(\x0b\x32\x0e.tests.HasKeysH\x00\x12\x38\n\x13schemapath_complete\x18\r \x01(\x0b\x32\x19.tests.SchemaPathCompleteH\x00\x12/\n\x0f\x64\x61ta_tree_paths\x18\x0e \x01(\x0b\x32\x14.tests.DataTreePathsH\x00\x42\x06\n\x04\x61rgs\"\xe2\x01\n\x04Test\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\x0f\n\x07timeout\x18\x02 \x01(\x05\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12%\n\nconnection\x18\x04 \x01(\x0b\x32\x11.tests.Connection\x12)\n\tsubscribe\x18\n \x01(\x0b\x32\x14.tests.SubscribeTestH\x00\x12$\n\x07get_set\x18\x0b \x01(\x0b\x32\x11.tests.GetSetTestH\x00\x12$\n\tfake_test\x18\x0c \x01(\x0b\x32\x0f.tests.FakeTestH\x00\x42\x06\n\x04type\"C\n\x0b\x43redentials\x12\x10\n\x08resolver\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"g\n\nConnection\x12\x0e\n\x06target\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\'\n\x0b\x63redentials\x18\x03 \x01(\x0b\x32\x12.tests.Credentials\x12\x0f\n\x07timeout\x18\x04 \x01(\x05\"\x18\n\x08\x46\x61keTest\x12\x0c\n\x04pass\x18\x01 \x01(\x08\"\xa5\x01\n\x07HasKeys\x12\x18\n\x04path\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12!\n\x04item\x18\x02 \x03(\x0b\x32\x13.tests.HasKeys.Item\x1a]\n\x04Item\x12)\n\x03key\x18\x01 \x03(\x0b\x32\x1c.tests.HasKeys.Item.KeyEntry\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xa9\x04\n\rDataTreePaths\x12\x31\n\ttest_oper\x18\x01 \x01(\x0b\x32\x1e.tests.DataTreePaths.TestQuery\x1a\x8d\x01\n\tQueryStep\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x34\n\x03key\x18\x02 \x03(\x0b\x32\'.tests.DataTreePaths.QueryStep.KeyEntry\x12\x10\n\x08key_name\x18\x03 \x01(\t\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\xb9\x01\n\tTestQuery\x12-\n\x05steps\x18\x01 \x03(\x0b\x32\x1e.tests.DataTreePaths.QueryStep\x12\x37\n\rget_list_keys\x18\x02 \x01(\x0b\x32\x1e.tests.DataTreePaths.ListQueryH\x00\x12<\n\x0erequired_paths\x18\x03 \x01(\x0b\x32\".tests.DataTreePaths.RequiredPathsH\x00\x42\x06\n\x04type\x1aQ\n\tListQuery\x12\x10\n\x08var_name\x18\x01 \x01(\t\x12\x32\n\nnext_query\x18\x02 \x01(\x0b\x32\x1e.tests.DataTreePaths.TestQuery\x1a\x46\n\rRequiredPaths\x12\x1a\n\x06prefix\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12\x19\n\x05paths\x18\x02 \x03(\x0b\x32\n.gnmi.Path\"J\n\x12SchemaPathComplete\x12\x1a\n\x06prefix\x18\x02 \x01(\x0b\x32\n.gnmi.Path\x12\x18\n\x04path\x18\x01 \x03(\x0b\x32\n.gnmi.Path\"L\n\nGetSetTest\x12\x36\n\x0foper_validation\x18\n \x01(\x0b\x32\x1b.tests.GetSetValidationTestH\x00\x42\x06\n\x04\x61rgs\"|\n\x14GetSetValidationTest\x12\x34\n\x0finitialise_oper\x18\x01 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\x12.\n\ttest_oper\x18\x02 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\"\x9e\x03\n\x14GetSetValidationOper\x12\x1f\n\x03set\x18\x01 \x01(\x0b\x32\x10.gnmi.SetRequestH\x00\x12\x1b\n\x11\x63ommon_setrequest\x18\x02 \x01(\tH\x00\x12\x36\n\x06set_ok\x18\n \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12\x1f\n\x03get\x18\x0b \x01(\x0b\x32\x10.gnmi.GetRequestH\x01\x12\x1b\n\x11\x63ommon_getrequest\x18\x0c \x01(\tH\x01\x12\x36\n\x06get_ok\x18\x14 \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12)\n\x0cget_response\x18\x15 \x01(\x0b\x32\x11.gnmi.GetResponseH\x02\x12\x1c\n\x12\x63ommon_getresponse\x18\x16 \x01(\tH\x02\"&\n\nOperResult\x12\x0c\n\x08NO_ERROR\x10\x00\x12\n\n\x06\x46\x41ILED\x10\x01\x42\x0c\n\nsetrequestB\x0c\n\ngetrequestB\r\n\x0bgetresponseb\x06proto3')
   ,
   dependencies=[github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2.DESCRIPTOR,])
 
@@ -43,8 +43,8 @@ _GETSETVALIDATIONOPER_OPERRESULT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1397,
-  serialized_end=1435,
+  serialized_start=2159,
+  serialized_end=2197,
 )
 _sym_db.RegisterEnumDescriptor(_GETSETVALIDATIONOPER_OPERRESULT)
 
@@ -88,22 +88,43 @@ _SUBSCRIBETEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='fake_test', full_name='tests.SubscribeTest.fake_test', index=1,
+      name='log_responses', full_name='tests.SubscribeTest.log_responses', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='fake_test', full_name='tests.SubscribeTest.fake_test', index=2,
       number=10, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='path_validation', full_name='tests.SubscribeTest.path_validation', index=2,
+      name='path_validation', full_name='tests.SubscribeTest.path_validation', index=3,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='has_keys', full_name='tests.SubscribeTest.has_keys', index=3,
+      name='has_keys', full_name='tests.SubscribeTest.has_keys', index=4,
       number=12, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='schemapath_complete', full_name='tests.SubscribeTest.schemapath_complete', index=5,
+      number=13, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data_tree_paths', full_name='tests.SubscribeTest.data_tree_paths', index=6,
+      number=14, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -124,7 +145,7 @@ _SUBSCRIBETEST = _descriptor.Descriptor(
       index=0, containing_type=None, fields=[]),
   ],
   serialized_start=96,
-  serialized_end=260,
+  serialized_end=390,
 )
 
 
@@ -199,8 +220,8 @@ _TEST = _descriptor.Descriptor(
       name='type', full_name='tests.Test.type',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=263,
-  serialized_end=489,
+  serialized_start=393,
+  serialized_end=619,
 )
 
 
@@ -244,8 +265,8 @@ _CREDENTIALS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=491,
-  serialized_end=558,
+  serialized_start=621,
+  serialized_end=688,
 )
 
 
@@ -296,8 +317,8 @@ _CONNECTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=560,
-  serialized_end=663,
+  serialized_start=690,
+  serialized_end=793,
 )
 
 
@@ -327,8 +348,8 @@ _FAKETEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=665,
-  serialized_end=689,
+  serialized_start=795,
+  serialized_end=819,
 )
 
 
@@ -365,8 +386,8 @@ _HASKEYS_ITEM_KEYENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=815,
-  serialized_end=857,
+  serialized_start=945,
+  serialized_end=987,
 )
 
 _HASKEYS_ITEM = _descriptor.Descriptor(
@@ -395,8 +416,8 @@ _HASKEYS_ITEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=764,
-  serialized_end=857,
+  serialized_start=894,
+  serialized_end=987,
 )
 
 _HASKEYS = _descriptor.Descriptor(
@@ -432,8 +453,279 @@ _HASKEYS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=692,
-  serialized_end=857,
+  serialized_start=822,
+  serialized_end=987,
+)
+
+
+_DATATREEPATHS_QUERYSTEP_KEYENTRY = _descriptor.Descriptor(
+  name='KeyEntry',
+  full_name='tests.DataTreePaths.QueryStep.KeyEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='tests.DataTreePaths.QueryStep.KeyEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='tests.DataTreePaths.QueryStep.KeyEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=945,
+  serialized_end=987,
+)
+
+_DATATREEPATHS_QUERYSTEP = _descriptor.Descriptor(
+  name='QueryStep',
+  full_name='tests.DataTreePaths.QueryStep',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='tests.DataTreePaths.QueryStep.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='key', full_name='tests.DataTreePaths.QueryStep.key', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='key_name', full_name='tests.DataTreePaths.QueryStep.key_name', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_DATATREEPATHS_QUERYSTEP_KEYENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1059,
+  serialized_end=1200,
+)
+
+_DATATREEPATHS_TESTQUERY = _descriptor.Descriptor(
+  name='TestQuery',
+  full_name='tests.DataTreePaths.TestQuery',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='steps', full_name='tests.DataTreePaths.TestQuery.steps', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='get_list_keys', full_name='tests.DataTreePaths.TestQuery.get_list_keys', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='required_paths', full_name='tests.DataTreePaths.TestQuery.required_paths', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='type', full_name='tests.DataTreePaths.TestQuery.type',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=1203,
+  serialized_end=1388,
+)
+
+_DATATREEPATHS_LISTQUERY = _descriptor.Descriptor(
+  name='ListQuery',
+  full_name='tests.DataTreePaths.ListQuery',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='var_name', full_name='tests.DataTreePaths.ListQuery.var_name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='next_query', full_name='tests.DataTreePaths.ListQuery.next_query', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1390,
+  serialized_end=1471,
+)
+
+_DATATREEPATHS_REQUIREDPATHS = _descriptor.Descriptor(
+  name='RequiredPaths',
+  full_name='tests.DataTreePaths.RequiredPaths',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='prefix', full_name='tests.DataTreePaths.RequiredPaths.prefix', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='paths', full_name='tests.DataTreePaths.RequiredPaths.paths', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1473,
+  serialized_end=1543,
+)
+
+_DATATREEPATHS = _descriptor.Descriptor(
+  name='DataTreePaths',
+  full_name='tests.DataTreePaths',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='test_oper', full_name='tests.DataTreePaths.test_oper', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_DATATREEPATHS_QUERYSTEP, _DATATREEPATHS_TESTQUERY, _DATATREEPATHS_LISTQUERY, _DATATREEPATHS_REQUIREDPATHS, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=990,
+  serialized_end=1543,
+)
+
+
+_SCHEMAPATHCOMPLETE = _descriptor.Descriptor(
+  name='SchemaPathComplete',
+  full_name='tests.SchemaPathComplete',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='prefix', full_name='tests.SchemaPathComplete.prefix', index=0,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='path', full_name='tests.SchemaPathComplete.path', index=1,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1545,
+  serialized_end=1619,
 )
 
 
@@ -466,8 +758,8 @@ _GETSETTEST = _descriptor.Descriptor(
       name='args', full_name='tests.GetSetTest.args',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=859,
-  serialized_end=935,
+  serialized_start=1621,
+  serialized_end=1697,
 )
 
 
@@ -504,8 +796,8 @@ _GETSETVALIDATIONTEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=937,
-  serialized_end=1061,
+  serialized_start=1699,
+  serialized_end=1823,
 )
 
 
@@ -594,13 +886,15 @@ _GETSETVALIDATIONOPER = _descriptor.Descriptor(
       name='getresponse', full_name='tests.GetSetValidationOper.getresponse',
       index=2, containing_type=None, fields=[]),
   ],
-  serialized_start=1064,
-  serialized_end=1478,
+  serialized_start=1826,
+  serialized_end=2240,
 )
 
 _SUBSCRIBETEST.fields_by_name['request'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._SUBSCRIBEREQUEST
 _SUBSCRIBETEST.fields_by_name['path_validation'].message_type = _DEFAULT
 _SUBSCRIBETEST.fields_by_name['has_keys'].message_type = _HASKEYS
+_SUBSCRIBETEST.fields_by_name['schemapath_complete'].message_type = _SCHEMAPATHCOMPLETE
+_SUBSCRIBETEST.fields_by_name['data_tree_paths'].message_type = _DATATREEPATHS
 _SUBSCRIBETEST.oneofs_by_name['args'].fields.append(
   _SUBSCRIBETEST.fields_by_name['fake_test'])
 _SUBSCRIBETEST.fields_by_name['fake_test'].containing_oneof = _SUBSCRIBETEST.oneofs_by_name['args']
@@ -610,6 +904,12 @@ _SUBSCRIBETEST.fields_by_name['path_validation'].containing_oneof = _SUBSCRIBETE
 _SUBSCRIBETEST.oneofs_by_name['args'].fields.append(
   _SUBSCRIBETEST.fields_by_name['has_keys'])
 _SUBSCRIBETEST.fields_by_name['has_keys'].containing_oneof = _SUBSCRIBETEST.oneofs_by_name['args']
+_SUBSCRIBETEST.oneofs_by_name['args'].fields.append(
+  _SUBSCRIBETEST.fields_by_name['schemapath_complete'])
+_SUBSCRIBETEST.fields_by_name['schemapath_complete'].containing_oneof = _SUBSCRIBETEST.oneofs_by_name['args']
+_SUBSCRIBETEST.oneofs_by_name['args'].fields.append(
+  _SUBSCRIBETEST.fields_by_name['data_tree_paths'])
+_SUBSCRIBETEST.fields_by_name['data_tree_paths'].containing_oneof = _SUBSCRIBETEST.oneofs_by_name['args']
 _TEST.fields_by_name['connection'].message_type = _CONNECTION
 _TEST.fields_by_name['subscribe'].message_type = _SUBSCRIBETEST
 _TEST.fields_by_name['get_set'].message_type = _GETSETTEST
@@ -629,6 +929,27 @@ _HASKEYS_ITEM.fields_by_name['key'].message_type = _HASKEYS_ITEM_KEYENTRY
 _HASKEYS_ITEM.containing_type = _HASKEYS
 _HASKEYS.fields_by_name['path'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
 _HASKEYS.fields_by_name['item'].message_type = _HASKEYS_ITEM
+_DATATREEPATHS_QUERYSTEP_KEYENTRY.containing_type = _DATATREEPATHS_QUERYSTEP
+_DATATREEPATHS_QUERYSTEP.fields_by_name['key'].message_type = _DATATREEPATHS_QUERYSTEP_KEYENTRY
+_DATATREEPATHS_QUERYSTEP.containing_type = _DATATREEPATHS
+_DATATREEPATHS_TESTQUERY.fields_by_name['steps'].message_type = _DATATREEPATHS_QUERYSTEP
+_DATATREEPATHS_TESTQUERY.fields_by_name['get_list_keys'].message_type = _DATATREEPATHS_LISTQUERY
+_DATATREEPATHS_TESTQUERY.fields_by_name['required_paths'].message_type = _DATATREEPATHS_REQUIREDPATHS
+_DATATREEPATHS_TESTQUERY.containing_type = _DATATREEPATHS
+_DATATREEPATHS_TESTQUERY.oneofs_by_name['type'].fields.append(
+  _DATATREEPATHS_TESTQUERY.fields_by_name['get_list_keys'])
+_DATATREEPATHS_TESTQUERY.fields_by_name['get_list_keys'].containing_oneof = _DATATREEPATHS_TESTQUERY.oneofs_by_name['type']
+_DATATREEPATHS_TESTQUERY.oneofs_by_name['type'].fields.append(
+  _DATATREEPATHS_TESTQUERY.fields_by_name['required_paths'])
+_DATATREEPATHS_TESTQUERY.fields_by_name['required_paths'].containing_oneof = _DATATREEPATHS_TESTQUERY.oneofs_by_name['type']
+_DATATREEPATHS_LISTQUERY.fields_by_name['next_query'].message_type = _DATATREEPATHS_TESTQUERY
+_DATATREEPATHS_LISTQUERY.containing_type = _DATATREEPATHS
+_DATATREEPATHS_REQUIREDPATHS.fields_by_name['prefix'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
+_DATATREEPATHS_REQUIREDPATHS.fields_by_name['paths'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
+_DATATREEPATHS_REQUIREDPATHS.containing_type = _DATATREEPATHS
+_DATATREEPATHS.fields_by_name['test_oper'].message_type = _DATATREEPATHS_TESTQUERY
+_SCHEMAPATHCOMPLETE.fields_by_name['prefix'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
+_SCHEMAPATHCOMPLETE.fields_by_name['path'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
 _GETSETTEST.fields_by_name['oper_validation'].message_type = _GETSETVALIDATIONTEST
 _GETSETTEST.oneofs_by_name['args'].fields.append(
   _GETSETTEST.fields_by_name['oper_validation'])
@@ -666,6 +987,8 @@ DESCRIPTOR.message_types_by_name['Credentials'] = _CREDENTIALS
 DESCRIPTOR.message_types_by_name['Connection'] = _CONNECTION
 DESCRIPTOR.message_types_by_name['FakeTest'] = _FAKETEST
 DESCRIPTOR.message_types_by_name['HasKeys'] = _HASKEYS
+DESCRIPTOR.message_types_by_name['DataTreePaths'] = _DATATREEPATHS
+DESCRIPTOR.message_types_by_name['SchemaPathComplete'] = _SCHEMAPATHCOMPLETE
 DESCRIPTOR.message_types_by_name['GetSetTest'] = _GETSETTEST
 DESCRIPTOR.message_types_by_name['GetSetValidationTest'] = _GETSETVALIDATIONTEST
 DESCRIPTOR.message_types_by_name['GetSetValidationOper'] = _GETSETVALIDATIONOPER
@@ -736,6 +1059,60 @@ _sym_db.RegisterMessage(HasKeys)
 _sym_db.RegisterMessage(HasKeys.Item)
 _sym_db.RegisterMessage(HasKeys.Item.KeyEntry)
 
+DataTreePaths = _reflection.GeneratedProtocolMessageType('DataTreePaths', (_message.Message,), dict(
+
+  QueryStep = _reflection.GeneratedProtocolMessageType('QueryStep', (_message.Message,), dict(
+
+    KeyEntry = _reflection.GeneratedProtocolMessageType('KeyEntry', (_message.Message,), dict(
+      DESCRIPTOR = _DATATREEPATHS_QUERYSTEP_KEYENTRY,
+      __module__ = 'proto.tests.tests_pb2'
+      # @@protoc_insertion_point(class_scope:tests.DataTreePaths.QueryStep.KeyEntry)
+      ))
+    ,
+    DESCRIPTOR = _DATATREEPATHS_QUERYSTEP,
+    __module__ = 'proto.tests.tests_pb2'
+    # @@protoc_insertion_point(class_scope:tests.DataTreePaths.QueryStep)
+    ))
+  ,
+
+  TestQuery = _reflection.GeneratedProtocolMessageType('TestQuery', (_message.Message,), dict(
+    DESCRIPTOR = _DATATREEPATHS_TESTQUERY,
+    __module__ = 'proto.tests.tests_pb2'
+    # @@protoc_insertion_point(class_scope:tests.DataTreePaths.TestQuery)
+    ))
+  ,
+
+  ListQuery = _reflection.GeneratedProtocolMessageType('ListQuery', (_message.Message,), dict(
+    DESCRIPTOR = _DATATREEPATHS_LISTQUERY,
+    __module__ = 'proto.tests.tests_pb2'
+    # @@protoc_insertion_point(class_scope:tests.DataTreePaths.ListQuery)
+    ))
+  ,
+
+  RequiredPaths = _reflection.GeneratedProtocolMessageType('RequiredPaths', (_message.Message,), dict(
+    DESCRIPTOR = _DATATREEPATHS_REQUIREDPATHS,
+    __module__ = 'proto.tests.tests_pb2'
+    # @@protoc_insertion_point(class_scope:tests.DataTreePaths.RequiredPaths)
+    ))
+  ,
+  DESCRIPTOR = _DATATREEPATHS,
+  __module__ = 'proto.tests.tests_pb2'
+  # @@protoc_insertion_point(class_scope:tests.DataTreePaths)
+  ))
+_sym_db.RegisterMessage(DataTreePaths)
+_sym_db.RegisterMessage(DataTreePaths.QueryStep)
+_sym_db.RegisterMessage(DataTreePaths.QueryStep.KeyEntry)
+_sym_db.RegisterMessage(DataTreePaths.TestQuery)
+_sym_db.RegisterMessage(DataTreePaths.ListQuery)
+_sym_db.RegisterMessage(DataTreePaths.RequiredPaths)
+
+SchemaPathComplete = _reflection.GeneratedProtocolMessageType('SchemaPathComplete', (_message.Message,), dict(
+  DESCRIPTOR = _SCHEMAPATHCOMPLETE,
+  __module__ = 'proto.tests.tests_pb2'
+  # @@protoc_insertion_point(class_scope:tests.SchemaPathComplete)
+  ))
+_sym_db.RegisterMessage(SchemaPathComplete)
+
 GetSetTest = _reflection.GeneratedProtocolMessageType('GetSetTest', (_message.Message,), dict(
   DESCRIPTOR = _GETSETTEST,
   __module__ = 'proto.tests.tests_pb2'
@@ -760,4 +1137,6 @@ _sym_db.RegisterMessage(GetSetValidationOper)
 
 _HASKEYS_ITEM_KEYENTRY.has_options = True
 _HASKEYS_ITEM_KEYENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_DATATREEPATHS_QUERYSTEP_KEYENTRY.has_options = True
+_DATATREEPATHS_QUERYSTEP_KEYENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 # @@protoc_insertion_point(module_scope)

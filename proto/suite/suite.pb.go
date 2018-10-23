@@ -71,28 +71,28 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // for test framework.
 type Suite struct {
 	// Name of the suite. Used for reporting purposes.
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	// Amount of time in seconds a test is allowed to run before cancelled.
 	// This can be overridden by individual tests.
-	Timeout int32 `protobuf:"varint,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout int32 `protobuf:"varint,2,opt,name=timeout" json:"timeout,omitempty"`
 	// Schema denotes which version of compiled gostructs to use in the test. If
 	// test doesn't specify one, the one specified in Suite will be effective.
-	Schema string `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
+	Schema string `protobuf:"bytes,3,opt,name=schema" json:"schema,omitempty"`
 	// Connection parameters to use while dialing into target. This must be set
 	// here or in all individual tests. If set both here and a test, the test
 	// instance takes precedence.
-	Connection *tests.Connection `protobuf:"bytes,4,opt,name=connection,proto3" json:"connection,omitempty"`
+	Connection *tests.Connection `protobuf:"bytes,4,opt,name=connection" json:"connection,omitempty"`
 	// Set of ExtensionList that can be referenced while composing
 	// openconfig.test.Instance.
-	ExtensionList map[string]*ExtensionList `protobuf:"bytes,10,rep,name=extension_list,json=extensionList,proto3" json:"extension_list,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ExtensionList map[string]*ExtensionList `protobuf:"bytes,10,rep,name=extension_list,json=extensionList" json:"extension_list,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// List of openconfig.test.InstanceGroup that comprises the test suite.
 	// openconfig.test.InstanceGroups run serially. However the tests within
 	// openconfig.test.InstanceGroup run in parallel.
-	InstanceGroupList []*InstanceGroup `protobuf:"bytes,15,rep,name=instance_group_list,json=instanceGroupList,proto3" json:"instance_group_list,omitempty"`
+	InstanceGroupList []*InstanceGroup `protobuf:"bytes,15,rep,name=instance_group_list,json=instanceGroupList" json:"instance_group_list,omitempty"`
 	// A set of common request and response messages which can be referenced
 	// from individual tests to reduce duplication of messages in the test
 	// specification.
-	Common               *CommonMessages `protobuf:"bytes,16,opt,name=common,proto3" json:"common,omitempty"`
+	Common               *CommonMessages `protobuf:"bytes,16,opt,name=common" json:"common,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -175,13 +175,13 @@ func (m *Suite) GetCommon() *CommonMessages {
 // RPC requests for tests in this group will be made in parallel.
 type InstanceGroup struct {
 	// Description of the instance group. Used for reporting purposes.
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Description string `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
 	// Name of the openconfig.test.Instances to run in parallel.
-	Instance []*Instance `protobuf:"bytes,2,rep,name=instance,proto3" json:"instance,omitempty"`
+	Instance []*Instance `protobuf:"bytes,2,rep,name=instance" json:"instance,omitempty"`
 	// Whether the failure of a test within the InstanceGroup should be considered
 	// fatal for the Suite. If set to true, when one or more of the tests within
 	// the group fails, all subsequent groups are not executed.
-	Fatal                bool     `protobuf:"varint,3,opt,name=fatal,proto3" json:"fatal,omitempty"`
+	Fatal                bool     `protobuf:"varint,3,opt,name=fatal" json:"fatal,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -236,14 +236,14 @@ func (m *InstanceGroup) GetFatal() bool {
 // information to run and report a test.
 type Instance struct {
 	// Description of the Instance. Used for reporting purposes.
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Description string `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
 	// Test configuration to use.
-	Test *tests.Test `protobuf:"bytes,2,opt,name=test,proto3" json:"test,omitempty"`
+	Test *tests.Test `protobuf:"bytes,2,opt,name=test" json:"test,omitempty"`
 	// List of openconfig.test.ExtensionList to run as part of this test.
 	// The tests run within the same context as the test specified in
 	// this message - and have access to the same requests (e.g.,
 	// subscription in the case of Subscribe tests).
-	ExtensionList        []string `protobuf:"bytes,3,rep,name=extension_list,json=extensionList,proto3" json:"extension_list,omitempty"`
+	ExtensionList        []string `protobuf:"bytes,3,rep,name=extension_list,json=extensionList" json:"extension_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -297,7 +297,7 @@ func (m *Instance) GetExtensionList() []string {
 // ExtensionList is a list of extensions. They run as part of the subscription
 // created for the parent test in openconfig.test.Instance.
 type ExtensionList struct {
-	Extension            []*tests.Test `protobuf:"bytes,1,rep,name=extension,proto3" json:"extension,omitempty"`
+	Extension            []*tests.Test `protobuf:"bytes,1,rep,name=extension" json:"extension,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -342,10 +342,10 @@ func (m *ExtensionList) GetExtension() []*tests.Test {
 // Each specificiation is a map keyed by a unique identifying name for the
 // message value of the map.
 type CommonMessages struct {
-	SetRequests          map[string]*gnmi.SetRequest       `protobuf:"bytes,1,rep,name=set_requests,json=setRequests,proto3" json:"set_requests,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	GetRequests          map[string]*gnmi.GetRequest       `protobuf:"bytes,3,rep,name=get_requests,json=getRequests,proto3" json:"get_requests,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	GetResponses         map[string]*gnmi.GetResponse      `protobuf:"bytes,4,rep,name=get_responses,json=getResponses,proto3" json:"get_responses,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	SubscribeRequests    map[string]*gnmi.SubscribeRequest `protobuf:"bytes,5,rep,name=subscribe_requests,json=subscribeRequests,proto3" json:"subscribe_requests,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	SetRequests          map[string]*gnmi.SetRequest       `protobuf:"bytes,1,rep,name=set_requests,json=setRequests" json:"set_requests,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	GetRequests          map[string]*gnmi.GetRequest       `protobuf:"bytes,3,rep,name=get_requests,json=getRequests" json:"get_requests,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	GetResponses         map[string]*gnmi.GetResponse      `protobuf:"bytes,4,rep,name=get_responses,json=getResponses" json:"get_responses,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	SubscribeRequests    map[string]*gnmi.SubscribeRequest `protobuf:"bytes,5,rep,name=subscribe_requests,json=subscribeRequests" json:"subscribe_requests,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
 	XXX_unrecognized     []byte                            `json:"-"`
 	XXX_sizecache        int32                             `json:"-"`

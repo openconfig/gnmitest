@@ -8,6 +8,7 @@ import fmt "fmt"
 import math "math"
 import gnmi "github.com/openconfig/gnmi/proto/gnmi"
 import tests "github.com/openconfig/gnmitest/proto/tests"
+import status "google.golang.org/genproto/googleapis/rpc/status"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -56,7 +57,7 @@ func (x CompletionStatus) String() string {
 	return proto.EnumName(CompletionStatus_name, int32(x))
 }
 func (CompletionStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{0}
+	return fileDescriptor_report_df282fa16d7344cd, []int{0}
 }
 
 // Result of running an individual test.
@@ -86,16 +87,43 @@ func (x Status) String() string {
 	return proto.EnumName(Status_name, int32(x))
 }
 func (Status) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{1}
+	return fileDescriptor_report_df282fa16d7344cd, []int{1}
+}
+
+// MatchResult enumerates the outcome of a match comparison.
+type MatchResult int32
+
+const (
+	MatchResult_MR_UNSET   MatchResult = 0
+	MatchResult_MR_EQUAL   MatchResult = 1
+	MatchResult_MR_UNEQUAL MatchResult = 2
+)
+
+var MatchResult_name = map[int32]string{
+	0: "MR_UNSET",
+	1: "MR_EQUAL",
+	2: "MR_UNEQUAL",
+}
+var MatchResult_value = map[string]int32{
+	"MR_UNSET":   0,
+	"MR_EQUAL":   1,
+	"MR_UNEQUAL": 2,
+}
+
+func (x MatchResult) String() string {
+	return proto.EnumName(MatchResult_name, int32(x))
+}
+func (MatchResult) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_report_df282fa16d7344cd, []int{2}
 }
 
 // SubscribeResponseResult proto is used to pair a gnmi SubscribeResponse and
 // the error returned from Process function of the test.
 type SubscribeResponseResult struct {
 	// gnmi SubscribeResponse received by the test.
-	Response *gnmi.SubscribeResponse `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
+	Response *gnmi.SubscribeResponse `protobuf:"bytes,1,opt,name=response" json:"response,omitempty"`
 	// error returned by Process function of the test.
-	Error                string   `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Error                string   `protobuf:"bytes,2,opt,name=error" json:"error,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -105,7 +133,7 @@ func (m *SubscribeResponseResult) Reset()         { *m = SubscribeResponseResult
 func (m *SubscribeResponseResult) String() string { return proto.CompactTextString(m) }
 func (*SubscribeResponseResult) ProtoMessage()    {}
 func (*SubscribeResponseResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{0}
+	return fileDescriptor_report_df282fa16d7344cd, []int{0}
 }
 func (m *SubscribeResponseResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscribeResponseResult.Unmarshal(m, b)
@@ -143,12 +171,12 @@ func (m *SubscribeResponseResult) GetError() string {
 // suite.SubscribeTest.
 type SubscribeTestResult struct {
 	// SubscribeResponse messages received as a result of subscription.
-	Responses []*SubscribeResponseResult `protobuf:"bytes,1,rep,name=responses,proto3" json:"responses,omitempty"`
+	Responses []*SubscribeResponseResult `protobuf:"bytes,1,rep,name=responses" json:"responses,omitempty"`
 	// If test is stateful, error is set as a result of calling Check function of
 	// the test. If test is stateless, error set here can be ignored.
-	Error string `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Error string `protobuf:"bytes,2,opt,name=error" json:"error,omitempty"`
 	// CompletionStatus indicates why the test ended.
-	Status               CompletionStatus `protobuf:"varint,3,opt,name=status,proto3,enum=report.CompletionStatus" json:"status,omitempty"`
+	Status               CompletionStatus `protobuf:"varint,3,opt,name=status,enum=report.CompletionStatus" json:"status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -158,7 +186,7 @@ func (m *SubscribeTestResult) Reset()         { *m = SubscribeTestResult{} }
 func (m *SubscribeTestResult) String() string { return proto.CompactTextString(m) }
 func (*SubscribeTestResult) ProtoMessage()    {}
 func (*SubscribeTestResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{1}
+	return fileDescriptor_report_df282fa16d7344cd, []int{1}
 }
 func (m *SubscribeTestResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscribeTestResult.Unmarshal(m, b)
@@ -199,15 +227,171 @@ func (m *SubscribeTestResult) GetStatus() CompletionStatus {
 	return CompletionStatus_UNKNOWN
 }
 
+// GetSetTestResult is the result of a GetSet test towards a target.
+type GetSetTestResult struct {
+	Test *tests.Test `protobuf:"bytes,1,opt,name=test" json:"test,omitempty"`
+	// Result of running the test.
+	Result Status `protobuf:"varint,2,opt,name=result,enum=report.Status" json:"result,omitempty"`
+	// Result of the initialisation operation specified in the input test.
+	InitialiseOper *GetSetOperResult `protobuf:"bytes,3,opt,name=initialise_oper,json=initialiseOper" json:"initialise_oper,omitempty"`
+	// Result of the test operation specified in the input test.
+	TestOper             *GetSetOperResult `protobuf:"bytes,4,opt,name=test_oper,json=testOper" json:"test_oper,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *GetSetTestResult) Reset()         { *m = GetSetTestResult{} }
+func (m *GetSetTestResult) String() string { return proto.CompactTextString(m) }
+func (*GetSetTestResult) ProtoMessage()    {}
+func (*GetSetTestResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_report_df282fa16d7344cd, []int{2}
+}
+func (m *GetSetTestResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetSetTestResult.Unmarshal(m, b)
+}
+func (m *GetSetTestResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetSetTestResult.Marshal(b, m, deterministic)
+}
+func (dst *GetSetTestResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetSetTestResult.Merge(dst, src)
+}
+func (m *GetSetTestResult) XXX_Size() int {
+	return xxx_messageInfo_GetSetTestResult.Size(m)
+}
+func (m *GetSetTestResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetSetTestResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetSetTestResult proto.InternalMessageInfo
+
+func (m *GetSetTestResult) GetTest() *tests.Test {
+	if m != nil {
+		return m.Test
+	}
+	return nil
+}
+
+func (m *GetSetTestResult) GetResult() Status {
+	if m != nil {
+		return m.Result
+	}
+	return Status_UNSET
+}
+
+func (m *GetSetTestResult) GetInitialiseOper() *GetSetOperResult {
+	if m != nil {
+		return m.InitialiseOper
+	}
+	return nil
+}
+
+func (m *GetSetTestResult) GetTestOper() *GetSetOperResult {
+	if m != nil {
+		return m.TestOper
+	}
+	return nil
+}
+
+// GetSetOperResult is the result of an individual operation within the
+// GetSetTest.
+type GetSetOperResult struct {
+	// Result of the operation.
+	Result Status `protobuf:"varint,1,opt,name=result,enum=report.Status" json:"result,omitempty"`
+	// set_responses is the SetResponse message received from the target.
+	SetResponse *gnmi.SetResponse `protobuf:"bytes,2,opt,name=set_response,json=setResponse" json:"set_response,omitempty"`
+	// set_status is the status.proto message received from the target in
+	// response to the Set RPC within the operation.
+	SetStatus *status.Status `protobuf:"bytes,3,opt,name=set_status,json=setStatus" json:"set_status,omitempty"`
+	// get_response is the GetResponse received from the target.
+	GetResponse *gnmi.GetResponse `protobuf:"bytes,4,opt,name=get_response,json=getResponse" json:"get_response,omitempty"`
+	// get_status is the status.proto message received from the target in
+	// response to the Get RPC within the operation.
+	GetStatus *status.Status `protobuf:"bytes,5,opt,name=get_status,json=getStatus" json:"get_status,omitempty"`
+	// get_response_matched indicates whether the GetResponse received from
+	// the target matched that specified in the test.
+	GetResponseMatched   MatchResult `protobuf:"varint,6,opt,name=get_response_matched,json=getResponseMatched,enum=report.MatchResult" json:"get_response_matched,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+
+func (m *GetSetOperResult) Reset()         { *m = GetSetOperResult{} }
+func (m *GetSetOperResult) String() string { return proto.CompactTextString(m) }
+func (*GetSetOperResult) ProtoMessage()    {}
+func (*GetSetOperResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_report_df282fa16d7344cd, []int{3}
+}
+func (m *GetSetOperResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetSetOperResult.Unmarshal(m, b)
+}
+func (m *GetSetOperResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetSetOperResult.Marshal(b, m, deterministic)
+}
+func (dst *GetSetOperResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetSetOperResult.Merge(dst, src)
+}
+func (m *GetSetOperResult) XXX_Size() int {
+	return xxx_messageInfo_GetSetOperResult.Size(m)
+}
+func (m *GetSetOperResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetSetOperResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetSetOperResult proto.InternalMessageInfo
+
+func (m *GetSetOperResult) GetResult() Status {
+	if m != nil {
+		return m.Result
+	}
+	return Status_UNSET
+}
+
+func (m *GetSetOperResult) GetSetResponse() *gnmi.SetResponse {
+	if m != nil {
+		return m.SetResponse
+	}
+	return nil
+}
+
+func (m *GetSetOperResult) GetSetStatus() *status.Status {
+	if m != nil {
+		return m.SetStatus
+	}
+	return nil
+}
+
+func (m *GetSetOperResult) GetGetResponse() *gnmi.GetResponse {
+	if m != nil {
+		return m.GetResponse
+	}
+	return nil
+}
+
+func (m *GetSetOperResult) GetGetStatus() *status.Status {
+	if m != nil {
+		return m.GetStatus
+	}
+	return nil
+}
+
+func (m *GetSetOperResult) GetGetResponseMatched() MatchResult {
+	if m != nil {
+		return m.GetResponseMatched
+	}
+	return MatchResult_MR_UNSET
+}
+
 // Test is used to pair a tests.Test and its result.
 type TestResult struct {
-	Test *tests.Test `protobuf:"bytes,1,opt,name=test,proto3" json:"test,omitempty"`
+	Test *tests.Test `protobuf:"bytes,1,opt,name=test" json:"test,omitempty"`
 	// Result of running the test.
-	Result Status `protobuf:"varint,2,opt,name=result,proto3,enum=report.Status" json:"result,omitempty"`
+	Result Status `protobuf:"varint,2,opt,name=result,enum=report.Status" json:"result,omitempty"`
 	// Oneof field can be expanded to include results of other gnmi RPCs.
 	//
 	// Types that are valid to be assigned to Type:
 	//	*TestResult_Subscribe
+	//	*TestResult_Getset
 	Type                 isTestResult_Type `protobuf_oneof:"type"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -218,7 +402,7 @@ func (m *TestResult) Reset()         { *m = TestResult{} }
 func (m *TestResult) String() string { return proto.CompactTextString(m) }
 func (*TestResult) ProtoMessage()    {}
 func (*TestResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{2}
+	return fileDescriptor_report_df282fa16d7344cd, []int{4}
 }
 func (m *TestResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TestResult.Unmarshal(m, b)
@@ -238,6 +422,27 @@ func (m *TestResult) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_TestResult proto.InternalMessageInfo
 
+type isTestResult_Type interface {
+	isTestResult_Type()
+}
+
+type TestResult_Subscribe struct {
+	Subscribe *SubscribeTestResult `protobuf:"bytes,10,opt,name=subscribe,oneof"`
+}
+type TestResult_Getset struct {
+	Getset *GetSetTestResult `protobuf:"bytes,11,opt,name=getset,oneof"`
+}
+
+func (*TestResult_Subscribe) isTestResult_Type() {}
+func (*TestResult_Getset) isTestResult_Type()    {}
+
+func (m *TestResult) GetType() isTestResult_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
 func (m *TestResult) GetTest() *tests.Test {
 	if m != nil {
 		return m.Test
@@ -252,26 +457,16 @@ func (m *TestResult) GetResult() Status {
 	return Status_UNSET
 }
 
-type isTestResult_Type interface {
-	isTestResult_Type()
-}
-
-type TestResult_Subscribe struct {
-	Subscribe *SubscribeTestResult `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
-}
-
-func (*TestResult_Subscribe) isTestResult_Type() {}
-
-func (m *TestResult) GetType() isTestResult_Type {
-	if m != nil {
-		return m.Type
+func (m *TestResult) GetSubscribe() *SubscribeTestResult {
+	if x, ok := m.GetType().(*TestResult_Subscribe); ok {
+		return x.Subscribe
 	}
 	return nil
 }
 
-func (m *TestResult) GetSubscribe() *SubscribeTestResult {
-	if x, ok := m.GetType().(*TestResult_Subscribe); ok {
-		return x.Subscribe
+func (m *TestResult) GetGetset() *GetSetTestResult {
+	if x, ok := m.GetType().(*TestResult_Getset); ok {
+		return x.Getset
 	}
 	return nil
 }
@@ -280,6 +475,7 @@ func (m *TestResult) GetSubscribe() *SubscribeTestResult {
 func (*TestResult) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _TestResult_OneofMarshaler, _TestResult_OneofUnmarshaler, _TestResult_OneofSizer, []interface{}{
 		(*TestResult_Subscribe)(nil),
+		(*TestResult_Getset)(nil),
 	}
 }
 
@@ -290,6 +486,11 @@ func _TestResult_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *TestResult_Subscribe:
 		b.EncodeVarint(10<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Subscribe); err != nil {
+			return err
+		}
+	case *TestResult_Getset:
+		b.EncodeVarint(11<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Getset); err != nil {
 			return err
 		}
 	case nil:
@@ -310,6 +511,14 @@ func _TestResult_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buf
 		err := b.DecodeMessage(msg)
 		m.Type = &TestResult_Subscribe{msg}
 		return true, err
+	case 11: // type.getset
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(GetSetTestResult)
+		err := b.DecodeMessage(msg)
+		m.Type = &TestResult_Getset{msg}
+		return true, err
 	default:
 		return false, nil
 	}
@@ -324,6 +533,11 @@ func _TestResult_OneofSizer(msg proto.Message) (n int) {
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
+	case *TestResult_Getset:
+		s := proto.Size(x.Getset)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -333,9 +547,9 @@ func _TestResult_OneofSizer(msg proto.Message) (n int) {
 
 // Instance stores test results of main test and its extensions.
 type Instance struct {
-	Description          string        `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Test                 *TestResult   `protobuf:"bytes,2,opt,name=test,proto3" json:"test,omitempty"`
-	Extensions           []*TestResult `protobuf:"bytes,3,rep,name=extensions,proto3" json:"extensions,omitempty"`
+	Description          string        `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	Test                 *TestResult   `protobuf:"bytes,2,opt,name=test" json:"test,omitempty"`
+	Extensions           []*TestResult `protobuf:"bytes,3,rep,name=extensions" json:"extensions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -345,7 +559,7 @@ func (m *Instance) Reset()         { *m = Instance{} }
 func (m *Instance) String() string { return proto.CompactTextString(m) }
 func (*Instance) ProtoMessage()    {}
 func (*Instance) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{3}
+	return fileDescriptor_report_df282fa16d7344cd, []int{5}
 }
 func (m *Instance) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Instance.Unmarshal(m, b)
@@ -388,11 +602,11 @@ func (m *Instance) GetExtensions() []*TestResult {
 
 // InstanceGroup stores a set of Instances.
 type InstanceGroup struct {
-	Description string      `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Instance    []*Instance `protobuf:"bytes,2,rep,name=instance,proto3" json:"instance,omitempty"`
+	Description string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	Instance    []*Instance `protobuf:"bytes,2,rep,name=instance" json:"instance,omitempty"`
 	// Skipped indicates whether the instance group was skipped during
 	// test execution based on a prior group being fatal.
-	Skipped              bool     `protobuf:"varint,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	Skipped              bool     `protobuf:"varint,3,opt,name=skipped" json:"skipped,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -402,7 +616,7 @@ func (m *InstanceGroup) Reset()         { *m = InstanceGroup{} }
 func (m *InstanceGroup) String() string { return proto.CompactTextString(m) }
 func (*InstanceGroup) ProtoMessage()    {}
 func (*InstanceGroup) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{4}
+	return fileDescriptor_report_df282fa16d7344cd, []int{6}
 }
 func (m *InstanceGroup) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InstanceGroup.Unmarshal(m, b)
@@ -445,7 +659,7 @@ func (m *InstanceGroup) GetSkipped() bool {
 
 // Report is result of running suite.Suite
 type Report struct {
-	Results              []*InstanceGroup `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
+	Results              []*InstanceGroup `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -455,7 +669,7 @@ func (m *Report) Reset()         { *m = Report{} }
 func (m *Report) String() string { return proto.CompactTextString(m) }
 func (*Report) ProtoMessage()    {}
 func (*Report) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_c440a61858d20820, []int{5}
+	return fileDescriptor_report_df282fa16d7344cd, []int{7}
 }
 func (m *Report) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Report.Unmarshal(m, b)
@@ -485,49 +699,66 @@ func (m *Report) GetResults() []*InstanceGroup {
 func init() {
 	proto.RegisterType((*SubscribeResponseResult)(nil), "report.SubscribeResponseResult")
 	proto.RegisterType((*SubscribeTestResult)(nil), "report.SubscribeTestResult")
+	proto.RegisterType((*GetSetTestResult)(nil), "report.GetSetTestResult")
+	proto.RegisterType((*GetSetOperResult)(nil), "report.GetSetOperResult")
 	proto.RegisterType((*TestResult)(nil), "report.TestResult")
 	proto.RegisterType((*Instance)(nil), "report.Instance")
 	proto.RegisterType((*InstanceGroup)(nil), "report.InstanceGroup")
 	proto.RegisterType((*Report)(nil), "report.Report")
 	proto.RegisterEnum("report.CompletionStatus", CompletionStatus_name, CompletionStatus_value)
 	proto.RegisterEnum("report.Status", Status_name, Status_value)
+	proto.RegisterEnum("report.MatchResult", MatchResult_name, MatchResult_value)
 }
 
-func init() { proto.RegisterFile("proto/report/report.proto", fileDescriptor_report_c440a61858d20820) }
+func init() { proto.RegisterFile("proto/report/report.proto", fileDescriptor_report_df282fa16d7344cd) }
 
-var fileDescriptor_report_c440a61858d20820 = []byte{
-	// 524 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0x5d, 0x6f, 0xd3, 0x30,
-	0x14, 0x9d, 0xdb, 0x2e, 0x4d, 0x6e, 0x59, 0x15, 0x19, 0xd0, 0xc2, 0x78, 0x58, 0x95, 0x87, 0xa9,
-	0xaa, 0x50, 0x3b, 0x75, 0x12, 0x12, 0x42, 0x3c, 0x8c, 0x92, 0xb1, 0x8a, 0x91, 0x22, 0xa7, 0x15,
-	0xe2, 0x01, 0x4d, 0x6b, 0x6b, 0x4a, 0xc4, 0x1a, 0x5b, 0xb6, 0x23, 0xb1, 0x7f, 0xc0, 0x6f, 0x40,
-	0xfc, 0x58, 0x14, 0xc7, 0x4e, 0xab, 0x8d, 0x4a, 0xbc, 0xf8, 0xe3, 0xde, 0x73, 0xee, 0x39, 0xf7,
-	0x3a, 0x81, 0x67, 0x5c, 0x30, 0xc5, 0x06, 0x82, 0x72, 0x26, 0x94, 0xd9, 0xfa, 0x3a, 0x86, 0x9d,
-	0xf2, 0x76, 0x74, 0xba, 0x4a, 0xd5, 0xf7, 0x7c, 0xde, 0x5f, 0xb0, 0xf5, 0x80, 0x71, 0x9a, 0x2d,
-	0x58, 0xf6, 0x2d, 0x5d, 0x0d, 0x56, 0xd9, 0x3a, 0x1d, 0x94, 0x6c, 0x7d, 0x2c, 0x96, 0x92, 0x79,
-	0xf4, 0x72, 0x37, 0x43, 0x51, 0xa9, 0x0c, 0xab, 0x38, 0xca, 0x72, 0x2d, 0x79, 0xe1, 0x12, 0x0e,
-	0x93, 0x7c, 0x2e, 0x17, 0x22, 0x9d, 0x53, 0x42, 0x25, 0x67, 0x99, 0x2c, 0xf6, 0xfc, 0x56, 0xe1,
-	0x33, 0x70, 0x85, 0x89, 0x04, 0xa8, 0x83, 0xba, 0xad, 0xe1, 0x61, 0x5f, 0x2b, 0x3e, 0x24, 0x54,
-	0x40, 0xfc, 0x04, 0xf6, 0xa9, 0x10, 0x4c, 0x04, 0xb5, 0x0e, 0xea, 0x7a, 0xa4, 0xbc, 0x84, 0x7f,
-	0x10, 0x3c, 0xae, 0x58, 0x53, 0x2a, 0x95, 0x91, 0x78, 0x03, 0x9e, 0x65, 0xca, 0x00, 0x75, 0xea,
-	0xdd, 0xd6, 0xf0, 0xb8, 0x6f, 0x26, 0xb2, 0xc3, 0x16, 0xd9, 0x30, 0xfe, 0x2d, 0x86, 0x4f, 0xc1,
-	0x91, 0xea, 0x46, 0xe5, 0x32, 0xa8, 0x77, 0x50, 0xb7, 0x3d, 0x0c, 0x6c, 0xc5, 0x11, 0x5b, 0xf3,
-	0x5b, 0xaa, 0x52, 0x96, 0x25, 0x3a, 0x4f, 0x0c, 0x2e, 0xfc, 0x8d, 0x00, 0xb6, 0x5c, 0x1d, 0x43,
-	0xa3, 0x18, 0x91, 0x69, 0xba, 0xd5, 0x2f, 0xe7, 0xa5, 0x01, 0x3a, 0x81, 0x4f, 0xc0, 0x11, 0x1a,
-	0xaa, 0x85, 0xdb, 0xc3, 0x76, 0xe5, 0xd9, 0xd4, 0x2d, 0xb3, 0xf8, 0x35, 0x78, 0xd2, 0x76, 0x11,
-	0x80, 0xae, 0xf6, 0xfc, 0x41, 0x7b, 0x1b, 0xe1, 0xcb, 0x3d, 0xb2, 0xc1, 0xbf, 0x75, 0xa0, 0xa1,
-	0xee, 0x38, 0x0d, 0x7f, 0x21, 0x70, 0xc7, 0x99, 0x54, 0x37, 0xd9, 0x82, 0xe2, 0x0e, 0xb4, 0x96,
-	0xb4, 0x00, 0xf0, 0xa2, 0x0d, 0xed, 0xd0, 0x23, 0xdb, 0x21, 0x7c, 0x62, 0xcc, 0xd7, 0xb4, 0x1c,
-	0xb6, 0x72, 0x1b, 0x15, 0xd3, 0xc3, 0x10, 0x80, 0xfe, 0x54, 0x34, 0x93, 0x29, 0xcb, 0x8a, 0x49,
-	0xd5, 0x77, 0xa0, 0xb7, 0x50, 0xe1, 0x1d, 0x1c, 0x58, 0x27, 0xef, 0x05, 0xcb, 0xf9, 0x7f, 0xd8,
-	0x79, 0x01, 0x6e, 0x6a, 0x28, 0x41, 0x4d, 0x8b, 0xf8, 0x56, 0xc4, 0x96, 0x22, 0x15, 0x02, 0x07,
-	0xd0, 0x94, 0x3f, 0x52, 0xce, 0xe9, 0x52, 0xbf, 0x9d, 0x4b, 0xec, 0x35, 0x7c, 0x05, 0x0e, 0xd1,
-	0x34, 0x3c, 0x80, 0x66, 0x39, 0x5e, 0xfb, 0xc5, 0x3c, 0xbd, 0x5f, 0x50, 0x7b, 0x23, 0x16, 0xd5,
-	0xfb, 0x0a, 0xfe, 0xfd, 0x97, 0xc7, 0x2d, 0x68, 0xce, 0xe2, 0x0f, 0xf1, 0xe4, 0x73, 0xec, 0xef,
-	0xe1, 0x47, 0xe0, 0x5e, 0x8c, 0xe3, 0x71, 0x72, 0x19, 0xbd, 0xf3, 0x11, 0xc6, 0xd0, 0x8e, 0xce,
-	0xc9, 0xd5, 0x97, 0xeb, 0x2a, 0x56, 0xc3, 0x07, 0xe0, 0x91, 0x4f, 0xa3, 0xeb, 0x88, 0x90, 0x09,
-	0xf1, 0xeb, 0x05, 0x7b, 0x3a, 0xfe, 0x18, 0x4d, 0x66, 0x53, 0xbf, 0xd1, 0xeb, 0x81, 0x63, 0x8a,
-	0x7a, 0xb0, 0x3f, 0x8b, 0x93, 0x68, 0xea, 0xef, 0x15, 0x88, 0x64, 0x36, 0x1a, 0x45, 0x49, 0xe2,
-	0x23, 0xec, 0x42, 0xe3, 0xe2, 0x7c, 0x7c, 0xe5, 0xd7, 0xe6, 0x8e, 0xfe, 0xe9, 0xce, 0xfe, 0x06,
-	0x00, 0x00, 0xff, 0xff, 0xa3, 0xf0, 0x75, 0x07, 0x03, 0x04, 0x00, 0x00,
+var fileDescriptor_report_df282fa16d7344cd = []byte{
+	// 745 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xdd, 0x6e, 0xeb, 0x44,
+	0x10, 0xae, 0x9d, 0xd4, 0x8d, 0xc7, 0x6d, 0x30, 0xdb, 0xa2, 0x9a, 0x72, 0xd1, 0xc8, 0x17, 0x55,
+	0x14, 0xa1, 0xa4, 0xa4, 0x80, 0x54, 0x21, 0x2e, 0x42, 0x70, 0xdb, 0x88, 0x26, 0x81, 0x75, 0x22,
+	0xc4, 0x05, 0x8a, 0xf2, 0xb3, 0xb8, 0x16, 0x89, 0x6d, 0x79, 0x37, 0x12, 0x7d, 0x03, 0x1e, 0x82,
+	0x67, 0xe2, 0xe6, 0xe8, 0xbc, 0xcf, 0xd1, 0xfe, 0xf8, 0xa7, 0x3f, 0x39, 0xe7, 0xdc, 0x9c, 0x9b,
+	0x78, 0x67, 0xe6, 0xfb, 0xe6, 0x9b, 0x99, 0x1d, 0x3b, 0xf0, 0x65, 0x92, 0xc6, 0x2c, 0xee, 0xa4,
+	0x24, 0x89, 0x53, 0xa6, 0x1e, 0x6d, 0xe1, 0x43, 0x86, 0xb4, 0xce, 0x2e, 0x83, 0x90, 0x3d, 0x6c,
+	0x17, 0xed, 0x65, 0xbc, 0xe9, 0xc4, 0x09, 0x89, 0x96, 0x71, 0xf4, 0x57, 0x18, 0x74, 0x82, 0x68,
+	0x13, 0x76, 0x24, 0x5b, 0x1c, 0xf9, 0x8f, 0x64, 0x9e, 0x7d, 0xbf, 0x9b, 0xc1, 0x08, 0x65, 0x8a,
+	0xc5, 0x8f, 0x54, 0xfe, 0x2a, 0xde, 0x69, 0x10, 0xc7, 0xc1, 0x9a, 0x74, 0xd2, 0x64, 0xd9, 0xa1,
+	0x6c, 0xce, 0xb6, 0x2a, 0xe0, 0xae, 0xe0, 0xd4, 0xdf, 0x2e, 0xe8, 0x32, 0x0d, 0x17, 0x04, 0x13,
+	0x9a, 0xc4, 0x11, 0xe5, 0xcf, 0xed, 0x9a, 0xa1, 0x2b, 0xa8, 0xa5, 0xca, 0xe3, 0x68, 0x0d, 0xad,
+	0x69, 0x75, 0x4f, 0xdb, 0xa2, 0x94, 0x97, 0x84, 0x1c, 0x88, 0x4e, 0x60, 0x9f, 0xa4, 0x69, 0x9c,
+	0x3a, 0x7a, 0x43, 0x6b, 0x9a, 0x58, 0x1a, 0xee, 0x7f, 0x1a, 0x1c, 0xe7, 0xac, 0x09, 0xa1, 0x4c,
+	0x49, 0xfc, 0x08, 0x66, 0xc6, 0xa4, 0x8e, 0xd6, 0xa8, 0x34, 0xad, 0xee, 0x79, 0x5b, 0x8d, 0x6a,
+	0x47, 0x59, 0xb8, 0x60, 0xbc, 0x2e, 0x86, 0x2e, 0xc1, 0x90, 0x2d, 0x3a, 0x95, 0x86, 0xd6, 0xac,
+	0x77, 0x9d, 0x2c, 0x63, 0x3f, 0xde, 0x24, 0x6b, 0xc2, 0xc2, 0x38, 0xf2, 0x45, 0x1c, 0x2b, 0x9c,
+	0xfb, 0x56, 0x03, 0xfb, 0x96, 0x30, 0x9f, 0xb0, 0x52, 0x6d, 0xe7, 0x50, 0xe5, 0x13, 0x54, 0xad,
+	0x5b, 0x6d, 0x39, 0x4e, 0x01, 0x10, 0x01, 0x74, 0x01, 0x46, 0x2a, 0xa0, 0x42, 0xbe, 0xde, 0xad,
+	0xe7, 0x95, 0xab, 0xec, 0x32, 0x8a, 0x7a, 0xf0, 0x59, 0x18, 0x85, 0x2c, 0x9c, 0xaf, 0x43, 0x4a,
+	0x66, 0x71, 0x42, 0x52, 0x51, 0x98, 0x55, 0x14, 0x26, 0xb5, 0xc7, 0x09, 0x49, 0x55, 0x8f, 0xf5,
+	0x82, 0xc0, 0xbd, 0xe8, 0x3b, 0x30, 0xb9, 0xa4, 0x24, 0x57, 0x3f, 0x40, 0xae, 0x71, 0x28, 0xb7,
+	0xdd, 0x37, 0x7a, 0xd6, 0x57, 0x11, 0x2e, 0x95, 0xad, 0xbd, 0xb7, 0xec, 0x6f, 0xe1, 0x90, 0x12,
+	0x36, 0xcb, 0x57, 0x40, 0x17, 0xb2, 0x9f, 0xab, 0x15, 0x20, 0x2c, 0xbf, 0x16, 0x8b, 0x16, 0x06,
+	0xfa, 0x06, 0x80, 0xb3, 0x4a, 0x17, 0x60, 0x75, 0x51, 0x5b, 0x6e, 0x5f, 0x3b, 0x4d, 0x96, 0x99,
+	0x8a, 0x49, 0x09, 0x93, 0x47, 0x2e, 0x14, 0x94, 0x85, 0xaa, 0x65, 0xa1, 0xdb, 0xb2, 0x50, 0xf0,
+	0x54, 0x28, 0x28, 0x84, 0xf6, 0x77, 0x0b, 0x05, 0xb9, 0x90, 0x07, 0x27, 0x65, 0xa1, 0xd9, 0x66,
+	0xce, 0x96, 0x0f, 0x64, 0xe5, 0x18, 0x62, 0x0e, 0xc7, 0xd9, 0x1c, 0x86, 0xdc, 0xad, 0x66, 0x89,
+	0x4a, 0x92, 0x43, 0x09, 0x77, 0xff, 0xd7, 0x00, 0x3e, 0xc5, 0x9e, 0xfc, 0x00, 0x26, 0xcd, 0x76,
+	0xde, 0x01, 0x91, 0xed, 0xab, 0x17, 0x2f, 0x43, 0x21, 0x7c, 0xb7, 0x87, 0x0b, 0x3c, 0xea, 0x82,
+	0x11, 0x10, 0x46, 0x09, 0x73, 0xac, 0xd7, 0xd6, 0xe3, 0x09, 0x4d, 0x21, 0x7f, 0x32, 0xa0, 0xca,
+	0x1e, 0x13, 0xe2, 0xfe, 0xab, 0x41, 0x6d, 0x10, 0x51, 0x36, 0x8f, 0x96, 0x04, 0x35, 0xc0, 0x5a,
+	0x11, 0x9e, 0x34, 0xe1, 0x2f, 0x8a, 0xe8, 0xca, 0xc4, 0x65, 0x17, 0xba, 0x50, 0x0d, 0xeb, 0x6a,
+	0xe6, 0x4a, 0xa8, 0x90, 0x50, 0x7d, 0x77, 0x01, 0xc8, 0x3f, 0x8c, 0x44, 0x34, 0x8c, 0x23, 0xbe,
+	0x0a, 0x95, 0x1d, 0xe8, 0x12, 0xca, 0x7d, 0x84, 0xa3, 0xac, 0x92, 0xdb, 0x34, 0xde, 0x26, 0x1f,
+	0x51, 0xce, 0xd7, 0x50, 0x0b, 0x15, 0xc5, 0xd1, 0x85, 0x88, 0x9d, 0x89, 0x64, 0xa9, 0x70, 0x8e,
+	0x40, 0x0e, 0x1c, 0xd0, 0xbf, 0xc3, 0x24, 0x21, 0x2b, 0xb1, 0x9c, 0x35, 0x9c, 0x99, 0xee, 0x35,
+	0x18, 0x58, 0xd0, 0x50, 0x07, 0x0e, 0xe4, 0x95, 0x64, 0xdf, 0xa4, 0x2f, 0x9e, 0x27, 0x14, 0xb5,
+	0xe1, 0x0c, 0xd5, 0xfa, 0x13, 0xec, 0xe7, 0xdf, 0x16, 0x64, 0xc1, 0xc1, 0x74, 0xf4, 0xcb, 0x68,
+	0xfc, 0xfb, 0xc8, 0xde, 0x43, 0x87, 0x50, 0xbb, 0x19, 0x8c, 0x06, 0xfe, 0x9d, 0xf7, 0xb3, 0xad,
+	0x21, 0x04, 0x75, 0xaf, 0x87, 0xef, 0xff, 0x98, 0xe5, 0x3e, 0x1d, 0x1d, 0x81, 0x89, 0x7f, 0xed,
+	0xcf, 0x3c, 0x8c, 0xc7, 0xd8, 0xae, 0x70, 0xf6, 0x64, 0x30, 0xf4, 0xc6, 0xd3, 0x89, 0x5d, 0x6d,
+	0xb5, 0xc0, 0x50, 0x49, 0x4d, 0xd8, 0x9f, 0x8e, 0x7c, 0x6f, 0x62, 0xef, 0x71, 0x84, 0x3f, 0xed,
+	0xf7, 0x3d, 0xdf, 0xb7, 0x35, 0x54, 0x83, 0xea, 0x4d, 0x6f, 0x70, 0x6f, 0xeb, 0xad, 0x6b, 0xb0,
+	0x4a, 0xfb, 0xcb, 0x85, 0x87, 0x78, 0x96, 0x71, 0xa4, 0xe5, 0xfd, 0x36, 0xed, 0xdd, 0xdb, 0x1a,
+	0xaa, 0x03, 0x88, 0x98, 0xb4, 0xf5, 0x85, 0x21, 0xfe, 0x11, 0xae, 0xde, 0x05, 0x00, 0x00, 0xff,
+	0xff, 0xf1, 0xe3, 0xb7, 0x96, 0xb9, 0x06, 0x00, 0x00,
 }

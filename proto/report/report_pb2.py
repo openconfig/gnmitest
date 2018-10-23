@@ -16,15 +16,16 @@ _sym_db = _symbol_database.Default()
 
 from github.com.openconfig.gnmi.proto.gnmi import gnmi_pb2 as github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2
 from github.com.openconfig.gnmitest.proto.tests import tests_pb2 as github_dot_com_dot_openconfig_dot_gnmitest_dot_proto_dot_tests_dot_tests__pb2
+from google.rpc import status_pb2 as google_dot_rpc_dot_status__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='proto/report/report.proto',
   package='report',
   syntax='proto3',
-  serialized_pb=_b('\n\x19proto/report/report.proto\x12\x06report\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\x1a\x36github.com/openconfig/gnmitest/proto/tests/tests.proto\"S\n\x17SubscribeResponseResult\x12)\n\x08response\x18\x01 \x01(\x0b\x32\x17.gnmi.SubscribeResponse\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"\x82\x01\n\x13SubscribeTestResult\x12\x32\n\tresponses\x18\x01 \x03(\x0b\x32\x1f.report.SubscribeResponseResult\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12(\n\x06status\x18\x03 \x01(\x0e\x32\x18.report.CompletionStatus\"\x81\x01\n\nTestResult\x12\x19\n\x04test\x18\x01 \x01(\x0b\x32\x0b.tests.Test\x12\x1e\n\x06result\x18\x02 \x01(\x0e\x32\x0e.report.Status\x12\x30\n\tsubscribe\x18\n \x01(\x0b\x32\x1b.report.SubscribeTestResultH\x00\x42\x06\n\x04type\"i\n\x08Instance\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12 \n\x04test\x18\x02 \x01(\x0b\x32\x12.report.TestResult\x12&\n\nextensions\x18\x03 \x03(\x0b\x32\x12.report.TestResult\"Y\n\rInstanceGroup\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\"\n\x08instance\x18\x02 \x03(\x0b\x32\x10.report.Instance\x12\x0f\n\x07skipped\x18\x03 \x01(\x08\"0\n\x06Report\x12&\n\x07results\x18\x01 \x03(\x0b\x32\x15.report.InstanceGroup*]\n\x10\x43ompletionStatus\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0c\n\x08\x46INISHED\x10\x01\x12\x12\n\x0e\x45\x41RLY_FINISHED\x10\x02\x12\r\n\tRPC_ERROR\x10\x03\x12\x0b\n\x07TIMEOUT\x10\x04**\n\x06Status\x12\t\n\x05UNSET\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x12\x08\n\x04\x46\x41IL\x10\x02\x62\x06proto3')
+  serialized_pb=_b('\n\x19proto/report/report.proto\x12\x06report\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\x1a\x36github.com/openconfig/gnmitest/proto/tests/tests.proto\x1a\x17google/rpc/status.proto\"S\n\x17SubscribeResponseResult\x12)\n\x08response\x18\x01 \x01(\x0b\x32\x17.gnmi.SubscribeResponse\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"\x82\x01\n\x13SubscribeTestResult\x12\x32\n\tresponses\x18\x01 \x03(\x0b\x32\x1f.report.SubscribeResponseResult\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12(\n\x06status\x18\x03 \x01(\x0e\x32\x18.report.CompletionStatus\"\xad\x01\n\x10GetSetTestResult\x12\x19\n\x04test\x18\x01 \x01(\x0b\x32\x0b.tests.Test\x12\x1e\n\x06result\x18\x02 \x01(\x0e\x32\x0e.report.Status\x12\x31\n\x0finitialise_oper\x18\x03 \x01(\x0b\x32\x18.report.GetSetOperResult\x12+\n\ttest_oper\x18\x04 \x01(\x0b\x32\x18.report.GetSetOperResult\"\x87\x02\n\x10GetSetOperResult\x12\x1e\n\x06result\x18\x01 \x01(\x0e\x32\x0e.report.Status\x12\'\n\x0cset_response\x18\x02 \x01(\x0b\x32\x11.gnmi.SetResponse\x12&\n\nset_status\x18\x03 \x01(\x0b\x32\x12.google.rpc.Status\x12\'\n\x0cget_response\x18\x04 \x01(\x0b\x32\x11.gnmi.GetResponse\x12&\n\nget_status\x18\x05 \x01(\x0b\x32\x12.google.rpc.Status\x12\x31\n\x14get_response_matched\x18\x06 \x01(\x0e\x32\x13.report.MatchResult\"\xad\x01\n\nTestResult\x12\x19\n\x04test\x18\x01 \x01(\x0b\x32\x0b.tests.Test\x12\x1e\n\x06result\x18\x02 \x01(\x0e\x32\x0e.report.Status\x12\x30\n\tsubscribe\x18\n \x01(\x0b\x32\x1b.report.SubscribeTestResultH\x00\x12*\n\x06getset\x18\x0b \x01(\x0b\x32\x18.report.GetSetTestResultH\x00\x42\x06\n\x04type\"i\n\x08Instance\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12 \n\x04test\x18\x02 \x01(\x0b\x32\x12.report.TestResult\x12&\n\nextensions\x18\x03 \x03(\x0b\x32\x12.report.TestResult\"Y\n\rInstanceGroup\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\"\n\x08instance\x18\x02 \x03(\x0b\x32\x10.report.Instance\x12\x0f\n\x07skipped\x18\x03 \x01(\x08\"0\n\x06Report\x12&\n\x07results\x18\x01 \x03(\x0b\x32\x15.report.InstanceGroup*]\n\x10\x43ompletionStatus\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0c\n\x08\x46INISHED\x10\x01\x12\x12\n\x0e\x45\x41RLY_FINISHED\x10\x02\x12\r\n\tRPC_ERROR\x10\x03\x12\x0b\n\x07TIMEOUT\x10\x04**\n\x06Status\x12\t\n\x05UNSET\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x12\x08\n\x04\x46\x41IL\x10\x02*9\n\x0bMatchResult\x12\x0c\n\x08MR_UNSET\x10\x00\x12\x0c\n\x08MR_EQUAL\x10\x01\x12\x0e\n\nMR_UNEQUAL\x10\x02\x62\x06proto3')
   ,
-  dependencies=[github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2.DESCRIPTOR,github_dot_com_dot_openconfig_dot_gnmitest_dot_proto_dot_tests_dot_tests__pb2.DESCRIPTOR,])
+  dependencies=[github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2.DESCRIPTOR,github_dot_com_dot_openconfig_dot_gnmitest_dot_proto_dot_tests_dot_tests__pb2.DESCRIPTOR,google_dot_rpc_dot_status__pb2.DESCRIPTOR,])
 
 _COMPLETIONSTATUS = _descriptor.EnumDescriptor(
   name='CompletionStatus',
@@ -55,8 +56,8 @@ _COMPLETIONSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=741,
-  serialized_end=834,
+  serialized_start=1252,
+  serialized_end=1345,
 )
 _sym_db.RegisterEnumDescriptor(_COMPLETIONSTATUS)
 
@@ -82,12 +83,39 @@ _STATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=836,
-  serialized_end=878,
+  serialized_start=1347,
+  serialized_end=1389,
 )
 _sym_db.RegisterEnumDescriptor(_STATUS)
 
 Status = enum_type_wrapper.EnumTypeWrapper(_STATUS)
+_MATCHRESULT = _descriptor.EnumDescriptor(
+  name='MatchResult',
+  full_name='report.MatchResult',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='MR_UNSET', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='MR_EQUAL', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='MR_UNEQUAL', index=2, number=2,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=1391,
+  serialized_end=1448,
+)
+_sym_db.RegisterEnumDescriptor(_MATCHRESULT)
+
+MatchResult = enum_type_wrapper.EnumTypeWrapper(_MATCHRESULT)
 UNKNOWN = 0
 FINISHED = 1
 EARLY_FINISHED = 2
@@ -96,6 +124,9 @@ TIMEOUT = 4
 UNSET = 0
 SUCCESS = 1
 FAIL = 2
+MR_UNSET = 0
+MR_EQUAL = 1
+MR_UNEQUAL = 2
 
 
 
@@ -132,8 +163,8 @@ _SUBSCRIBERESPONSERESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=143,
-  serialized_end=226,
+  serialized_start=168,
+  serialized_end=251,
 )
 
 
@@ -177,8 +208,126 @@ _SUBSCRIBETESTRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=229,
-  serialized_end=359,
+  serialized_start=254,
+  serialized_end=384,
+)
+
+
+_GETSETTESTRESULT = _descriptor.Descriptor(
+  name='GetSetTestResult',
+  full_name='report.GetSetTestResult',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='test', full_name='report.GetSetTestResult.test', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='result', full_name='report.GetSetTestResult.result', index=1,
+      number=2, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='initialise_oper', full_name='report.GetSetTestResult.initialise_oper', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='test_oper', full_name='report.GetSetTestResult.test_oper', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=387,
+  serialized_end=560,
+)
+
+
+_GETSETOPERRESULT = _descriptor.Descriptor(
+  name='GetSetOperResult',
+  full_name='report.GetSetOperResult',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='result', full_name='report.GetSetOperResult.result', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='set_response', full_name='report.GetSetOperResult.set_response', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='set_status', full_name='report.GetSetOperResult.set_status', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='get_response', full_name='report.GetSetOperResult.get_response', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='get_status', full_name='report.GetSetOperResult.get_status', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='get_response_matched', full_name='report.GetSetOperResult.get_response_matched', index=5,
+      number=6, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=563,
+  serialized_end=826,
 )
 
 
@@ -210,6 +359,13 @@ _TESTRESULT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='getset', full_name='report.TestResult.getset', index=3,
+      number=11, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -225,8 +381,8 @@ _TESTRESULT = _descriptor.Descriptor(
       name='type', full_name='report.TestResult.type',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=362,
-  serialized_end=491,
+  serialized_start=829,
+  serialized_end=1002,
 )
 
 
@@ -270,8 +426,8 @@ _INSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=493,
-  serialized_end=598,
+  serialized_start=1004,
+  serialized_end=1109,
 )
 
 
@@ -315,8 +471,8 @@ _INSTANCEGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=600,
-  serialized_end=689,
+  serialized_start=1111,
+  serialized_end=1200,
 )
 
 
@@ -346,31 +502,48 @@ _REPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=691,
-  serialized_end=739,
+  serialized_start=1202,
+  serialized_end=1250,
 )
 
 _SUBSCRIBERESPONSERESULT.fields_by_name['response'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._SUBSCRIBERESPONSE
 _SUBSCRIBETESTRESULT.fields_by_name['responses'].message_type = _SUBSCRIBERESPONSERESULT
 _SUBSCRIBETESTRESULT.fields_by_name['status'].enum_type = _COMPLETIONSTATUS
+_GETSETTESTRESULT.fields_by_name['test'].message_type = github_dot_com_dot_openconfig_dot_gnmitest_dot_proto_dot_tests_dot_tests__pb2._TEST
+_GETSETTESTRESULT.fields_by_name['result'].enum_type = _STATUS
+_GETSETTESTRESULT.fields_by_name['initialise_oper'].message_type = _GETSETOPERRESULT
+_GETSETTESTRESULT.fields_by_name['test_oper'].message_type = _GETSETOPERRESULT
+_GETSETOPERRESULT.fields_by_name['result'].enum_type = _STATUS
+_GETSETOPERRESULT.fields_by_name['set_response'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._SETRESPONSE
+_GETSETOPERRESULT.fields_by_name['set_status'].message_type = google_dot_rpc_dot_status__pb2._STATUS
+_GETSETOPERRESULT.fields_by_name['get_response'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._GETRESPONSE
+_GETSETOPERRESULT.fields_by_name['get_status'].message_type = google_dot_rpc_dot_status__pb2._STATUS
+_GETSETOPERRESULT.fields_by_name['get_response_matched'].enum_type = _MATCHRESULT
 _TESTRESULT.fields_by_name['test'].message_type = github_dot_com_dot_openconfig_dot_gnmitest_dot_proto_dot_tests_dot_tests__pb2._TEST
 _TESTRESULT.fields_by_name['result'].enum_type = _STATUS
 _TESTRESULT.fields_by_name['subscribe'].message_type = _SUBSCRIBETESTRESULT
+_TESTRESULT.fields_by_name['getset'].message_type = _GETSETTESTRESULT
 _TESTRESULT.oneofs_by_name['type'].fields.append(
   _TESTRESULT.fields_by_name['subscribe'])
 _TESTRESULT.fields_by_name['subscribe'].containing_oneof = _TESTRESULT.oneofs_by_name['type']
+_TESTRESULT.oneofs_by_name['type'].fields.append(
+  _TESTRESULT.fields_by_name['getset'])
+_TESTRESULT.fields_by_name['getset'].containing_oneof = _TESTRESULT.oneofs_by_name['type']
 _INSTANCE.fields_by_name['test'].message_type = _TESTRESULT
 _INSTANCE.fields_by_name['extensions'].message_type = _TESTRESULT
 _INSTANCEGROUP.fields_by_name['instance'].message_type = _INSTANCE
 _REPORT.fields_by_name['results'].message_type = _INSTANCEGROUP
 DESCRIPTOR.message_types_by_name['SubscribeResponseResult'] = _SUBSCRIBERESPONSERESULT
 DESCRIPTOR.message_types_by_name['SubscribeTestResult'] = _SUBSCRIBETESTRESULT
+DESCRIPTOR.message_types_by_name['GetSetTestResult'] = _GETSETTESTRESULT
+DESCRIPTOR.message_types_by_name['GetSetOperResult'] = _GETSETOPERRESULT
 DESCRIPTOR.message_types_by_name['TestResult'] = _TESTRESULT
 DESCRIPTOR.message_types_by_name['Instance'] = _INSTANCE
 DESCRIPTOR.message_types_by_name['InstanceGroup'] = _INSTANCEGROUP
 DESCRIPTOR.message_types_by_name['Report'] = _REPORT
 DESCRIPTOR.enum_types_by_name['CompletionStatus'] = _COMPLETIONSTATUS
 DESCRIPTOR.enum_types_by_name['Status'] = _STATUS
+DESCRIPTOR.enum_types_by_name['MatchResult'] = _MATCHRESULT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 SubscribeResponseResult = _reflection.GeneratedProtocolMessageType('SubscribeResponseResult', (_message.Message,), dict(
@@ -386,6 +559,20 @@ SubscribeTestResult = _reflection.GeneratedProtocolMessageType('SubscribeTestRes
   # @@protoc_insertion_point(class_scope:report.SubscribeTestResult)
   ))
 _sym_db.RegisterMessage(SubscribeTestResult)
+
+GetSetTestResult = _reflection.GeneratedProtocolMessageType('GetSetTestResult', (_message.Message,), dict(
+  DESCRIPTOR = _GETSETTESTRESULT,
+  __module__ = 'proto.report.report_pb2'
+  # @@protoc_insertion_point(class_scope:report.GetSetTestResult)
+  ))
+_sym_db.RegisterMessage(GetSetTestResult)
+
+GetSetOperResult = _reflection.GeneratedProtocolMessageType('GetSetOperResult', (_message.Message,), dict(
+  DESCRIPTOR = _GETSETOPERRESULT,
+  __module__ = 'proto.report.report_pb2'
+  # @@protoc_insertion_point(class_scope:report.GetSetOperResult)
+  ))
+_sym_db.RegisterMessage(GetSetOperResult)
 
 TestResult = _reflection.GeneratedProtocolMessageType('TestResult', (_message.Message,), dict(
   DESCRIPTOR = _TESTRESULT,
