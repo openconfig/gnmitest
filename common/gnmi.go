@@ -31,7 +31,7 @@ import (
 	"github.com/openconfig/gnmitest/creds"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/metadata/metadata"
+	"google.golang.org/grpc/metadata"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	tpb "github.com/openconfig/gnmitest/proto/tests"

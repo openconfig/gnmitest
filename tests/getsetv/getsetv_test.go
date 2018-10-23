@@ -24,7 +24,7 @@ import (
 	"context"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"
-	"github.com/openconfig/gnmitest/schemafake/schemafake"
+	"github.com/openconfig/gnmitest/schemafake"
 	"github.com/openconfig/gnmitest/schemas/openconfig"
 	"github.com/openconfig/ygot/ygot"
 	"github.com/openconfig/ygot/ytypes"

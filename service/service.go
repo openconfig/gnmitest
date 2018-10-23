@@ -33,7 +33,7 @@ import (
 	// composing Suite proto.
 	_ "github.com/openconfig/gnmitest/tests/subscribe/haskeys"
 	_ "github.com/openconfig/gnmitest/tests/subscribe/pathvalidation"
-	_ "github.com/openconfig/gnmitest/tests/subscribe/schemapathc/schemapathc"
+	_ "github.com/openconfig/gnmitest/tests/subscribe/schemapathc"
 
 	rpb "github.com/openconfig/gnmitest/proto/report"
 	spb "github.com/openconfig/gnmitest/proto/suite"

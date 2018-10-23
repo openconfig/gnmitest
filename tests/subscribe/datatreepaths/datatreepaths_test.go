@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmpopts/cmpopts"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kylelemons/godebug/pretty"
-	"github.com/openconfig/exampleoc"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmitest/schemas"
 	"github.com/openconfig/goyang/pkg/yang"
+	"github.com/openconfig/ygot/exampleoc"
 	"github.com/openconfig/ygot/testutil"
 	"github.com/openconfig/ygot/ygot"
 

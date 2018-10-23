@@ -66,7 +66,7 @@ func TestPathValidation(t *testing.T) {
 			inDesc:           "fail path doesn't match due to partial defined element at the end",
 			inPrefixPath:     "interfaces",
 			inUpdatePath:     "interface[name=arbitrary_key]/state",
-			wantErrSubstring: `path doesn't point to a leaf node; *gostructs.OpenconfigInterfaces_Interfaces_Interface_State`,
+			wantErrSubstring: `path doesn't point to leaf node, *gostructs.OpenconfigInterfaces_Interfaces_Interface_State`,
 		},
 		{
 			inDesc:           "fail path doesn't match due to incorrect key name for the interface",
@@ -78,13 +78,13 @@ func TestPathValidation(t *testing.T) {
 			inDesc:           "fail path points to a non-leaf node",
 			inPrefixPath:     "network-instances",
 			inUpdatePath:     "network-instance[name=arbitrary_key]",
-			wantErrSubstring: "path doesn't point to a leaf node",
+			wantErrSubstring: "path doesn't point to leaf node",
 		},
 		{
 			inDesc:           "fail path points to a non-leaf node",
 			inPrefixPath:     "network-instances",
 			inUpdatePath:     "network-instance[name=arbitrary_key]/protocols/protocol[name=arbitrary_name][identifier=DIRECTLY_CONNECTED]",
-			wantErrSubstring: "path doesn't point to a leaf node",
+			wantErrSubstring: "path doesn't point to leaf node",
 		},
 		{
 			inDesc:           "fail path uses a struct key type with incorrect enum",

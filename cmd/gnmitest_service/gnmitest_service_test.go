@@ -16,7 +16,7 @@ import (
 	"github.com/openconfig/gnmi/client/gnmi"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmitest/common"
-	"github.com/openconfig/gnmitest/schemafake/schemafake"
+	"github.com/openconfig/gnmitest/schemafake"
 	"github.com/openconfig/gnmitest/schemas/openconfig"
 	"github.com/openconfig/gnmitest/service"
 	"github.com/openconfig/ygot/testutil"

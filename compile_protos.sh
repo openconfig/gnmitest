@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -euo pipefail
 
-proto_imports=".:${GOPATH}/src/github.com/google/protobuf/src:${GOPATH}/src"
+# Fetch source including status.proto
+go get github.com/googleapis/googleapis
+
+proto_imports=".:${GOPATH}/src/github.com/googleapis/googleapis:${GOPATH}/src/github.com/google/protobuf/src:${GOPATH}/src"
 
 # Go
 protoc -I=$proto_imports --go_out=plugins=grpc:. proto/gnmitest/gnmitest.proto
@@ -26,6 +28,6 @@ protoc -I=$proto_imports --go_out=plugins=grpc:. proto/report/report.proto
 
 # Python
 python -m grpc_tools.protoc -I=$proto_imports --python_out=. --grpc_python_out=. proto/gnmitest/gnmitest.proto
-python -m grpc_tools.protoc -I=$proto_imports --python_out=. --grpc_python_out=. proto/suite/suite.proto
-python -m grpc_tools.protoc -I=$proto_imports --python_out=. --grpc_python_out=. proto/tests/tests.proto
-python -m grpc_tools.protoc -I=$proto_imports --python_out=. --grpc_python_out=. proto/report/report.proto
+python -m grpc_tools.protoc -I=$proto_imports --python_out=. proto/suite/suite.proto
+python -m grpc_tools.protoc -I=$proto_imports --python_out=. proto/tests/tests.proto
+python -m grpc_tools.protoc -I=$proto_imports --python_out=. proto/report/report.proto

@@ -36,7 +36,7 @@ import (
 	"github.com/openconfig/gnmitest/config"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/subscribe"
-	"github.com/openconfig/gnmitest/tests/getsetv/getsetv"
+	"github.com/openconfig/gnmitest/tests/getsetv"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	rpb "github.com/openconfig/gnmitest/proto/report"
