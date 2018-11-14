@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sort"
 
 	"github.com/golang/protobuf/proto"
 
@@ -73,7 +74,8 @@ func (t *test) Check() error {
 		return fmt.Errorf("cannot resolve paths to query, %v", err)
 	}
 
-	var errs errlist.List
+	var errs []error
+	addErr := func(e error) { errs = append(errs, e) }
 	for _, q := range queries {
 		nodes, err := ytypes.GetNode(t.schema, t.dataTree, q)
 		var retErr error
@@ -81,9 +83,17 @@ func (t *test) Check() error {
 		case err != nil:
 			retErr = fmt.Errorf("got error, %v", err)
 		case len(nodes) == 1:
+			_, isGoEnum := nodes[0].Data.(ygot.GoEnum)
 			vv := reflect.ValueOf(nodes[0].Data)
-			if util.IsValuePtr(vv) && (util.IsValueNil(vv.Elem()) || !vv.Elem().IsValid()) {
+			switch {
+			case util.IsValuePtr(vv) && (util.IsValueNil(vv.Elem()) || !vv.Elem().IsValid()):
 				retErr = errors.New("got nil data for path")
+			case isGoEnum:
+				// This is an enumerated value -- check whether it is set to 0
+				// which means it was not set.
+				if vv.Int() == 0 {
+					retErr = fmt.Errorf("enum type %T was UNSET", vv.Interface())
+				}
 			}
 		case len(nodes) == 0:
 			retErr = errors.New("no matches for path")
@@ -94,18 +104,32 @@ func (t *test) Check() error {
 			if ps, err := ygot.PathToString(q); err == nil {
 				estr = ps
 			}
-			errs.Add(fmt.Errorf("%s: %v", estr, retErr))
+			addErr(fmt.Errorf("%s: %v", estr, retErr))
 		}
 	}
 
-	return errs.Err()
+	sortedErrs := errlist.List{}
+	if len(errs) != 0 {
+		se := map[string]error{}
+		es := []string{}
+		for _, e := range errs {
+			se[e.Error()] = e
+			es = append(es, e.Error())
+		}
+		sort.Strings(es)
+		for _, ename := range es {
+			sortedErrs.Append(se[ename])
+		}
+	}
+
+	return sortedErrs.Err()
 }
 
 // Process is called for each response received from the target for the test.
 // It returns the current status of the test (running, or complete) based
 // on the contents of the sr SubscribeResponse.
 func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	return subscribe.OneShotGetOrCreate(t.schema, t.dataTree, sr)
+	return subscribe.OneShotSetNode(t.schema, t.dataTree, sr, &ytypes.InitMissingElements{})
 }
 
 // queries resolves the contents of the testSpec into the exact paths to be

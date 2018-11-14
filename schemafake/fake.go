@@ -20,6 +20,7 @@ package schemafake
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"reflect"
 	"sync"
@@ -172,6 +173,164 @@ func (t *Target) Load(b []byte, origin string, opts ...ytypes.UnmarshalOpt) erro
 	return nil
 }
 
+// Subscribe handles the gNMI bi-directional streaming Subscribe RPC.
+// SubscribeRequest messages are read from the client, and the target streams
+// responses back according to the type of subscription specified.
+//
+// Currently, this implementation only supports the ONCE subscription mode.
+func (t *Target) Subscribe(stream gpb.GNMI_SubscribeServer) error {
+	in, err := stream.Recv()
+	if err == io.EOF {
+		return nil
+	}
+
+	if err != nil {
+		return err
+	}
+
+	switch v := in.GetRequest(); v.(type) {
+	case *gpb.SubscribeRequest_Subscribe:
+		switch s := in.GetSubscribe(); s.GetMode() {
+		case gpb.SubscriptionList_ONCE:
+			return t.handleOnce(s, stream)
+		default:
+			return status.Errorf(codes.Unimplemented, "Subscription modes other than ONCE are not implemented")
+		}
+	case *gpb.SubscribeRequest_Poll:
+		return status.Errorf(codes.Unimplemented, "Poll is unimplemented")
+	}
+
+	return nil
+}
+
+// handleOnce is a handler for the ONCE RPC, the SubscriptionList received from
+// the client is parsed for the paths that are to be exported, which are
+// marshalled to gNMI Notifications and written to the supplied stream.
+func (t *Target) handleOnce(req *gpb.SubscriptionList, stream gpb.GNMI_SubscribeServer) error {
+	msgs, err := t.initialSync(req)
+	if err != nil {
+		return err
+	}
+
+	for _, m := range msgs {
+		if err := stream.Send(m); err != nil {
+			return status.Errorf(codes.Aborted, "cannot send message, %v", err)
+		}
+	}
+	return nil
+}
+
+// initialSync is a generic implementation for retrieving the set of paths in the
+// supplied req SubscriptionList and returning a set of SubscribeResponse messages
+// to be sent to the client. The target appends a sync_response message to the set
+// of paths to indicate that the set of paths have been sent - as is required by
+// both the initial sync of a STREAM subscription, or a ONCE subscription.
+func (t *Target) initialSync(req *gpb.SubscriptionList) ([]*gpb.SubscribeResponse, error) {
+	var sr []*gpb.SubscribeResponse
+	for _, sub := range req.GetSubscription() {
+		// TODO(robjs): Handle prefix being removed from Notifications.
+		nodes, _, err := t.getAndPrefix(absolutePath(req.Prefix, sub.Path))
+		if err != nil {
+			status, ok := status.FromError(err)
+			switch {
+			case ok && status.Code() == codes.NotFound:
+				// Not finding an element in the tree is explictly not an
+				// error in Subscribe, invalid paths are handled using
+				// InvalidArgument, and hence we ignore this error.
+				continue
+			default:
+				return nil, err
+			}
+		}
+
+		for _, n := range nodes {
+			switch d := n.Data; d.(type) {
+			case ygot.GoStruct:
+				ns, err := ygot.TogNMINotifications(d.(ygot.GoStruct), Timestamp(), ygot.GNMINotificationsConfig{UsePathElem: true})
+				if err != nil {
+					return nil, fmt.Errorf("cannot convert path %s into Notifications, %v", n.Path, err)
+				}
+				for _, u := range ns {
+					u.Prefix = n.Path
+					sr = append(sr, &gpb.SubscribeResponse{
+						Response: &gpb.SubscribeResponse_Update{u},
+					})
+				}
+			default:
+				v, err := ygot.EncodeTypedValue(n.Data, gpb.Encoding_PROTO)
+				if err != nil {
+					return nil, fmt.Errorf("cannot convert scalar data %s into Notifications, %v", n.Path, err)
+				}
+				sr = append(sr, &gpb.SubscribeResponse{
+					Response: &gpb.SubscribeResponse_Update{
+						&gpb.Notification{
+							Timestamp: Timestamp(),
+							Update: []*gpb.Update{{
+								Path: n.Path,
+								Val:  v,
+							}},
+						},
+					},
+				})
+			}
+		}
+	}
+
+	sr = append(sr, &gpb.SubscribeResponse{
+		Response: &gpb.SubscribeResponse_SyncResponse{true},
+	})
+	return sr, nil
+}
+
+// absolutePath calculates the absolute path indicated by the prefix and path
+// supplied.
+func absolutePath(prefix *gpb.Path, path *gpb.Path) *gpb.Path {
+	p := path
+	if prefix != nil {
+		p = &gpb.Path{
+			Elem: append(prefix.Elem, path.Elem...),
+		}
+
+		if path.GetOrigin() == "" && prefix.GetOrigin() != "" {
+			p.Origin = prefix.Origin
+		}
+	}
+	return p
+}
+
+// getAndPrefix queries the target's data trees for nodes that correspond to path,
+// and returns the data found, along with a prefix that applies to the nodes in
+// the query.
+func (t *Target) getAndPrefix(path *gpb.Path) ([]*ytypes.TreeNode, *gpb.Path, error) {
+	orig, err := t.getOrigin(path.Origin)
+	if err != nil {
+		return nil, nil, status.Errorf(codes.NotFound, "cannot find origin %s on target, %v", path.Origin, err)
+	}
+
+	nodes, err := orig.get(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var prefix *gpb.Path
+	if path.Origin != "" || path.Target != "" {
+		prefix = &gpb.Path{
+			Origin: path.Origin,
+			Target: path.Target,
+		}
+	}
+
+	if len(nodes) > 1 {
+		var paths []*gpb.Path
+		for _, n := range nodes {
+			paths = append(paths, n.Path)
+		}
+		prefix = util.FindPathElemPrefix(paths)
+	}
+
+	return nodes, prefix, nil
+}
+
 // Get implements the gNMI Get RPC. The request received from the client is extracted from the
 // GetRequest received from the client. Each path is retrieved from the target's data tree,
 // and subsequently marshalled into a gNMI Notification. Each path in the GetRequest is
@@ -181,44 +340,14 @@ func (t *Target) Load(b []byte, origin string, opts ...ytypes.UnmarshalOpt) erro
 func (t *Target) Get(ctx context.Context, r *gpb.GetRequest) (*gpb.GetResponse, error) {
 	var notifications []*gpb.Notification
 	for _, p := range r.Path {
-		fullPath := p
-		if r.Prefix != nil {
-			fullPath = &gpb.Path{
-				Elem: append(r.Prefix.Elem, p.Elem...),
-			}
-
-			if p.Origin == "" && r.Prefix.Origin != "" {
-				fullPath.Origin = r.Prefix.Origin
-			}
-		}
+		fullPath := absolutePath(r.Prefix, p)
 
 		// Capture the timestamp for the Notification.
 		ts := Timestamp()
 
-		orig, err := t.getOrigin(p.Origin)
-		if err != nil {
-			return nil, status.Errorf(codes.NotFound, "cannot find origin %s on target, %v", p.Origin, err)
-		}
-
-		nodes, err := orig.get(fullPath)
+		nodes, prefix, err := t.getAndPrefix(fullPath)
 		if err != nil {
 			return nil, err
-		}
-
-		var prefix *gpb.Path
-		if p.Origin != "" || p.Target != "" {
-			prefix = &gpb.Path{
-				Origin: p.Origin,
-				Target: p.Target,
-			}
-		}
-
-		if len(nodes) > 1 {
-			var paths []*gpb.Path
-			for _, n := range nodes {
-				paths = append(paths, n.Path)
-			}
-			prefix = util.FindPathElemPrefix(paths)
 		}
 
 		var u []*gpb.Update

@@ -2,6 +2,7 @@ package schemafake
 
 import (
 	"fmt"
+	"io"
 	"path/filepath"
 	"testing"
 	"time"
@@ -291,7 +292,7 @@ func TestLoadGet(t *testing.T) {
 					mustPath("/does-not-exist"),
 				},
 			},
-			errSubstring: "NotFound",
+			errSubstring: "InvalidArgument",
 		}, {
 			req: &gpb.GetRequest{
 				Path: []*gpb.Path{
@@ -351,6 +352,166 @@ func TestLoadGet(t *testing.T) {
 					t.Fatalf("did not get expected response, for test case %d. Sent:\n%s\ndiff(-got,+want):\n%s", i, proto.MarshalTextString(tc.req), pretty.Compare(got, tc.res))
 				}
 			}
+		})
+	}
+}
+
+// subscribeTest defines a test for the Subscribe RPC.
+type subscribeTest struct {
+	desc         string                   // desc describes the subtest for documentation purposes.
+	req          *gpb.SubscribeRequest    // req is the input request sent to the target.
+	res          []*gpb.SubscribeResponse // res is the set of responses received from the target.
+	errSubstring string                   // errSubstring is used to substring match any received error.
+}
+
+func subReq(paths []string, mode gpb.SubscriptionList_Mode) *gpb.SubscribeRequest {
+	sl := &gpb.SubscriptionList{
+		Mode: mode,
+	}
+
+	for _, p := range paths {
+		sl.Subscription = append(sl.Subscription, &gpb.Subscription{
+			Path: mustPath(p),
+		})
+	}
+
+	return &gpb.SubscribeRequest{
+		Request: &gpb.SubscribeRequest_Subscribe{
+			sl,
+		},
+	}
+}
+func TestSubscribeOnce(t *testing.T) {
+	Timestamp = func() int64 { return 42 }
+
+	tests := []struct {
+		name     string
+		inSchema map[string]*ytypes.Schema
+		inKey    string
+		inCert   string
+		inJSON   map[string][]byte // input data, keyed by origin name
+		inTests  []subscribeTest
+	}{{
+		name: "single leaf",
+		inSchema: map[string]*ytypes.Schema{
+			"openconfig": mustSchema(gostructs.Schema()),
+		},
+		inKey:  "testdata/key.key",
+		inCert: "testdata/cert.crt",
+		inJSON: map[string][]byte{"openconfig": []byte(`
+		{
+			"system": {
+				"state": {
+					"hostname": "gnmi-target",
+					"domain-name": "google.com"
+				}
+			}
+		}`)},
+		inTests: []subscribeTest{{
+			desc: "leaf subscribe",
+			req:  subReq([]string{"/system/state/hostname"}, gpb.SubscriptionList_ONCE),
+			res: []*gpb.SubscribeResponse{{
+				Response: &gpb.SubscribeResponse_Update{
+					notification(Timestamp(), nil,
+						pathVal{p: mustPath("/system/state/hostname"), v: &gpb.TypedValue{Value: &gpb.TypedValue_StringVal{"gnmi-target"}}},
+					),
+				},
+			}, {
+				Response: &gpb.SubscribeResponse_SyncResponse{true},
+			}},
+		}, {
+			desc: "container path",
+			req:  subReq([]string{"/system/state"}, gpb.SubscriptionList_ONCE),
+			res: []*gpb.SubscribeResponse{{
+				Response: &gpb.SubscribeResponse_Update{
+					notification(Timestamp(), mustPath("/system/state"),
+						pathVal{p: mustPath("hostname"), v: &gpb.TypedValue{Value: &gpb.TypedValue_StringVal{"gnmi-target"}}},
+						pathVal{p: mustPath("domain-name"), v: &gpb.TypedValue{Value: &gpb.TypedValue_StringVal{"google.com"}}},
+					),
+				},
+			}, {
+				Response: &gpb.SubscribeResponse_SyncResponse{true},
+			}},
+		}, {
+			desc: "unknown path - valid in schema",
+			req:  subReq([]string{"/system/clock/state"}, gpb.SubscriptionList_ONCE),
+			// target should not return an error, but rather just a sync response.
+			res: []*gpb.SubscribeResponse{{
+				Response: &gpb.SubscribeResponse_SyncResponse{true},
+			}},
+		}, {
+			desc:         "unknown invalid path",
+			req:          subReq([]string{"/system/fish"}, gpb.SubscriptionList_ONCE),
+			errSubstring: "InvalidArgument",
+		}},
+	}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			target, err := New(tt.inSchema)
+			if err != nil {
+				t.Fatalf("cannot create fake, %v", err)
+			}
+
+			for orig, data := range tt.inJSON {
+				if err := target.Load(data, orig); err != nil {
+					t.Fatalf("cannot load JSON input, %v", err)
+				}
+			}
+
+			port, stop, err := target.Start(tt.inCert, tt.inKey)
+			if err != nil {
+				t.Fatalf("cannot start fake, %v", err)
+			}
+			defer stop()
+
+			c, cclose, err := common.Connect(context.Background(), &tpb.Connection{
+				Address: fmt.Sprintf("localhost:%d", port),
+				Timeout: 30,
+			})
+			if err != nil {
+				t.Fatalf("cannot connect to fake, %v", err)
+			}
+
+			defer cclose()
+
+			for _, tc := range tt.inTests {
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
+
+				stream, err := c.Subscribe(ctx)
+				if err != nil {
+					t.Errorf("test %s, did not create stream successfully, got err: %v", tc.desc, err)
+					continue
+				}
+
+				got := []*gpb.SubscribeResponse{}
+
+				if err := stream.Send(tc.req); err != nil {
+					t.Errorf("test %s, cannot send subscribe request, got err: %v", tc.desc, err)
+					continue
+				}
+
+				for {
+					msg, err := stream.Recv()
+					if err == io.EOF {
+						break
+					}
+					if err != nil {
+						if diff := errdiff.Substring(err, tc.errSubstring); diff != "" {
+							t.Errorf("test %s, got unexpected error whilst receiving, got err: %v", tc.desc, err)
+						}
+						break
+					}
+
+					got = append(got, msg)
+				}
+
+				if matched := testutil.SubscribeResponseSetEqual(got, tc.res); !matched {
+					t.Errorf("did not get matching SubscribeResponses, got: %s, want: %s", got, tc.res)
+				}
+			}
+
 		})
 	}
 }

@@ -31,9 +31,12 @@ import (
 
 	// Tests below register themselves to test framework. They can be used while
 	// composing Suite proto.
+	_ "github.com/openconfig/gnmitest/tests/subscribe/datatreepaths"
+	_ "github.com/openconfig/gnmitest/tests/subscribe/gnmipathc"
 	_ "github.com/openconfig/gnmitest/tests/subscribe/haskeys"
 	_ "github.com/openconfig/gnmitest/tests/subscribe/pathvalidation"
 	_ "github.com/openconfig/gnmitest/tests/subscribe/schemapathc"
+	_ "github.com/openconfig/gnmitest/tests/subscribe/valuevalidation"
 
 	rpb "github.com/openconfig/gnmitest/proto/report"
 	spb "github.com/openconfig/gnmitest/proto/suite"

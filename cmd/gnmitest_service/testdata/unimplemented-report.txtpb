@@ -29,7 +29,7 @@ results: {
                   }
                 }
               }
-              mode: ONCE
+              mode: STREAM
             }
           }
           path_validation: {
@@ -37,7 +37,7 @@ results: {
         }
       }
       subscribe: {
-        error: "rpc error: code = Unimplemented desc = Unimplemented"
+        error: "rpc error: code = Unimplemented desc = Subscription modes other than ONCE are not implemented"
         status: RPC_ERROR
       }
     }

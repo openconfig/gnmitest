@@ -34,6 +34,27 @@ func noti(p ...string) *gpb.Notification {
 	return n
 }
 
+type pathVal struct {
+	p *gpb.Path
+	v *gpb.TypedValue
+}
+
+func notiVal(ts int64, pfx *gpb.Path, upd ...pathVal) *gpb.Notification {
+	n := &gpb.Notification{
+		Prefix:    pfx,
+		Timestamp: ts,
+	}
+
+	for _, u := range upd {
+		n.Update = append(n.Update, &gpb.Update{
+			Path: u.p,
+			Val:  u.v,
+		})
+	}
+
+	return n
+}
+
 func TestCheck(t *testing.T) {
 	s, err := exampleoc.Schema()
 	if err != nil {
@@ -86,6 +107,80 @@ func TestCheck(t *testing.T) {
 				),
 			},
 		}},
+	}, {
+		name: "simple data tree path with enum",
+		inSpec: &tpb.Test{
+			Type: &tpb.Test_Subscribe{
+				&tpb.SubscribeTest{
+					Args: &tpb.SubscribeTest_DataTreePaths{
+						DataTreePaths: &tpb.DataTreePaths{
+							TestOper: &tpb.DataTreePaths_TestQuery{
+								Steps: []*tpb.DataTreePaths_QueryStep{{
+									Name: "interfaces",
+								}, {
+									Name: "interface",
+									Key:  map[string]string{"name": "eth0"},
+								}},
+								Type: &tpb.DataTreePaths_TestQuery_RequiredPaths{
+									&tpb.DataTreePaths_RequiredPaths{
+										Prefix: mustPath("state"),
+										Paths: []*gpb.Path{
+											mustPath("admin-status"),
+											mustPath("oper-status"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		inSubscribeResponses: []*gpb.SubscribeResponse{{
+			Response: &gpb.SubscribeResponse_Update{
+				notiVal(42, mustPath("/interfaces/interface[name=eth0]/state"),
+					pathVal{mustPath("admin-status"), &gpb.TypedValue{Value: &gpb.TypedValue_StringVal{"UP"}}},
+					pathVal{mustPath("oper-status"), &gpb.TypedValue{Value: &gpb.TypedValue_StringVal{"DORMANT"}}},
+				),
+			},
+		}},
+	}, {
+		name: "unset enum",
+		inSpec: &tpb.Test{
+			Type: &tpb.Test_Subscribe{
+				&tpb.SubscribeTest{
+					Args: &tpb.SubscribeTest_DataTreePaths{
+						DataTreePaths: &tpb.DataTreePaths{
+							TestOper: &tpb.DataTreePaths_TestQuery{
+								Steps: []*tpb.DataTreePaths_QueryStep{{
+									Name: "interfaces",
+								}, {
+									Name: "interface",
+									Key:  map[string]string{"name": "eth0"},
+								}},
+								Type: &tpb.DataTreePaths_TestQuery_RequiredPaths{
+									&tpb.DataTreePaths_RequiredPaths{
+										Prefix: mustPath("state"),
+										Paths: []*gpb.Path{
+											mustPath("admin-status"),
+											mustPath("oper-status"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		inSubscribeResponses: []*gpb.SubscribeResponse{{
+			Response: &gpb.SubscribeResponse_Update{
+				notiVal(42, mustPath("/interfaces/interface[name=eth0]/state"),
+					pathVal{mustPath("admin-status"), &gpb.TypedValue{Value: &gpb.TypedValue_StringVal{"UP"}}},
+				),
+			},
+		}},
+		wantErrSubstring: "enum type exampleoc.E_OpenconfigInterfaces_Interface_OperStatus was UNSET",
 	}, {
 		name: "iterative test",
 		inSpec: &tpb.Test{

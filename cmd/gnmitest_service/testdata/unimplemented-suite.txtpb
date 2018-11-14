@@ -30,8 +30,7 @@ instance_group_list {
                 }
               }
             }
-            # Subscribe for ONCE mode.
-            mode: ONCE 
+            mode: STREAM
           }
         }
         path_validation {}

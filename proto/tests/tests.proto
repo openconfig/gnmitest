@@ -41,6 +41,8 @@ message SubscribeTest {
     HasKeys has_keys = 12;
     SchemaPathComplete schemapath_complete = 13;
     DataTreePaths data_tree_paths = 14;
+    Default value_validation = 15;
+    GNMIPathCompliance gnmipath_compliance = 16;
   }
 }
 
@@ -117,6 +119,28 @@ message HasKeys {
   repeated Item item = 2;
 }
 
+// GNMIPathCompliance defines the test to validate target and origin fields of
+// gNMI Path as well as usage of Elem field instead of deprecated Element field.
+// If check_target and/or check_origin fields are set to "*", corresponding
+// field in gNMI prefix path must exist, but can be any value. If they are set
+// to a value other than "*", corresponding field must be equal to the value. If
+// check_target and/or check_origin isn't set or set to an empty string, this
+// means no validation is needed on the corresponding field. For instance:
+//
+// {
+//   // target must exist, but can have any value other than empty string
+//   check_target: "*"
+//   // origin must exist and be equal to "openconfig"
+//   check_origin: "openconfig"
+//   // Elem field of gNMI Path must be used instead of Element field
+//   check_elem: true
+// }
+message GNMIPathCompliance {
+  bool check_elem = 1;
+  string check_target = 2;
+  string check_origin = 3;
+}
+
 // DataTreePaths specifies a test which allows for checks for the
 // existence of particular data within the data tree. It allows recursion
 // into lists, or simple queries for data tree paths.
@@ -159,17 +183,19 @@ message HasKeys {
 // {
 //   steps { name: "interfaces" }
 //   steps { name: "interface"  }
-//   get_list_keys { var_name: "%%interface%%" }
-//   next_query {
-//     steps { name: "interfaces" }
-//     steps { name: "interface" key_name: "%%interface%%" }
-//     required_paths {
-//      prefix: {
-//        elem: "state"
-//        elem: "counters"
+//   get_list_keys {
+//     var_name: "%%interface%%"
+//     next_query {
+//       steps { name: "interfaces" }
+//       steps { name: "interface" key_name: "%%interface%%" }
+//       required_paths {
+//         prefix: {
+//           elem: "state"
+//           elem: "counters"
+//        }
+//        paths { elem { name: "in-pkts" } }
+//        paths { elem { name: "out-pkts" } }
 //      }
-//      paths { elem { name: "in-pkts" } }
-//      paths { elem { name: "out-pkts" } }
 //    }
 //   }
 // }
@@ -196,37 +222,158 @@ message HasKeys {
 //  {
 //    steps { name: "interfaces" }
 //    steps { name: "interface" }
-//    get_list_keys { var_name: "%%interface%%" }
-//    next_query {
-//      steps { name: "interfaces" }
-//      steps { name: "interface" key_name: "%%interface%%" }
-//      steps { name: "subinterfaces" }
-//      steps { name: "subinterface" }
-//      get_list_keys { var_name: "%%subinterface%%" }
+//    get_list_keys {
+//      var_name: "%%interface%%"
 //      next_query {
 //        steps { name: "interfaces" }
 //        steps { name: "interface" key_name: "%%interface%%" }
 //        steps { name: "subinterfaces" }
-//        steps { name: "subinterface" key_name: "%%subinterface%%" }
-//        steps { name: "ipv4" }
-//        steps { name: "addresses" }
-//        steps { name: "address" }
-//        get_list_keys { var_name: "%%v4address%%" }
-//        next_query {
-//          steps { name: "interfaces" }
-//          steps { name: "interface" key_name: "%%interface%%" }
-//          steps { name: "subinterfaces" }
-//          steps { name: "subinterface" key_name: "%%subinterface%%" }
-//          steps { name: "ipv4" }
-//          steps { name: "addresses" }
-//          steps { name: "address"  key_name: "%%v4address%%" }
-//          required_paths {
-//            ... actual test with required paths ...
+//        steps { name: "subinterface" }
+//        get_list_keys {
+//          var_name: "%%subinterface%%"
+//          next_query {
+//            steps { name: "interfaces" }
+//            steps { name: "interface" key_name: "%%interface%%" }
+//            steps { name: "subinterfaces" }
+//            steps { name: "subinterface" key_name: "%%subinterface%%" }
+//            steps { name: "ipv4" }
+//            steps { name: "addresses" }
+//            steps { name: "address" }
+//            get_list_keys {
+//              var_name: "%%v4address%%"
+//              next_query {
+//                steps { name: "interfaces" }
+//                steps { name: "interface" key_name: "%%interface%%" }
+//                steps { name: "subinterfaces" }
+//                steps { name: "subinterface" key_name: "%%subinterface%%" }
+//                steps { name: "ipv4" }
+//                steps { name: "addresses" }
+//                steps { name: "address"  key_name: "%%v4address%%" }
+//                required_paths {
+//                  ... actual test with required paths ...
+//                }
+//              }
+//            }
 //          }
 //        }
 //      }
 //    }
 //  }
+//
+//
+// The filter field within a TestQuery can be used to filter the set of list
+// items that are to be iterated over. When a PathValueMatch filter is
+// specified, its contents are evaluated, and only when the result of the match
+// is true is the item in the list iterated over.
+//
+// For example, it is possible to iterate over components of a particular type
+// within the OpenConfig schema by specifying a filter:
+//
+// {
+//   steps: "components"
+//   steps: "component"
+//   get_list_keys {
+//     var_name: "%%component_name%%"
+//     filter {
+//       path {
+//         elem { name: "state" }
+//         elem { name: "type" }
+//       }
+//       equal { string_val: "TRANSCEIVER" }
+//     }
+//     next_query {
+//       required_paths {
+//         prefix { name: "state" }
+//         paths { name: "mfg-name" }
+//         paths { name: "serial-no" }
+//       }
+//     }
+//   }
+// }
+//
+// The get_list_keys query is filtered according to the criteria described in
+// the "filter". The path specified in this message must be relative to the
+// current selection.
+//
+// It is also possible to filter based on multiple queries, using the "and" and
+// "or" fields of the PathValueMatch message, for example, to filter on
+// components of type LINECARD or PORT, the following PathValueMatch is
+// specified:
+//
+// {
+//   path {
+//     elem { name: "state" }
+//     elem { name: "type" }
+//   }
+//   equal { string_val: "LINECARD" }
+//   or {
+//     path {
+//       elem { name: "state" }
+//       elem { name: "type" }
+//     }
+//     equal { string_val: PORT" }
+//   }
+// }
+//
+// The "or" field specifies that a PathValueMatch should be evaluated to true if
+// the parent or any "or" query evaluates to true.
+//
+// If multiple filters, are required, for example, to match multiple list keys,
+// the "and" field can be used within a PathValueMatch:
+//
+// {
+//   // Assume we are within a query of the
+//   // network-instances/network-instance/protocols/protocol list.
+//   path {
+//     elem { name: "state" }
+//     elem { name: "identifier" }
+//   }
+//   equal { string_val: "BGP" }
+//   and {
+//     path {
+//       elem { name: "state" }
+//       elem { name: "name" }
+//     }
+//     equal { string_val: "15169" }
+//   }
+// }
+//
+// As well as requiring a specific set of paths to exist, the datatreepaths test
+// can be used to test values within the data tree, using the required_values
+// field. For example, to validate that all non-logical interfaces have LLDP
+// enabled, the following query can be formulated -- checking that
+// /lldp/interfaces/interface[name=<if-name>]/state/enabled = true:
+//
+// {
+//   steps { name: "interfaces" }
+//   steps { name: "interface" }
+//   get_list_keys {
+//     var_name: "<if-name>"
+//     filter {
+//       path {
+//         elem { name: "state" }
+//         elem { name: "logical" }
+//       }
+//       equal { bool_val: false }
+//     }
+//     next_query {
+//       steps { name: "lldp" }
+//       steps { name: "interfaces" }
+//       steps { name: "interface" key_name: "<if-name>" }
+//       required_values {
+//         prefix {
+//           elem { name: "state" }
+//         }
+//         matches {
+//           path {
+//             elem { name: "enabled" }
+//           }
+//           equal { bool_val: true }
+//         }
+//       }
+//     }
+//   }
+// }
 message DataTreePaths {
   // QueryStep defines a query against the gNMI path of a data tree element.
   message QueryStep {
@@ -256,6 +403,10 @@ message DataTreePaths {
       // required_paths specifies that the query results are to be used to
       // check for required paths in the data tree.
       RequiredPaths required_paths = 3;
+      // required_values specifies that the query results are to be used to
+      // check whether values that are found at the path match a certain
+      // criteria.
+      RequiredValues required_values = 4;
     }
   }
   // ListQuery specifies an operation that retrieves the keys from a list.
@@ -266,6 +417,10 @@ message DataTreePaths {
     // next_query specifies a query that should be run for each key that
     // is retrieved by the ListQuery operation.
     TestQuery next_query = 2;
+    // filter specifies a set of filters that must be met for each entry
+    // in the list for it to be included in subsequent iterations. If it
+    // is not set then all entries are iterated.
+    repeated PathValueMatch filter = 3;
   }
   // RequiredPaths specifies an operation that checks for paths within
   // the data tree.
@@ -276,8 +431,117 @@ message DataTreePaths {
     // paths is the set of paths that are to be checked for.
     repeated gnmi.Path paths = 2;
   }
+  // RequiredValues specifies an operation that checks values within
+  // the data tree.
+  message RequiredValues {
+    // prefix is a common prefix for the paths within the required_values
+    // list.
+    gnmi.Path prefix = 1;
+    // matches specifies a set of path to value criteria that must be met.
+    // Each match is considered in isolation to evalute to true or false.
+    // The test fails if any of the matches evaluate to false.
+    repeated PathValueMatch matches = 2;
+  }
   // test_oper is the operation to be performed for the test.
   TestQuery test_oper = 1;
+}
+
+// PathValueMatch specifies a match critiera for a set of gNMI paths.
+// It is used to express criteria that a gNMI path must match.
+message PathValueMatch {
+  // path is the path to be verified. It can be absolute or relative
+  // based pon the context that the PathValueMatch message is used.
+  gnmi.Path path = 1;
+  // criteria specifies the condition to be met for the value at the
+  // path.
+  oneof criteria {
+    // equal is a gNMI TypedValue that the value found at the path must
+    // be equal to.
+    gnmi.TypedValue equal = 2;
+  }
+  // and specifies a set of additional matches that must be met for
+  // the test to evaluate to true. If any matches are not met, the
+  // match is false.
+  //
+  // For example, if the following message is specified:
+  // {
+  //   path {
+  //     elem { name: "system" }
+  //     elem { name: "state" }
+  //     elem { name: "hostname" }
+  //   }
+  //   equal { string_val: "box0" }
+  //   and {
+  //     path {
+  //       elem { name: "system" }
+  //       elem { name: "state" }
+  //       elem { name: "domain-name" }
+  //     }
+  //     equal { string_val: "openconfig.net" }
+  //   }
+  //   and {
+  //     path {
+  //       elem { name: "system" }
+  //       elem { name: "clock" }
+  //       elem { name: "state" }
+  //       elem { name: "timezone-name" }
+  //     }
+  //     equal { string_val: "Europe/London" }
+  //   }
+  // }
+  //
+  // Then the query only evaluates to true if /system/state/hostname
+  // == "box0" && /system/state/domain-name == "openconfig.net" &&
+  // /system/clock/state/timezone-name == "Europe/London".
+  repeated PathValueMatch and = 20;
+  // or specifies a set of matches that any one of which must be
+  // met for the test to evaluate to true.
+  //
+  // For example, if the following message is spceified:
+  //
+  // {
+  //   or {
+  //     path {
+  //       elem { name: "system" }
+  //       elem { name: "state" }
+  //       elem { name: "hostname" }
+  //     }
+  //     equal { string_val: "box0.openconfig.net" }
+  //     and {
+  //       path {
+  //         elem { name: "system" }
+  //         elem { name: "state" }
+  //         elem { name: "domain-name" }
+  //       }
+  //       equal { string_val: "openconfig.net" }
+  //   }
+  //   or {
+  //     path {
+  //       elem { name: "system" }
+  //       elem { name: "state" }
+  //       elem { name: "hostname" }
+  //     }
+  //     equal { string_val: "box0" }
+  //     and {
+  //       path {
+  //         elem { name: "system" }
+  //         elem { name: "state" }
+  //         elem { name: "domain-name" }
+  //       }
+  //       equal { string_val: "openconfig.net" }
+  //     }
+  //   }
+  // }
+  //
+  // Then the query only evaluates to true if:
+  //  (/system/state/hostname == "box0.openconfig.net" &&
+  //  /system/state/domain-name == "openconfig") ||
+  //  (/system/state/hostname == "box0" && /system/state/domain-name ==
+  //  "openconfig.net")
+  //
+  //  In this case, the top-level query has no specified path or criteria. Such
+  //  a query evaluates to true to allow such nesting.
+  repeated PathValueMatch or = 21;
 }
 
 // SchemaPathComplete defines the input for a test that checks that at least

@@ -120,3 +120,36 @@ func OneShotGetOrCreate(schema *yang.Entry, root ygot.GoStruct, sr *gpb.Subscrib
 	}
 	return Running, fmt.Errorf("unexpected message: %T", sr.Response)
 }
+
+// OneShotSetNode unmarshals the values in gpb.SubscribeResponse into the given
+// GoStruct with the provided schema.
+func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeResponse, opts ...ytypes.SetNodeOpt) (Status, error) {
+	switch v := sr.Response.(type) {
+	case *gpb.SubscribeResponse_Update:
+		pe := v.Update.GetPrefix().GetElem()
+		for _, u := range v.Update.Update {
+			if u != nil && u.Path != nil {
+				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, u.Path.GetElem()...)}, u.GetVal(), opts...); err != nil {
+					return Running, err
+				}
+			}
+		}
+
+		for _, d := range v.Update.Delete {
+			if d != nil {
+				// TODO(yusufsn): Support removing the value from GoStruct. Setting
+				// value to nil will not modify anything.
+				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, d.GetElem()...)}, nil, opts...); err != nil {
+					return Running, err
+				}
+			}
+		}
+
+		return Running, nil
+	case *gpb.SubscribeResponse_SyncResponse:
+		//Once the subscription has received all paths at least once - i.e., sync_response is
+		//sent by the target, then complete the test.
+		return Complete, nil
+	}
+	return Running, fmt.Errorf("unexpected message: %T", sr.Response)
+}

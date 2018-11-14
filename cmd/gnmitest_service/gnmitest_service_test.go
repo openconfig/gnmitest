@@ -73,6 +73,22 @@ func TestIntegration(t *testing.T) {
 			"openconfig": filepath.Join("testdata", "simple-get.json"),
 		},
 		wantReportFile: filepath.Join("testdata", "simple-get-report.txtpb"),
+	}, {
+		name:        "simple subscribe tests",
+		inSuiteFile: filepath.Join("testdata", "simple-subscribe-suite.txtpb"),
+		inSchema:    map[string]*ytypes.Schema{"openconfig": ocSchema},
+		inFakeDataFiles: map[string]string{
+			"openconfig": filepath.Join("testdata", "simple-subscribe.json"),
+		},
+		wantReportFile: filepath.Join("testdata", "simple-subscribe-report.txtpb"),
+	}, {
+		name:        "failing subscribe tests",
+		inSuiteFile: filepath.Join("testdata", "fail-subscribe-suite.txtpb"),
+		inSchema:    map[string]*ytypes.Schema{"openconfig": ocSchema},
+		inFakeDataFiles: map[string]string{
+			"openconfig": filepath.Join("testdata", "simple-subscribe.json"),
+		},
+		wantReportFile: filepath.Join("testdata", "fail-subscribe-report.txtpb"),
 	}}
 
 	for _, tt := range tests {
