@@ -41,7 +41,7 @@ func (x GetSetValidationOper_OperResult) String() string {
 	return proto.EnumName(GetSetValidationOper_OperResult_name, int32(x))
 }
 func (GetSetValidationOper_OperResult) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{11, 0}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{13, 0}
 }
 
 // Default message to use if test doesn't need any arguments. Default message
@@ -57,7 +57,7 @@ func (m *Default) Reset()         { *m = Default{} }
 func (m *Default) String() string { return proto.CompactTextString(m) }
 func (*Default) ProtoMessage()    {}
 func (*Default) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{0}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{0}
 }
 func (m *Default) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Default.Unmarshal(m, b)
@@ -83,16 +83,18 @@ type SubscribeTest struct {
 	// an extension list, a real subscription isn't created, but the query is
 	// registered to receive updates corresponding to its path from subscription
 	// of parent test.
-	Request *gnmi.SubscribeRequest `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+	Request *gnmi.SubscribeRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
 	// log_responses indicates to the test whether it should log all
 	// SubscribeResponse messages that are received from the target.
-	LogResponses bool `protobuf:"varint,2,opt,name=log_responses,json=logResponses" json:"log_responses,omitempty"`
+	LogResponses bool `protobuf:"varint,2,opt,name=log_responses,json=logResponses,proto3" json:"log_responses,omitempty"`
 	// Types that are valid to be assigned to Args:
 	//	*SubscribeTest_FakeTest
 	//	*SubscribeTest_PathValidation
 	//	*SubscribeTest_HasKeys
 	//	*SubscribeTest_SchemapathComplete
 	//	*SubscribeTest_DataTreePaths
+	//	*SubscribeTest_ValueValidation
+	//	*SubscribeTest_GnmipathCompliance
 	Args                 isSubscribeTest_Args `protobuf_oneof:"args"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
@@ -103,7 +105,7 @@ func (m *SubscribeTest) Reset()         { *m = SubscribeTest{} }
 func (m *SubscribeTest) String() string { return proto.CompactTextString(m) }
 func (*SubscribeTest) ProtoMessage()    {}
 func (*SubscribeTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{1}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{1}
 }
 func (m *SubscribeTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscribeTest.Unmarshal(m, b)
@@ -128,19 +130,25 @@ type isSubscribeTest_Args interface {
 }
 
 type SubscribeTest_FakeTest struct {
-	FakeTest string `protobuf:"bytes,10,opt,name=fake_test,json=fakeTest,oneof"`
+	FakeTest string `protobuf:"bytes,10,opt,name=fake_test,json=fakeTest,proto3,oneof"`
 }
 type SubscribeTest_PathValidation struct {
-	PathValidation *Default `protobuf:"bytes,11,opt,name=path_validation,json=pathValidation,oneof"`
+	PathValidation *Default `protobuf:"bytes,11,opt,name=path_validation,json=pathValidation,proto3,oneof"`
 }
 type SubscribeTest_HasKeys struct {
-	HasKeys *HasKeys `protobuf:"bytes,12,opt,name=has_keys,json=hasKeys,oneof"`
+	HasKeys *HasKeys `protobuf:"bytes,12,opt,name=has_keys,json=hasKeys,proto3,oneof"`
 }
 type SubscribeTest_SchemapathComplete struct {
-	SchemapathComplete *SchemaPathComplete `protobuf:"bytes,13,opt,name=schemapath_complete,json=schemapathComplete,oneof"`
+	SchemapathComplete *SchemaPathComplete `protobuf:"bytes,13,opt,name=schemapath_complete,json=schemapathComplete,proto3,oneof"`
 }
 type SubscribeTest_DataTreePaths struct {
-	DataTreePaths *DataTreePaths `protobuf:"bytes,14,opt,name=data_tree_paths,json=dataTreePaths,oneof"`
+	DataTreePaths *DataTreePaths `protobuf:"bytes,14,opt,name=data_tree_paths,json=dataTreePaths,proto3,oneof"`
+}
+type SubscribeTest_ValueValidation struct {
+	ValueValidation *Default `protobuf:"bytes,15,opt,name=value_validation,json=valueValidation,proto3,oneof"`
+}
+type SubscribeTest_GnmipathCompliance struct {
+	GnmipathCompliance *GNMIPathCompliance `protobuf:"bytes,16,opt,name=gnmipath_compliance,json=gnmipathCompliance,proto3,oneof"`
 }
 
 func (*SubscribeTest_FakeTest) isSubscribeTest_Args()           {}
@@ -148,6 +156,8 @@ func (*SubscribeTest_PathValidation) isSubscribeTest_Args()     {}
 func (*SubscribeTest_HasKeys) isSubscribeTest_Args()            {}
 func (*SubscribeTest_SchemapathComplete) isSubscribeTest_Args() {}
 func (*SubscribeTest_DataTreePaths) isSubscribeTest_Args()      {}
+func (*SubscribeTest_ValueValidation) isSubscribeTest_Args()    {}
+func (*SubscribeTest_GnmipathCompliance) isSubscribeTest_Args() {}
 
 func (m *SubscribeTest) GetArgs() isSubscribeTest_Args {
 	if m != nil {
@@ -205,6 +215,20 @@ func (m *SubscribeTest) GetDataTreePaths() *DataTreePaths {
 	return nil
 }
 
+func (m *SubscribeTest) GetValueValidation() *Default {
+	if x, ok := m.GetArgs().(*SubscribeTest_ValueValidation); ok {
+		return x.ValueValidation
+	}
+	return nil
+}
+
+func (m *SubscribeTest) GetGnmipathCompliance() *GNMIPathCompliance {
+	if x, ok := m.GetArgs().(*SubscribeTest_GnmipathCompliance); ok {
+		return x.GnmipathCompliance
+	}
+	return nil
+}
+
 // XXX_OneofFuncs is for the internal use of the proto package.
 func (*SubscribeTest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _SubscribeTest_OneofMarshaler, _SubscribeTest_OneofUnmarshaler, _SubscribeTest_OneofSizer, []interface{}{
@@ -213,6 +237,8 @@ func (*SubscribeTest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer)
 		(*SubscribeTest_HasKeys)(nil),
 		(*SubscribeTest_SchemapathComplete)(nil),
 		(*SubscribeTest_DataTreePaths)(nil),
+		(*SubscribeTest_ValueValidation)(nil),
+		(*SubscribeTest_GnmipathCompliance)(nil),
 	}
 }
 
@@ -241,6 +267,16 @@ func _SubscribeTest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *SubscribeTest_DataTreePaths:
 		b.EncodeVarint(14<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.DataTreePaths); err != nil {
+			return err
+		}
+	case *SubscribeTest_ValueValidation:
+		b.EncodeVarint(15<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.ValueValidation); err != nil {
+			return err
+		}
+	case *SubscribeTest_GnmipathCompliance:
+		b.EncodeVarint(16<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.GnmipathCompliance); err != nil {
 			return err
 		}
 	case nil:
@@ -292,6 +328,22 @@ func _SubscribeTest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.
 		err := b.DecodeMessage(msg)
 		m.Args = &SubscribeTest_DataTreePaths{msg}
 		return true, err
+	case 15: // args.value_validation
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(Default)
+		err := b.DecodeMessage(msg)
+		m.Args = &SubscribeTest_ValueValidation{msg}
+		return true, err
+	case 16: // args.gnmipath_compliance
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(GNMIPathCompliance)
+		err := b.DecodeMessage(msg)
+		m.Args = &SubscribeTest_GnmipathCompliance{msg}
+		return true, err
 	default:
 		return false, nil
 	}
@@ -325,6 +377,16 @@ func _SubscribeTest_OneofSizer(msg proto.Message) (n int) {
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
+	case *SubscribeTest_ValueValidation:
+		s := proto.Size(x.ValueValidation)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *SubscribeTest_GnmipathCompliance:
+		s := proto.Size(x.GnmipathCompliance)
+		n += 2 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -340,14 +402,14 @@ func _SubscribeTest_OneofSizer(msg proto.Message) (n int) {
 // storage of authentication data that can be retrieved by the framework.
 type Test struct {
 	// Description of the individual test to use for reporting purposes.
-	Description string `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
+	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
 	// Amount of time in seconds test is allowed to run before cancelled.
-	Timeout int32 `protobuf:"varint,2,opt,name=timeout" json:"timeout,omitempty"`
+	Timeout int32 `protobuf:"varint,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// The compiled schema that should be used within the test.
-	Schema string `protobuf:"bytes,3,opt,name=schema" json:"schema,omitempty"`
+	Schema string `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Connection parameters to dial into target. If not specified, the one
 	// specified by Suite proto is used.
-	Connection *Connection `protobuf:"bytes,4,opt,name=connection" json:"connection,omitempty"`
+	Connection *Connection `protobuf:"bytes,4,opt,name=connection,proto3" json:"connection,omitempty"`
 	// Can be extended to include other gNMI RPCs.
 	//
 	// Types that are valid to be assigned to Type:
@@ -364,7 +426,7 @@ func (m *Test) Reset()         { *m = Test{} }
 func (m *Test) String() string { return proto.CompactTextString(m) }
 func (*Test) ProtoMessage()    {}
 func (*Test) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{2}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{2}
 }
 func (m *Test) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Test.Unmarshal(m, b)
@@ -389,13 +451,13 @@ type isTest_Type interface {
 }
 
 type Test_Subscribe struct {
-	Subscribe *SubscribeTest `protobuf:"bytes,10,opt,name=subscribe,oneof"`
+	Subscribe *SubscribeTest `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
 }
 type Test_GetSet struct {
-	GetSet *GetSetTest `protobuf:"bytes,11,opt,name=get_set,json=getSet,oneof"`
+	GetSet *GetSetTest `protobuf:"bytes,11,opt,name=get_set,json=getSet,proto3,oneof"`
 }
 type Test_FakeTest struct {
-	FakeTest *FakeTest `protobuf:"bytes,12,opt,name=fake_test,json=fakeTest,oneof"`
+	FakeTest *FakeTest `protobuf:"bytes,12,opt,name=fake_test,json=fakeTest,proto3,oneof"`
 }
 
 func (*Test_Subscribe) isTest_Type() {}
@@ -558,9 +620,9 @@ type Credentials struct {
 	// default, plaintext resolver is used if nothing is specified here. If a
 	// special resolver is needed, it needs to be registered into global resolvers
 	// table.
-	Resolver             string   `protobuf:"bytes,1,opt,name=resolver" json:"resolver,omitempty"`
-	Username             string   `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
-	Password             string   `protobuf:"bytes,3,opt,name=password" json:"password,omitempty"`
+	Resolver             string   `protobuf:"bytes,1,opt,name=resolver,proto3" json:"resolver,omitempty"`
+	Username             string   `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Password             string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -570,7 +632,7 @@ func (m *Credentials) Reset()         { *m = Credentials{} }
 func (m *Credentials) String() string { return proto.CompactTextString(m) }
 func (*Credentials) ProtoMessage()    {}
 func (*Credentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{3}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{3}
 }
 func (m *Credentials) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Credentials.Unmarshal(m, b)
@@ -616,13 +678,13 @@ type Connection struct {
 	// The name of the target to be set in gNMI messages. For gNMI implementations
 	// that can be address multiple targets, this value can be used to specify
 	// which one should be the device under test.
-	Target string `protobuf:"bytes,1,opt,name=target" json:"target,omitempty"`
+	Target string `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
 	// Address is used while dialing into gNMI server under test. It needs to be
 	// in the form "host:port" or it should resolve to a "host:port".
-	Address     string       `protobuf:"bytes,2,opt,name=address" json:"address,omitempty"`
-	Credentials *Credentials `protobuf:"bytes,3,opt,name=credentials" json:"credentials,omitempty"`
+	Address     string       `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Credentials *Credentials `protobuf:"bytes,3,opt,name=credentials,proto3" json:"credentials,omitempty"`
 	// Dial timeout in seconds while connecting to gNMI server under test.
-	Timeout              int32    `protobuf:"varint,4,opt,name=timeout" json:"timeout,omitempty"`
+	Timeout              int32    `protobuf:"varint,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -632,7 +694,7 @@ func (m *Connection) Reset()         { *m = Connection{} }
 func (m *Connection) String() string { return proto.CompactTextString(m) }
 func (*Connection) ProtoMessage()    {}
 func (*Connection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{4}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{4}
 }
 func (m *Connection) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Connection.Unmarshal(m, b)
@@ -683,7 +745,7 @@ func (m *Connection) GetTimeout() int32 {
 // FakeTest is the configuration used for a fake test within the framework.
 type FakeTest struct {
 	// pass indicates whether the faked test should pass or fail.
-	Pass                 bool     `protobuf:"varint,1,opt,name=pass" json:"pass,omitempty"`
+	Pass                 bool     `protobuf:"varint,1,opt,name=pass,proto3" json:"pass,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -693,7 +755,7 @@ func (m *FakeTest) Reset()         { *m = FakeTest{} }
 func (m *FakeTest) String() string { return proto.CompactTextString(m) }
 func (*FakeTest) ProtoMessage()    {}
 func (*FakeTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{5}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{5}
 }
 func (m *FakeTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FakeTest.Unmarshal(m, b)
@@ -725,9 +787,9 @@ func (m *FakeTest) GetPass() bool {
 // to check for data completeness of a particular list within the schema.
 type HasKeys struct {
 	// Path to the list that should be checked.
-	Path *gnmi.Path `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
+	Path *gnmi.Path `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	// Items that should be found in the list.
-	Item                 []*HasKeys_Item `protobuf:"bytes,2,rep,name=item" json:"item,omitempty"`
+	Item                 []*HasKeys_Item `protobuf:"bytes,2,rep,name=item,proto3" json:"item,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -737,7 +799,7 @@ func (m *HasKeys) Reset()         { *m = HasKeys{} }
 func (m *HasKeys) String() string { return proto.CompactTextString(m) }
 func (*HasKeys) ProtoMessage()    {}
 func (*HasKeys) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{6}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{6}
 }
 func (m *HasKeys) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasKeys.Unmarshal(m, b)
@@ -773,7 +835,7 @@ func (m *HasKeys) GetItem() []*HasKeys_Item {
 
 // Item defines an entry in the list.
 type HasKeys_Item struct {
-	Key                  map[string]string `protobuf:"bytes,1,rep,name=key" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Key                  map[string]string `protobuf:"bytes,1,rep,name=key,proto3" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -783,7 +845,7 @@ func (m *HasKeys_Item) Reset()         { *m = HasKeys_Item{} }
 func (m *HasKeys_Item) String() string { return proto.CompactTextString(m) }
 func (*HasKeys_Item) ProtoMessage()    {}
 func (*HasKeys_Item) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{6, 0}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{6, 0}
 }
 func (m *HasKeys_Item) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasKeys_Item.Unmarshal(m, b)
@@ -808,6 +870,76 @@ func (m *HasKeys_Item) GetKey() map[string]string {
 		return m.Key
 	}
 	return nil
+}
+
+// GNMIPathCompliance defines the test to validate target and origin fields of
+// gNMI Path as well as usage of Elem field instead of deprecated Element field.
+// If check_target and/or check_origin fields are set to "*", corresponding
+// field in gNMI prefix path must exist, but can be any value. If they are set
+// to a value other than "*", corresponding field must be equal to the value. If
+// check_target and/or check_origin isn't set or set to an empty string, this
+// means no validation is needed on the corresponding field. For instance:
+//
+// {
+//   // target must exist, but can have any value other than empty string
+//   check_target: "*"
+//   // origin must exist and be equal to "openconfig"
+//   check_origin: "openconfig"
+//   // Elem field of gNMI Path must be used instead of Element field
+//   check_elem: true
+// }
+type GNMIPathCompliance struct {
+	CheckElem            bool     `protobuf:"varint,1,opt,name=check_elem,json=checkElem,proto3" json:"check_elem,omitempty"`
+	CheckTarget          string   `protobuf:"bytes,2,opt,name=check_target,json=checkTarget,proto3" json:"check_target,omitempty"`
+	CheckOrigin          string   `protobuf:"bytes,3,opt,name=check_origin,json=checkOrigin,proto3" json:"check_origin,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GNMIPathCompliance) Reset()         { *m = GNMIPathCompliance{} }
+func (m *GNMIPathCompliance) String() string { return proto.CompactTextString(m) }
+func (*GNMIPathCompliance) ProtoMessage()    {}
+func (*GNMIPathCompliance) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{7}
+}
+func (m *GNMIPathCompliance) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GNMIPathCompliance.Unmarshal(m, b)
+}
+func (m *GNMIPathCompliance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GNMIPathCompliance.Marshal(b, m, deterministic)
+}
+func (dst *GNMIPathCompliance) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GNMIPathCompliance.Merge(dst, src)
+}
+func (m *GNMIPathCompliance) XXX_Size() int {
+	return xxx_messageInfo_GNMIPathCompliance.Size(m)
+}
+func (m *GNMIPathCompliance) XXX_DiscardUnknown() {
+	xxx_messageInfo_GNMIPathCompliance.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GNMIPathCompliance proto.InternalMessageInfo
+
+func (m *GNMIPathCompliance) GetCheckElem() bool {
+	if m != nil {
+		return m.CheckElem
+	}
+	return false
+}
+
+func (m *GNMIPathCompliance) GetCheckTarget() string {
+	if m != nil {
+		return m.CheckTarget
+	}
+	return ""
+}
+
+func (m *GNMIPathCompliance) GetCheckOrigin() string {
+	if m != nil {
+		return m.CheckOrigin
+	}
+	return ""
 }
 
 // DataTreePaths specifies a test which allows for checks for the
@@ -852,17 +984,19 @@ func (m *HasKeys_Item) GetKey() map[string]string {
 // {
 //   steps { name: "interfaces" }
 //   steps { name: "interface"  }
-//   get_list_keys { var_name: "%%interface%%" }
-//   next_query {
-//     steps { name: "interfaces" }
-//     steps { name: "interface" key_name: "%%interface%%" }
-//     required_paths {
-//      prefix: {
-//        elem: "state"
-//        elem: "counters"
+//   get_list_keys {
+//     var_name: "%%interface%%"
+//     next_query {
+//       steps { name: "interfaces" }
+//       steps { name: "interface" key_name: "%%interface%%" }
+//       required_paths {
+//         prefix: {
+//           elem: "state"
+//           elem: "counters"
+//        }
+//        paths { elem { name: "in-pkts" } }
+//        paths { elem { name: "out-pkts" } }
 //      }
-//      paths { elem { name: "in-pkts" } }
-//      paths { elem { name: "out-pkts" } }
 //    }
 //   }
 // }
@@ -889,40 +1023,161 @@ func (m *HasKeys_Item) GetKey() map[string]string {
 //  {
 //    steps { name: "interfaces" }
 //    steps { name: "interface" }
-//    get_list_keys { var_name: "%%interface%%" }
-//    next_query {
-//      steps { name: "interfaces" }
-//      steps { name: "interface" key_name: "%%interface%%" }
-//      steps { name: "subinterfaces" }
-//      steps { name: "subinterface" }
-//      get_list_keys { var_name: "%%subinterface%%" }
+//    get_list_keys {
+//      var_name: "%%interface%%"
 //      next_query {
 //        steps { name: "interfaces" }
 //        steps { name: "interface" key_name: "%%interface%%" }
 //        steps { name: "subinterfaces" }
-//        steps { name: "subinterface" key_name: "%%subinterface%%" }
-//        steps { name: "ipv4" }
-//        steps { name: "addresses" }
-//        steps { name: "address" }
-//        get_list_keys { var_name: "%%v4address%%" }
-//        next_query {
-//          steps { name: "interfaces" }
-//          steps { name: "interface" key_name: "%%interface%%" }
-//          steps { name: "subinterfaces" }
-//          steps { name: "subinterface" key_name: "%%subinterface%%" }
-//          steps { name: "ipv4" }
-//          steps { name: "addresses" }
-//          steps { name: "address"  key_name: "%%v4address%%" }
-//          required_paths {
-//            ... actual test with required paths ...
+//        steps { name: "subinterface" }
+//        get_list_keys {
+//          var_name: "%%subinterface%%"
+//          next_query {
+//            steps { name: "interfaces" }
+//            steps { name: "interface" key_name: "%%interface%%" }
+//            steps { name: "subinterfaces" }
+//            steps { name: "subinterface" key_name: "%%subinterface%%" }
+//            steps { name: "ipv4" }
+//            steps { name: "addresses" }
+//            steps { name: "address" }
+//            get_list_keys {
+//              var_name: "%%v4address%%"
+//              next_query {
+//                steps { name: "interfaces" }
+//                steps { name: "interface" key_name: "%%interface%%" }
+//                steps { name: "subinterfaces" }
+//                steps { name: "subinterface" key_name: "%%subinterface%%" }
+//                steps { name: "ipv4" }
+//                steps { name: "addresses" }
+//                steps { name: "address"  key_name: "%%v4address%%" }
+//                required_paths {
+//                  ... actual test with required paths ...
+//                }
+//              }
+//            }
 //          }
 //        }
 //      }
 //    }
 //  }
+//
+//
+// The filter field within a TestQuery can be used to filter the set of list
+// items that are to be iterated over. When a PathValueMatch filter is
+// specified, its contents are evaluated, and only when the result of the match
+// is true is the item in the list iterated over.
+//
+// For example, it is possible to iterate over components of a particular type
+// within the OpenConfig schema by specifying a filter:
+//
+// {
+//   steps: "components"
+//   steps: "component"
+//   get_list_keys {
+//     var_name: "%%component_name%%"
+//     filter {
+//       path {
+//         elem { name: "state" }
+//         elem { name: "type" }
+//       }
+//       equal { string_val: "TRANSCEIVER" }
+//     }
+//     next_query {
+//       required_paths {
+//         prefix { name: "state" }
+//         paths { name: "mfg-name" }
+//         paths { name: "serial-no" }
+//       }
+//     }
+//   }
+// }
+//
+// The get_list_keys query is filtered according to the criteria described in
+// the "filter". The path specified in this message must be relative to the
+// current selection.
+//
+// It is also possible to filter based on multiple queries, using the "and" and
+// "or" fields of the PathValueMatch message, for example, to filter on
+// components of type LINECARD or PORT, the following PathValueMatch is
+// specified:
+//
+// {
+//   path {
+//     elem { name: "state" }
+//     elem { name: "type" }
+//   }
+//   equal { string_val: "LINECARD" }
+//   or {
+//     path {
+//       elem { name: "state" }
+//       elem { name: "type" }
+//     }
+//     equal { string_val: PORT" }
+//   }
+// }
+//
+// The "or" field specifies that a PathValueMatch should be evaluated to true if
+// the parent or any "or" query evaluates to true.
+//
+// If multiple filters, are required, for example, to match multiple list keys,
+// the "and" field can be used within a PathValueMatch:
+//
+// {
+//   // Assume we are within a query of the
+//   // network-instances/network-instance/protocols/protocol list.
+//   path {
+//     elem { name: "state" }
+//     elem { name: "identifier" }
+//   }
+//   equal { string_val: "BGP" }
+//   and {
+//     path {
+//       elem { name: "state" }
+//       elem { name: "name" }
+//     }
+//     equal { string_val: "15169" }
+//   }
+// }
+//
+// As well as requiring a specific set of paths to exist, the datatreepaths test
+// can be used to test values within the data tree, using the required_values
+// field. For example, to validate that all non-logical interfaces have LLDP
+// enabled, the following query can be formulated -- checking that
+// /lldp/interfaces/interface[name=<if-name>]/state/enabled = true:
+//
+// {
+//   steps { name: "interfaces" }
+//   steps { name: "interface" }
+//   get_list_keys {
+//     var_name: "<if-name>"
+//     filter {
+//       path {
+//         elem { name: "state" }
+//         elem { name: "logical" }
+//       }
+//       equal { bool_val: false }
+//     }
+//     next_query {
+//       steps { name: "lldp" }
+//       steps { name: "interfaces" }
+//       steps { name: "interface" key_name: "<if-name>" }
+//       required_values {
+//         prefix {
+//           elem { name: "state" }
+//         }
+//         matches {
+//           path {
+//             elem { name: "enabled" }
+//           }
+//           equal { bool_val: true }
+//         }
+//       }
+//     }
+//   }
+// }
 type DataTreePaths struct {
 	// test_oper is the operation to be performed for the test.
-	TestOper             *DataTreePaths_TestQuery `protobuf:"bytes,1,opt,name=test_oper,json=testOper" json:"test_oper,omitempty"`
+	TestOper             *DataTreePaths_TestQuery `protobuf:"bytes,1,opt,name=test_oper,json=testOper,proto3" json:"test_oper,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_unrecognized     []byte                   `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
@@ -932,7 +1187,7 @@ func (m *DataTreePaths) Reset()         { *m = DataTreePaths{} }
 func (m *DataTreePaths) String() string { return proto.CompactTextString(m) }
 func (*DataTreePaths) ProtoMessage()    {}
 func (*DataTreePaths) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{8}
 }
 func (m *DataTreePaths) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataTreePaths.Unmarshal(m, b)
@@ -963,15 +1218,15 @@ func (m *DataTreePaths) GetTestOper() *DataTreePaths_TestQuery {
 type DataTreePaths_QueryStep struct {
 	// name specifies a name that should be explicitly matched in the
 	// gnmi.PathElem the QueryStep is being compared to.
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// key specifies the key map which should be explicitly matched in
 	// the gnmi.PathElem the QueryStep is being compared to.
-	Key map[string]string `protobuf:"bytes,2,rep,name=key" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Key map[string]string `protobuf:"bytes,2,rep,name=key,proto3" json:"key,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// key_name specifies the name of a variable that has been written to
 	// by a previous stage of the test. The value of the key map in the
 	// PathElem is substituted for the value currently being iterated over
 	// for the variable.
-	KeyName              string   `protobuf:"bytes,3,opt,name=key_name,json=keyName" json:"key_name,omitempty"`
+	KeyName              string   `protobuf:"bytes,3,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -981,7 +1236,7 @@ func (m *DataTreePaths_QueryStep) Reset()         { *m = DataTreePaths_QueryStep
 func (m *DataTreePaths_QueryStep) String() string { return proto.CompactTextString(m) }
 func (*DataTreePaths_QueryStep) ProtoMessage()    {}
 func (*DataTreePaths_QueryStep) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 0}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{8, 0}
 }
 func (m *DataTreePaths_QueryStep) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataTreePaths_QueryStep.Unmarshal(m, b)
@@ -1026,10 +1281,11 @@ func (m *DataTreePaths_QueryStep) GetKeyName() string {
 type DataTreePaths_TestQuery struct {
 	// steps specifies the set of QuerySteps that should be made against the
 	// data tree to retrieve the data for the operation being performed.
-	Steps []*DataTreePaths_QueryStep `protobuf:"bytes,1,rep,name=steps" json:"steps,omitempty"`
+	Steps []*DataTreePaths_QueryStep `protobuf:"bytes,1,rep,name=steps,proto3" json:"steps,omitempty"`
 	// Types that are valid to be assigned to Type:
 	//	*DataTreePaths_TestQuery_GetListKeys
 	//	*DataTreePaths_TestQuery_RequiredPaths
+	//	*DataTreePaths_TestQuery_RequiredValues
 	Type                 isDataTreePaths_TestQuery_Type `protobuf_oneof:"type"`
 	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
 	XXX_unrecognized     []byte                         `json:"-"`
@@ -1040,7 +1296,7 @@ func (m *DataTreePaths_TestQuery) Reset()         { *m = DataTreePaths_TestQuery
 func (m *DataTreePaths_TestQuery) String() string { return proto.CompactTextString(m) }
 func (*DataTreePaths_TestQuery) ProtoMessage()    {}
 func (*DataTreePaths_TestQuery) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 1}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{8, 1}
 }
 func (m *DataTreePaths_TestQuery) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataTreePaths_TestQuery.Unmarshal(m, b)
@@ -1065,14 +1321,18 @@ type isDataTreePaths_TestQuery_Type interface {
 }
 
 type DataTreePaths_TestQuery_GetListKeys struct {
-	GetListKeys *DataTreePaths_ListQuery `protobuf:"bytes,2,opt,name=get_list_keys,json=getListKeys,oneof"`
+	GetListKeys *DataTreePaths_ListQuery `protobuf:"bytes,2,opt,name=get_list_keys,json=getListKeys,proto3,oneof"`
 }
 type DataTreePaths_TestQuery_RequiredPaths struct {
-	RequiredPaths *DataTreePaths_RequiredPaths `protobuf:"bytes,3,opt,name=required_paths,json=requiredPaths,oneof"`
+	RequiredPaths *DataTreePaths_RequiredPaths `protobuf:"bytes,3,opt,name=required_paths,json=requiredPaths,proto3,oneof"`
+}
+type DataTreePaths_TestQuery_RequiredValues struct {
+	RequiredValues *DataTreePaths_RequiredValues `protobuf:"bytes,4,opt,name=required_values,json=requiredValues,proto3,oneof"`
 }
 
-func (*DataTreePaths_TestQuery_GetListKeys) isDataTreePaths_TestQuery_Type()   {}
-func (*DataTreePaths_TestQuery_RequiredPaths) isDataTreePaths_TestQuery_Type() {}
+func (*DataTreePaths_TestQuery_GetListKeys) isDataTreePaths_TestQuery_Type()    {}
+func (*DataTreePaths_TestQuery_RequiredPaths) isDataTreePaths_TestQuery_Type()  {}
+func (*DataTreePaths_TestQuery_RequiredValues) isDataTreePaths_TestQuery_Type() {}
 
 func (m *DataTreePaths_TestQuery) GetType() isDataTreePaths_TestQuery_Type {
 	if m != nil {
@@ -1102,11 +1362,19 @@ func (m *DataTreePaths_TestQuery) GetRequiredPaths() *DataTreePaths_RequiredPath
 	return nil
 }
 
+func (m *DataTreePaths_TestQuery) GetRequiredValues() *DataTreePaths_RequiredValues {
+	if x, ok := m.GetType().(*DataTreePaths_TestQuery_RequiredValues); ok {
+		return x.RequiredValues
+	}
+	return nil
+}
+
 // XXX_OneofFuncs is for the internal use of the proto package.
 func (*DataTreePaths_TestQuery) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _DataTreePaths_TestQuery_OneofMarshaler, _DataTreePaths_TestQuery_OneofUnmarshaler, _DataTreePaths_TestQuery_OneofSizer, []interface{}{
 		(*DataTreePaths_TestQuery_GetListKeys)(nil),
 		(*DataTreePaths_TestQuery_RequiredPaths)(nil),
+		(*DataTreePaths_TestQuery_RequiredValues)(nil),
 	}
 }
 
@@ -1122,6 +1390,11 @@ func _DataTreePaths_TestQuery_OneofMarshaler(msg proto.Message, b *proto.Buffer)
 	case *DataTreePaths_TestQuery_RequiredPaths:
 		b.EncodeVarint(3<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.RequiredPaths); err != nil {
+			return err
+		}
+	case *DataTreePaths_TestQuery_RequiredValues:
+		b.EncodeVarint(4<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.RequiredValues); err != nil {
 			return err
 		}
 	case nil:
@@ -1150,6 +1423,14 @@ func _DataTreePaths_TestQuery_OneofUnmarshaler(msg proto.Message, tag, wire int,
 		err := b.DecodeMessage(msg)
 		m.Type = &DataTreePaths_TestQuery_RequiredPaths{msg}
 		return true, err
+	case 4: // type.required_values
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(DataTreePaths_RequiredValues)
+		err := b.DecodeMessage(msg)
+		m.Type = &DataTreePaths_TestQuery_RequiredValues{msg}
+		return true, err
 	default:
 		return false, nil
 	}
@@ -1169,6 +1450,11 @@ func _DataTreePaths_TestQuery_OneofSizer(msg proto.Message) (n int) {
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
+	case *DataTreePaths_TestQuery_RequiredValues:
+		s := proto.Size(x.RequiredValues)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -1180,20 +1466,24 @@ func _DataTreePaths_TestQuery_OneofSizer(msg proto.Message) (n int) {
 type DataTreePaths_ListQuery struct {
 	// var_name specifies the variable name by which the key values will
 	// be referred to in subsequent queries.
-	VarName string `protobuf:"bytes,1,opt,name=var_name,json=varName" json:"var_name,omitempty"`
+	VarName string `protobuf:"bytes,1,opt,name=var_name,json=varName,proto3" json:"var_name,omitempty"`
 	// next_query specifies a query that should be run for each key that
 	// is retrieved by the ListQuery operation.
-	NextQuery            *DataTreePaths_TestQuery `protobuf:"bytes,2,opt,name=next_query,json=nextQuery" json:"next_query,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
+	NextQuery *DataTreePaths_TestQuery `protobuf:"bytes,2,opt,name=next_query,json=nextQuery,proto3" json:"next_query,omitempty"`
+	// filter specifies a set of filters that must be met for each entry
+	// in the list for it to be included in subsequent iterations. If it
+	// is not set then all entries are iterated.
+	Filter               []*PathValueMatch `protobuf:"bytes,3,rep,name=filter,proto3" json:"filter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
 func (m *DataTreePaths_ListQuery) Reset()         { *m = DataTreePaths_ListQuery{} }
 func (m *DataTreePaths_ListQuery) String() string { return proto.CompactTextString(m) }
 func (*DataTreePaths_ListQuery) ProtoMessage()    {}
 func (*DataTreePaths_ListQuery) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 2}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{8, 2}
 }
 func (m *DataTreePaths_ListQuery) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataTreePaths_ListQuery.Unmarshal(m, b)
@@ -1227,14 +1517,21 @@ func (m *DataTreePaths_ListQuery) GetNextQuery() *DataTreePaths_TestQuery {
 	return nil
 }
 
+func (m *DataTreePaths_ListQuery) GetFilter() []*PathValueMatch {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
 // RequiredPaths specifies an operation that checks for paths within
 // the data tree.
 type DataTreePaths_RequiredPaths struct {
 	// prefix is a common prefix for the paths within the required_paths
 	// list.
-	Prefix *gnmi.Path `protobuf:"bytes,1,opt,name=prefix" json:"prefix,omitempty"`
+	Prefix *gnmi.Path `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	// paths is the set of paths that are to be checked for.
-	Paths                []*gnmi.Path `protobuf:"bytes,2,rep,name=paths" json:"paths,omitempty"`
+	Paths                []*gnmi.Path `protobuf:"bytes,2,rep,name=paths,proto3" json:"paths,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
@@ -1244,7 +1541,7 @@ func (m *DataTreePaths_RequiredPaths) Reset()         { *m = DataTreePaths_Requi
 func (m *DataTreePaths_RequiredPaths) String() string { return proto.CompactTextString(m) }
 func (*DataTreePaths_RequiredPaths) ProtoMessage()    {}
 func (*DataTreePaths_RequiredPaths) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{7, 3}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{8, 3}
 }
 func (m *DataTreePaths_RequiredPaths) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataTreePaths_RequiredPaths.Unmarshal(m, b)
@@ -1278,16 +1575,293 @@ func (m *DataTreePaths_RequiredPaths) GetPaths() []*gnmi.Path {
 	return nil
 }
 
+// RequiredValues specifies an operation that checks values within
+// the data tree.
+type DataTreePaths_RequiredValues struct {
+	// prefix is a common prefix for the paths within the required_values
+	// list.
+	Prefix *gnmi.Path `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// matches specifies a set of path to value criteria that must be met.
+	// Each match is considered in isolation to evalute to true or false.
+	// The test fails if any of the matches evaluate to false.
+	Matches              []*PathValueMatch `protobuf:"bytes,2,rep,name=matches,proto3" json:"matches,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *DataTreePaths_RequiredValues) Reset()         { *m = DataTreePaths_RequiredValues{} }
+func (m *DataTreePaths_RequiredValues) String() string { return proto.CompactTextString(m) }
+func (*DataTreePaths_RequiredValues) ProtoMessage()    {}
+func (*DataTreePaths_RequiredValues) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{8, 4}
+}
+func (m *DataTreePaths_RequiredValues) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataTreePaths_RequiredValues.Unmarshal(m, b)
+}
+func (m *DataTreePaths_RequiredValues) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataTreePaths_RequiredValues.Marshal(b, m, deterministic)
+}
+func (dst *DataTreePaths_RequiredValues) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataTreePaths_RequiredValues.Merge(dst, src)
+}
+func (m *DataTreePaths_RequiredValues) XXX_Size() int {
+	return xxx_messageInfo_DataTreePaths_RequiredValues.Size(m)
+}
+func (m *DataTreePaths_RequiredValues) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataTreePaths_RequiredValues.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataTreePaths_RequiredValues proto.InternalMessageInfo
+
+func (m *DataTreePaths_RequiredValues) GetPrefix() *gnmi.Path {
+	if m != nil {
+		return m.Prefix
+	}
+	return nil
+}
+
+func (m *DataTreePaths_RequiredValues) GetMatches() []*PathValueMatch {
+	if m != nil {
+		return m.Matches
+	}
+	return nil
+}
+
+// PathValueMatch specifies a match critiera for a set of gNMI paths.
+// It is used to express criteria that a gNMI path must match.
+type PathValueMatch struct {
+	// path is the path to be verified. It can be absolute or relative
+	// based pon the context that the PathValueMatch message is used.
+	Path *gnmi.Path `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	// criteria specifies the condition to be met for the value at the
+	// path.
+	//
+	// Types that are valid to be assigned to Criteria:
+	//	*PathValueMatch_Equal
+	Criteria isPathValueMatch_Criteria `protobuf_oneof:"criteria"`
+	// and specifies a set of additional matches that must be met for
+	// the test to evaluate to true. If any matches are not met, the
+	// match is false.
+	//
+	// For example, if the following message is specified:
+	// {
+	//   path {
+	//     elem { name: "system" }
+	//     elem { name: "state" }
+	//     elem { name: "hostname" }
+	//   }
+	//   equal { string_val: "box0" }
+	//   and {
+	//     path {
+	//       elem { name: "system" }
+	//       elem { name: "state" }
+	//       elem { name: "domain-name" }
+	//     }
+	//     equal { string_val: "openconfig.net" }
+	//   }
+	//   and {
+	//     path {
+	//       elem { name: "system" }
+	//       elem { name: "clock" }
+	//       elem { name: "state" }
+	//       elem { name: "timezone-name" }
+	//     }
+	//     equal { string_val: "Europe/London" }
+	//   }
+	// }
+	//
+	// Then the query only evaluates to true if /system/state/hostname
+	// == "box0" && /system/state/domain-name == "openconfig.net" &&
+	// /system/clock/state/timezone-name == "Europe/London".
+	And []*PathValueMatch `protobuf:"bytes,20,rep,name=and,proto3" json:"and,omitempty"`
+	// or specifies a set of matches that any one of which must be
+	// met for the test to evaluate to true.
+	//
+	// For example, if the following message is spceified:
+	//
+	// {
+	//   or {
+	//     path {
+	//       elem { name: "system" }
+	//       elem { name: "state" }
+	//       elem { name: "hostname" }
+	//     }
+	//     equal { string_val: "box0.openconfig.net" }
+	//     and {
+	//       path {
+	//         elem { name: "system" }
+	//         elem { name: "state" }
+	//         elem { name: "domain-name" }
+	//       }
+	//       equal { string_val: "openconfig.net" }
+	//   }
+	//   or {
+	//     path {
+	//       elem { name: "system" }
+	//       elem { name: "state" }
+	//       elem { name: "hostname" }
+	//     }
+	//     equal { string_val: "box0" }
+	//     and {
+	//       path {
+	//         elem { name: "system" }
+	//         elem { name: "state" }
+	//         elem { name: "domain-name" }
+	//       }
+	//       equal { string_val: "openconfig.net" }
+	//     }
+	//   }
+	// }
+	//
+	// Then the query only evaluates to true if:
+	//  (/system/state/hostname == "box0.openconfig.net" &&
+	//  /system/state/domain-name == "openconfig") ||
+	//  (/system/state/hostname == "box0" && /system/state/domain-name ==
+	//  "openconfig.net")
+	//
+	//  In this case, the top-level query has no specified path or criteria. Such
+	//  a query evaluates to true to allow such nesting.
+	Or                   []*PathValueMatch `protobuf:"bytes,21,rep,name=or,proto3" json:"or,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *PathValueMatch) Reset()         { *m = PathValueMatch{} }
+func (m *PathValueMatch) String() string { return proto.CompactTextString(m) }
+func (*PathValueMatch) ProtoMessage()    {}
+func (*PathValueMatch) Descriptor() ([]byte, []int) {
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{9}
+}
+func (m *PathValueMatch) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PathValueMatch.Unmarshal(m, b)
+}
+func (m *PathValueMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PathValueMatch.Marshal(b, m, deterministic)
+}
+func (dst *PathValueMatch) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PathValueMatch.Merge(dst, src)
+}
+func (m *PathValueMatch) XXX_Size() int {
+	return xxx_messageInfo_PathValueMatch.Size(m)
+}
+func (m *PathValueMatch) XXX_DiscardUnknown() {
+	xxx_messageInfo_PathValueMatch.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PathValueMatch proto.InternalMessageInfo
+
+type isPathValueMatch_Criteria interface {
+	isPathValueMatch_Criteria()
+}
+
+type PathValueMatch_Equal struct {
+	Equal *gnmi.TypedValue `protobuf:"bytes,2,opt,name=equal,proto3,oneof"`
+}
+
+func (*PathValueMatch_Equal) isPathValueMatch_Criteria() {}
+
+func (m *PathValueMatch) GetCriteria() isPathValueMatch_Criteria {
+	if m != nil {
+		return m.Criteria
+	}
+	return nil
+}
+
+func (m *PathValueMatch) GetPath() *gnmi.Path {
+	if m != nil {
+		return m.Path
+	}
+	return nil
+}
+
+func (m *PathValueMatch) GetEqual() *gnmi.TypedValue {
+	if x, ok := m.GetCriteria().(*PathValueMatch_Equal); ok {
+		return x.Equal
+	}
+	return nil
+}
+
+func (m *PathValueMatch) GetAnd() []*PathValueMatch {
+	if m != nil {
+		return m.And
+	}
+	return nil
+}
+
+func (m *PathValueMatch) GetOr() []*PathValueMatch {
+	if m != nil {
+		return m.Or
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*PathValueMatch) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _PathValueMatch_OneofMarshaler, _PathValueMatch_OneofUnmarshaler, _PathValueMatch_OneofSizer, []interface{}{
+		(*PathValueMatch_Equal)(nil),
+	}
+}
+
+func _PathValueMatch_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*PathValueMatch)
+	// criteria
+	switch x := m.Criteria.(type) {
+	case *PathValueMatch_Equal:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Equal); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("PathValueMatch.Criteria has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _PathValueMatch_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*PathValueMatch)
+	switch tag {
+	case 2: // criteria.equal
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(gnmi.TypedValue)
+		err := b.DecodeMessage(msg)
+		m.Criteria = &PathValueMatch_Equal{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _PathValueMatch_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*PathValueMatch)
+	// criteria
+	switch x := m.Criteria.(type) {
+	case *PathValueMatch_Equal:
+		s := proto.Size(x.Equal)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
 // SchemaPathComplete defines the input for a test that checks that at least
 // one instance of a particular schema path is sent to the test framework. It
 // can be used to check for path coverage of a particular target.
 type SchemaPathComplete struct {
 	// prefix is a gNMI path that should be appended to each path in the
 	// paths list to form an absolute schema path.
-	Prefix *gnmi.Path `protobuf:"bytes,2,opt,name=prefix" json:"prefix,omitempty"`
+	Prefix *gnmi.Path `protobuf:"bytes,2,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	// paths is the list of paths that are expected to be received by the
 	// test framework.
-	Path                 []*gnmi.Path `protobuf:"bytes,1,rep,name=path" json:"path,omitempty"`
+	Path                 []*gnmi.Path `protobuf:"bytes,1,rep,name=path,proto3" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
@@ -1297,7 +1871,7 @@ func (m *SchemaPathComplete) Reset()         { *m = SchemaPathComplete{} }
 func (m *SchemaPathComplete) String() string { return proto.CompactTextString(m) }
 func (*SchemaPathComplete) ProtoMessage()    {}
 func (*SchemaPathComplete) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{8}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{10}
 }
 func (m *SchemaPathComplete) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SchemaPathComplete.Unmarshal(m, b)
@@ -1348,7 +1922,7 @@ func (m *GetSetTest) Reset()         { *m = GetSetTest{} }
 func (m *GetSetTest) String() string { return proto.CompactTextString(m) }
 func (*GetSetTest) ProtoMessage()    {}
 func (*GetSetTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{9}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{11}
 }
 func (m *GetSetTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetTest.Unmarshal(m, b)
@@ -1373,7 +1947,7 @@ type isGetSetTest_Args interface {
 }
 
 type GetSetTest_OperValidation struct {
-	OperValidation *GetSetValidationTest `protobuf:"bytes,10,opt,name=oper_validation,json=operValidation,oneof"`
+	OperValidation *GetSetValidationTest `protobuf:"bytes,10,opt,name=oper_validation,json=operValidation,proto3,oneof"`
 }
 
 func (*GetSetTest_OperValidation) isGetSetTest_Args() {}
@@ -1463,12 +2037,12 @@ type GetSetValidationTest struct {
 	// initialise_oper is the operation to initialise the target. It may consist
 	// of a configuration to be set and/or get request that validates the target's
 	// current state.
-	InitialiseOper *GetSetValidationOper `protobuf:"bytes,1,opt,name=initialise_oper,json=initialiseOper" json:"initialise_oper,omitempty"`
+	InitialiseOper *GetSetValidationOper `protobuf:"bytes,1,opt,name=initialise_oper,json=initialiseOper,proto3" json:"initialise_oper,omitempty"`
 	// test_oper is the operation that is under test in the validation test.  The
 	// Get and/or Set operations may be set within the operation such that the
 	// test can validate a set, a set followed by a get, or solely a get
 	// operation.
-	TestOper             *GetSetValidationOper `protobuf:"bytes,2,opt,name=test_oper,json=testOper" json:"test_oper,omitempty"`
+	TestOper             *GetSetValidationOper `protobuf:"bytes,2,opt,name=test_oper,json=testOper,proto3" json:"test_oper,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -1478,7 +2052,7 @@ func (m *GetSetValidationTest) Reset()         { *m = GetSetValidationTest{} }
 func (m *GetSetValidationTest) String() string { return proto.CompactTextString(m) }
 func (*GetSetValidationTest) ProtoMessage()    {}
 func (*GetSetValidationTest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{10}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{12}
 }
 func (m *GetSetValidationTest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetValidationTest.Unmarshal(m, b)
@@ -1529,12 +2103,12 @@ type GetSetValidationOper struct {
 	//	*GetSetValidationOper_CommonSetrequest
 	Setrequest isGetSetValidationOper_Setrequest `protobuf_oneof:"setrequest"`
 	// set_ok specifies whether the Set RPC should be successful.
-	SetOk GetSetValidationOper_OperResult `protobuf:"varint,10,opt,name=set_ok,json=setOk,enum=tests.GetSetValidationOper_OperResult" json:"set_ok,omitempty"`
+	SetOk GetSetValidationOper_OperResult `protobuf:"varint,10,opt,name=set_ok,json=setOk,proto3,enum=tests.GetSetValidationOper_OperResult" json:"set_ok,omitempty"`
 	// Types that are valid to be assigned to Getrequest:
 	//	*GetSetValidationOper_Get
 	//	*GetSetValidationOper_CommonGetrequest
 	Getrequest isGetSetValidationOper_Getrequest `protobuf_oneof:"getrequest"`
-	GetOk      GetSetValidationOper_OperResult   `protobuf:"varint,20,opt,name=get_ok,json=getOk,enum=tests.GetSetValidationOper_OperResult" json:"get_ok,omitempty"`
+	GetOk      GetSetValidationOper_OperResult   `protobuf:"varint,20,opt,name=get_ok,json=getOk,proto3,enum=tests.GetSetValidationOper_OperResult" json:"get_ok,omitempty"`
 	// Types that are valid to be assigned to Getresponse:
 	//	*GetSetValidationOper_GetResponse
 	//	*GetSetValidationOper_CommonGetresponse
@@ -1548,7 +2122,7 @@ func (m *GetSetValidationOper) Reset()         { *m = GetSetValidationOper{} }
 func (m *GetSetValidationOper) String() string { return proto.CompactTextString(m) }
 func (*GetSetValidationOper) ProtoMessage()    {}
 func (*GetSetValidationOper) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tests_d7f4f41f086a4fc3, []int{11}
+	return fileDescriptor_tests_6c3490c220f7d14a, []int{13}
 }
 func (m *GetSetValidationOper) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetValidationOper.Unmarshal(m, b)
@@ -1579,22 +2153,22 @@ type isGetSetValidationOper_Getresponse interface {
 }
 
 type GetSetValidationOper_Set struct {
-	Set *gnmi.SetRequest `protobuf:"bytes,1,opt,name=set,oneof"`
+	Set *gnmi.SetRequest `protobuf:"bytes,1,opt,name=set,proto3,oneof"`
 }
 type GetSetValidationOper_CommonSetrequest struct {
-	CommonSetrequest string `protobuf:"bytes,2,opt,name=common_setrequest,json=commonSetrequest,oneof"`
+	CommonSetrequest string `protobuf:"bytes,2,opt,name=common_setrequest,json=commonSetrequest,proto3,oneof"`
 }
 type GetSetValidationOper_Get struct {
-	Get *gnmi.GetRequest `protobuf:"bytes,11,opt,name=get,oneof"`
+	Get *gnmi.GetRequest `protobuf:"bytes,11,opt,name=get,proto3,oneof"`
 }
 type GetSetValidationOper_CommonGetrequest struct {
-	CommonGetrequest string `protobuf:"bytes,12,opt,name=common_getrequest,json=commonGetrequest,oneof"`
+	CommonGetrequest string `protobuf:"bytes,12,opt,name=common_getrequest,json=commonGetrequest,proto3,oneof"`
 }
 type GetSetValidationOper_GetResponse struct {
-	GetResponse *gnmi.GetResponse `protobuf:"bytes,21,opt,name=get_response,json=getResponse,oneof"`
+	GetResponse *gnmi.GetResponse `protobuf:"bytes,21,opt,name=get_response,json=getResponse,proto3,oneof"`
 }
 type GetSetValidationOper_CommonGetresponse struct {
-	CommonGetresponse string `protobuf:"bytes,22,opt,name=common_getresponse,json=commonGetresponse,oneof"`
+	CommonGetresponse string `protobuf:"bytes,22,opt,name=common_getresponse,json=commonGetresponse,proto3,oneof"`
 }
 
 func (*GetSetValidationOper_Set) isGetSetValidationOper_Setrequest()                {}
@@ -1851,12 +2425,15 @@ func init() {
 	proto.RegisterType((*HasKeys)(nil), "tests.HasKeys")
 	proto.RegisterType((*HasKeys_Item)(nil), "tests.HasKeys.Item")
 	proto.RegisterMapType((map[string]string)(nil), "tests.HasKeys.Item.KeyEntry")
+	proto.RegisterType((*GNMIPathCompliance)(nil), "tests.GNMIPathCompliance")
 	proto.RegisterType((*DataTreePaths)(nil), "tests.DataTreePaths")
 	proto.RegisterType((*DataTreePaths_QueryStep)(nil), "tests.DataTreePaths.QueryStep")
 	proto.RegisterMapType((map[string]string)(nil), "tests.DataTreePaths.QueryStep.KeyEntry")
 	proto.RegisterType((*DataTreePaths_TestQuery)(nil), "tests.DataTreePaths.TestQuery")
 	proto.RegisterType((*DataTreePaths_ListQuery)(nil), "tests.DataTreePaths.ListQuery")
 	proto.RegisterType((*DataTreePaths_RequiredPaths)(nil), "tests.DataTreePaths.RequiredPaths")
+	proto.RegisterType((*DataTreePaths_RequiredValues)(nil), "tests.DataTreePaths.RequiredValues")
+	proto.RegisterType((*PathValueMatch)(nil), "tests.PathValueMatch")
 	proto.RegisterType((*SchemaPathComplete)(nil), "tests.SchemaPathComplete")
 	proto.RegisterType((*GetSetTest)(nil), "tests.GetSetTest")
 	proto.RegisterType((*GetSetValidationTest)(nil), "tests.GetSetValidationTest")
@@ -1864,82 +2441,96 @@ func init() {
 	proto.RegisterEnum("tests.GetSetValidationOper_OperResult", GetSetValidationOper_OperResult_name, GetSetValidationOper_OperResult_value)
 }
 
-func init() { proto.RegisterFile("proto/tests/tests.proto", fileDescriptor_tests_d7f4f41f086a4fc3) }
+func init() { proto.RegisterFile("proto/tests/tests.proto", fileDescriptor_tests_6c3490c220f7d14a) }
 
-var fileDescriptor_tests_d7f4f41f086a4fc3 = []byte{
-	// 1173 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0x5b, 0x6f, 0x1b, 0x45,
-	0x14, 0xf6, 0xfa, 0xee, 0xe3, 0x4b, 0xd2, 0x69, 0x28, 0x5b, 0x03, 0x91, 0xb5, 0xa0, 0x36, 0x12,
-	0xe0, 0x94, 0x10, 0x55, 0x2d, 0xa8, 0x48, 0xe4, 0xea, 0x2a, 0x51, 0x03, 0x93, 0x82, 0x78, 0x40,
-	0x5a, 0x4d, 0xec, 0x93, 0xf5, 0xca, 0xde, 0x4b, 0x77, 0xc6, 0xa1, 0x7e, 0xe6, 0x9d, 0x47, 0x24,
-	0x7e, 0x02, 0x0f, 0xfc, 0x09, 0x7e, 0x07, 0xbf, 0x84, 0x27, 0x34, 0x97, 0xbd, 0x58, 0x75, 0x83,
-	0xe0, 0x65, 0xb5, 0x67, 0xce, 0xed, 0x9b, 0xef, 0x9c, 0x33, 0x33, 0xf0, 0x6e, 0x9c, 0x44, 0x22,
-	0xda, 0x15, 0xc8, 0x05, 0xd7, 0xdf, 0xa1, 0x5a, 0x21, 0x35, 0x25, 0xf4, 0x1f, 0x79, 0xbe, 0x98,
-	0x2e, 0xae, 0x86, 0xe3, 0x28, 0xd8, 0x8d, 0x62, 0x0c, 0xc7, 0x51, 0x78, 0xed, 0x7b, 0xbb, 0x5e,
-	0x18, 0xf8, 0xbb, 0xda, 0x55, 0xfd, 0xca, 0x8f, 0x76, 0x74, 0x5a, 0xd0, 0x38, 0xc2, 0x6b, 0xb6,
-	0x98, 0x0b, 0xe7, 0xe7, 0x0a, 0x74, 0x2f, 0x17, 0x57, 0x7c, 0x9c, 0xf8, 0x57, 0xf8, 0x12, 0xb9,
-	0x20, 0x8f, 0xa0, 0x91, 0xe0, 0xab, 0x05, 0x72, 0x61, 0x5b, 0x03, 0x6b, 0xa7, 0xbd, 0x77, 0x6f,
-	0xa8, 0x5c, 0x33, 0x2b, 0xaa, 0xb5, 0x34, 0x35, 0x23, 0x1f, 0x42, 0x77, 0x1e, 0x79, 0x6e, 0x82,
-	0x3c, 0x8e, 0x42, 0x8e, 0xdc, 0x2e, 0x0f, 0xac, 0x9d, 0x26, 0xed, 0xcc, 0x23, 0x8f, 0xa6, 0x6b,
-	0xe4, 0x03, 0x68, 0x5d, 0xb3, 0x19, 0xba, 0x12, 0xb3, 0x0d, 0x03, 0x6b, 0xa7, 0x35, 0x2a, 0xd1,
-	0xa6, 0x5c, 0x52, 0x59, 0x9f, 0xc2, 0x46, 0xcc, 0xc4, 0xd4, 0xbd, 0x61, 0x73, 0x7f, 0xc2, 0x84,
-	0x1f, 0x85, 0x76, 0x5b, 0x65, 0xef, 0x0d, 0xf5, 0x96, 0x0d, 0xe0, 0x51, 0x89, 0xf6, 0xa4, 0xe1,
-	0xf7, 0x99, 0x1d, 0xf9, 0x18, 0x9a, 0x53, 0xc6, 0xdd, 0x19, 0x2e, 0xb9, 0xdd, 0x59, 0xf1, 0x19,
-	0x31, 0x7e, 0x86, 0x4b, 0x3e, 0x2a, 0xd1, 0xc6, 0x54, 0xff, 0x92, 0x73, 0xb8, 0xcb, 0xc7, 0x53,
-	0x0c, 0x98, 0xca, 0x36, 0x8e, 0x82, 0x78, 0x8e, 0x02, 0xed, 0xae, 0xf2, 0xbb, 0x6f, 0xfc, 0x2e,
-	0x95, 0xc5, 0x37, 0x4c, 0x4c, 0x0f, 0x8d, 0xc1, 0xa8, 0x44, 0x49, 0xee, 0x97, 0xae, 0x92, 0xaf,
-	0x60, 0x63, 0xc2, 0x04, 0x73, 0x45, 0x82, 0xe8, 0x4a, 0x0d, 0xb7, 0x7b, 0x2a, 0xd2, 0x56, 0x8a,
-	0x9a, 0x09, 0xf6, 0x32, 0x41, 0x94, 0xb1, 0x24, 0x8e, 0xee, 0xa4, 0xb8, 0x70, 0x50, 0x87, 0x2a,
-	0x4b, 0x3c, 0xee, 0xfc, 0x5e, 0x86, 0xaa, 0xa2, 0x61, 0x00, 0xed, 0x09, 0x4a, 0x9a, 0x63, 0x45,
-	0x81, 0x2c, 0x40, 0x8b, 0x16, 0x97, 0x88, 0x0d, 0x0d, 0xe1, 0x07, 0x18, 0x2d, 0x84, 0xa2, 0xb9,
-	0x46, 0x53, 0x91, 0xdc, 0x83, 0xba, 0x86, 0x68, 0x57, 0x94, 0x9b, 0x91, 0xc8, 0x67, 0x00, 0xe3,
-	0x28, 0x0c, 0x71, 0xac, 0x42, 0x56, 0x15, 0xbe, 0x3b, 0x06, 0xdf, 0x61, 0xa6, 0xa0, 0x05, 0x23,
-	0xb2, 0x0f, 0x2d, 0x9e, 0x96, 0x5b, 0x15, 0x2b, 0xdf, 0xd1, 0x4a, 0xb3, 0x8c, 0x4a, 0x34, 0x37,
-	0x24, 0x9f, 0x40, 0xc3, 0x43, 0xe1, 0x72, 0x14, 0xa6, 0x76, 0x69, 0x96, 0x53, 0x14, 0x97, 0x28,
-	0x8c, 0x43, 0xdd, 0x53, 0x12, 0x19, 0x16, 0x1b, 0x42, 0xd7, 0x6d, 0xc3, 0xd8, 0x9f, 0x98, 0xae,
-	0x28, 0x76, 0x88, 0xe4, 0x4a, 0x2c, 0x63, 0x74, 0x18, 0xb4, 0x0f, 0x13, 0x9c, 0x60, 0x28, 0x7c,
-	0x36, 0xe7, 0xa4, 0x0f, 0xcd, 0x04, 0x79, 0x34, 0xbf, 0xc1, 0xc4, 0xd0, 0x95, 0xc9, 0x52, 0xb7,
-	0xe0, 0x98, 0x84, 0x2c, 0x40, 0x45, 0x56, 0x8b, 0x66, 0xb2, 0xd4, 0xc5, 0x8c, 0xf3, 0x9f, 0xa2,
-	0x64, 0x62, 0xf8, 0xca, 0x64, 0xe7, 0x17, 0x0b, 0x20, 0x67, 0x46, 0x12, 0x2b, 0x58, 0xe2, 0xa1,
-	0x30, 0x09, 0x8c, 0x24, 0x4b, 0xc1, 0x26, 0x93, 0x04, 0x39, 0x37, 0xd1, 0x53, 0x91, 0xec, 0x43,
-	0x7b, 0x9c, 0x63, 0x54, 0xf1, 0xdb, 0x7b, 0x24, 0xe5, 0x3c, 0xd7, 0xd0, 0xa2, 0x59, 0xb1, 0xb4,
-	0xd5, 0x95, 0xd2, 0x3a, 0xdb, 0xd0, 0x4c, 0x39, 0x21, 0x04, 0xaa, 0x12, 0xa8, 0xc2, 0xd2, 0xa4,
-	0xea, 0xdf, 0xf9, 0xd3, 0x82, 0x86, 0x69, 0x76, 0xb2, 0x2d, 0xf5, 0x62, 0x6a, 0x86, 0x17, 0xf4,
-	0xf0, 0xca, 0x76, 0xa3, 0x6a, 0x9d, 0x3c, 0x84, 0xaa, 0x2f, 0x30, 0xb0, 0xcb, 0x83, 0xca, 0x4e,
-	0x7b, 0xef, 0xee, 0xea, 0xa8, 0x0c, 0x9f, 0x0b, 0x0c, 0xa8, 0x32, 0xe8, 0x87, 0x50, 0x95, 0x12,
-	0x19, 0x42, 0x65, 0x86, 0x4b, 0xdb, 0x52, 0xf6, 0xef, 0xaf, 0xb1, 0x1f, 0x9e, 0xe1, 0xf2, 0x38,
-	0x14, 0xc9, 0x92, 0x4a, 0xc3, 0xfe, 0x63, 0x68, 0xa6, 0x0b, 0x64, 0x33, 0xf5, 0x95, 0xf4, 0xc8,
-	0x5f, 0xb2, 0x05, 0xb5, 0x1b, 0x36, 0x5f, 0xa4, 0x05, 0xd1, 0xc2, 0x17, 0xe5, 0x27, 0x96, 0xf3,
-	0x5b, 0x0d, 0xba, 0x2b, 0xf3, 0x42, 0xbe, 0x84, 0x96, 0xcc, 0xe6, 0x46, 0xb1, 0x29, 0x6e, 0x7b,
-	0x6f, 0x7b, 0xdd, 0x60, 0x0d, 0x25, 0x31, 0xdf, 0x2e, 0x30, 0x59, 0xd2, 0xa6, 0x54, 0x5f, 0xc4,
-	0x98, 0xf4, 0xff, 0xb0, 0xa0, 0xa5, 0xd6, 0x2e, 0x05, 0xc6, 0x92, 0x35, 0xd5, 0x06, 0x1a, 0x89,
-	0xfa, 0x27, 0x4f, 0x35, 0x38, 0x4d, 0xc4, 0xc3, 0xb5, 0x81, 0xb3, 0x00, 0xab, 0x7b, 0x24, 0xf7,
-	0xa1, 0x39, 0xc3, 0xa5, 0xab, 0x42, 0xea, 0xee, 0x69, 0xcc, 0x70, 0xf9, 0x82, 0x05, 0xf8, 0x7f,
-	0xb7, 0xdf, 0xff, 0xcb, 0x82, 0x56, 0xb6, 0x0f, 0xb2, 0x0f, 0x35, 0x2e, 0x30, 0xe6, 0x86, 0xf6,
-	0xed, 0xdb, 0xd1, 0x51, 0x6d, 0x4c, 0x8e, 0xa0, 0x2b, 0x27, 0x70, 0xee, 0x73, 0xa1, 0xcf, 0xc3,
-	0xf2, 0x2d, 0xa4, 0x9d, 0xfb, 0x26, 0xd9, 0xa8, 0x44, 0xdb, 0x1e, 0x0a, 0x29, 0xab, 0x0e, 0x3a,
-	0x83, 0x9e, 0x3c, 0xda, 0xfd, 0x04, 0x27, 0xe6, 0x50, 0xd3, 0x0d, 0xec, 0xac, 0x0d, 0x43, 0x8d,
-	0x69, 0x76, 0xc4, 0x25, 0xc5, 0x85, 0x74, 0x6c, 0xfb, 0x08, 0xad, 0x2c, 0xa1, 0xa4, 0xef, 0x86,
-	0x25, 0x6e, 0xa1, 0x22, 0x8d, 0x1b, 0x96, 0x48, 0xfa, 0xc8, 0x33, 0x80, 0x10, 0x5f, 0x0b, 0xf7,
-	0x95, 0x34, 0xbc, 0x15, 0x7f, 0x5e, 0xf4, 0x96, 0xf4, 0x50, 0xbf, 0xfd, 0xef, 0xa0, 0xbb, 0x02,
-	0x88, 0x38, 0x50, 0x8f, 0x13, 0xbc, 0xf6, 0x5f, 0xaf, 0x19, 0x08, 0xa3, 0x21, 0x03, 0xa8, 0xe9,
-	0x7d, 0xea, 0x56, 0x28, 0x9a, 0x68, 0x85, 0xf3, 0x03, 0x90, 0x37, 0x2f, 0x85, 0x42, 0xec, 0xf2,
-	0x5b, 0x63, 0xe7, 0xe3, 0x58, 0x59, 0x37, 0x8e, 0xce, 0x8f, 0x00, 0xf9, 0xf1, 0x48, 0x4e, 0x60,
-	0x43, 0x36, 0x7b, 0xf1, 0x1a, 0xd4, 0xc7, 0xef, 0x7b, 0x2b, 0x47, 0x69, 0x7e, 0xfb, 0x99, 0x63,
-	0xb2, 0x27, 0xbd, 0xf2, 0xd5, 0xec, 0x62, 0xf9, 0xd5, 0x82, 0xad, 0x75, 0x2e, 0xe4, 0x08, 0x36,
-	0xfc, 0xd0, 0x97, 0xe7, 0x8e, 0xcf, 0xb1, 0x38, 0x60, 0x6f, 0x4b, 0x24, 0x67, 0x8a, 0xf6, 0x72,
-	0x1f, 0x29, 0x93, 0x27, 0xc5, 0x01, 0x2d, 0xff, 0xbb, 0x7f, 0x36, 0x9d, 0xce, 0xdf, 0x95, 0x37,
-	0x81, 0xa9, 0x90, 0x1f, 0x41, 0x85, 0x63, 0xfa, 0xf4, 0xd8, 0x34, 0x4f, 0x0f, 0x14, 0xe6, 0xd1,
-	0x31, 0x2a, 0x51, 0xa9, 0x26, 0x9f, 0xc2, 0x9d, 0x71, 0x14, 0x04, 0x51, 0x28, 0x6f, 0x9b, 0xf4,
-	0xb9, 0x52, 0x36, 0xaf, 0x8a, 0x4d, 0xad, 0xba, 0xcc, 0x34, 0xe4, 0x19, 0xd4, 0x39, 0x0a, 0x37,
-	0x9a, 0x29, 0x36, 0x7b, 0x7b, 0x0f, 0x6e, 0x01, 0x39, 0x54, 0x48, 0x91, 0x2f, 0xe6, 0x82, 0xd6,
-	0x38, 0x8a, 0x8b, 0x99, 0xc4, 0xe4, 0x65, 0x97, 0x9a, 0xc1, 0x74, 0x9a, 0x63, 0xb2, 0xa8, 0x54,
-	0x17, 0x30, 0x79, 0x39, 0xa6, 0x8e, 0xc2, 0x64, 0xa5, 0x98, 0x4e, 0x57, 0x30, 0x79, 0x1a, 0xd3,
-	0xd6, 0x7f, 0xc3, 0xe4, 0x29, 0x4c, 0x8f, 0xa1, 0x23, 0xdd, 0xd3, 0x47, 0x97, 0xfd, 0x8e, 0xb9,
-	0x71, 0x73, 0x70, 0x5a, 0x31, 0x2a, 0xab, 0xe1, 0x4e, 0x45, 0xb2, 0x0b, 0xa4, 0x88, 0xd2, 0x78,
-	0xdf, 0x53, 0x30, 0xcb, 0xf4, 0x4e, 0x01, 0xa6, 0x56, 0x39, 0x0f, 0x00, 0xf2, 0xec, 0xa4, 0x03,
-	0xcd, 0x17, 0x17, 0xee, 0x31, 0xa5, 0x17, 0x74, 0xb3, 0x44, 0x00, 0xea, 0x27, 0x5f, 0x3f, 0x3f,
-	0x3f, 0x3e, 0xda, 0xb4, 0x0e, 0x3a, 0x00, 0x79, 0x2d, 0xa4, 0x94, 0xb3, 0x70, 0xd0, 0x85, 0x76,
-	0x21, 0xdb, 0x55, 0x5d, 0x3d, 0x43, 0x3f, 0xff, 0x27, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x20, 0xf7,
-	0x7b, 0xda, 0x0a, 0x00, 0x00,
+var fileDescriptor_tests_6c3490c220f7d14a = []byte{
+	// 1404 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x57, 0xdd, 0x6e, 0x1b, 0xc5,
+	0x17, 0xf7, 0xda, 0x8e, 0x3f, 0x8e, 0x63, 0x3b, 0x9d, 0xa6, 0xfd, 0x6f, 0xfd, 0xa7, 0x51, 0xd8,
+	0x42, 0x1b, 0x09, 0xea, 0x94, 0x50, 0x55, 0x2d, 0xa8, 0x48, 0xa4, 0x49, 0xe3, 0xaa, 0x69, 0x52,
+	0x26, 0xa1, 0xe2, 0x02, 0xc9, 0x9a, 0xd8, 0x27, 0xeb, 0x95, 0xed, 0xdd, 0xed, 0xcc, 0x38, 0xd4,
+	0x77, 0x3c, 0x41, 0xaf, 0x10, 0xef, 0x80, 0x04, 0xb7, 0x3c, 0x00, 0x8f, 0xc5, 0x15, 0x9a, 0x8f,
+	0xfd, 0x30, 0x4d, 0x52, 0xe0, 0x26, 0xf2, 0x39, 0xe7, 0x77, 0xce, 0xfc, 0xce, 0xc7, 0x9e, 0x99,
+	0xc0, 0xff, 0x62, 0x1e, 0xc9, 0x68, 0x53, 0xa2, 0x90, 0xc2, 0xfc, 0xed, 0x6a, 0x0d, 0x59, 0xd2,
+	0x42, 0xe7, 0x9e, 0x1f, 0xc8, 0xd1, 0xec, 0xa4, 0x3b, 0x88, 0xa6, 0x9b, 0x51, 0x8c, 0xe1, 0x20,
+	0x0a, 0x4f, 0x03, 0x7f, 0xd3, 0x0f, 0xa7, 0xc1, 0xa6, 0x71, 0xd5, 0x3f, 0xd5, 0x1f, 0xe3, 0xe8,
+	0xd5, 0xa1, 0xba, 0x83, 0xa7, 0x6c, 0x36, 0x91, 0xde, 0xdb, 0x32, 0x34, 0x8f, 0x66, 0x27, 0x62,
+	0xc0, 0x83, 0x13, 0x3c, 0x46, 0x21, 0xc9, 0x3d, 0xa8, 0x72, 0x7c, 0x3d, 0x43, 0x21, 0x5d, 0x67,
+	0xdd, 0xd9, 0x68, 0x6c, 0x5d, 0xef, 0x6a, 0xd7, 0x14, 0x45, 0x8d, 0x95, 0x26, 0x30, 0x72, 0x0b,
+	0x9a, 0x93, 0xc8, 0xef, 0x73, 0x14, 0x71, 0x14, 0x0a, 0x14, 0x6e, 0x71, 0xdd, 0xd9, 0xa8, 0xd1,
+	0xe5, 0x49, 0xe4, 0xd3, 0x44, 0x47, 0x6e, 0x42, 0xfd, 0x94, 0x8d, 0xb1, 0xaf, 0x38, 0xbb, 0xb0,
+	0xee, 0x6c, 0xd4, 0x7b, 0x05, 0x5a, 0x53, 0x2a, 0x7d, 0xea, 0x23, 0x68, 0xc7, 0x4c, 0x8e, 0xfa,
+	0x67, 0x6c, 0x12, 0x0c, 0x99, 0x0c, 0xa2, 0xd0, 0x6d, 0xe8, 0xd3, 0x5b, 0x5d, 0x93, 0xb2, 0x25,
+	0xdc, 0x2b, 0xd0, 0x96, 0x02, 0xbe, 0x4a, 0x71, 0xe4, 0x13, 0xa8, 0x8d, 0x98, 0xe8, 0x8f, 0x71,
+	0x2e, 0xdc, 0xe5, 0x05, 0x9f, 0x1e, 0x13, 0xcf, 0x71, 0x2e, 0x7a, 0x05, 0x5a, 0x1d, 0x99, 0x9f,
+	0x64, 0x1f, 0xae, 0x8a, 0xc1, 0x08, 0xa7, 0x4c, 0x9f, 0x36, 0x88, 0xa6, 0xf1, 0x04, 0x25, 0xba,
+	0x4d, 0xed, 0x77, 0xc3, 0xfa, 0x1d, 0x69, 0xc4, 0x4b, 0x26, 0x47, 0x4f, 0x2c, 0xa0, 0x57, 0xa0,
+	0x24, 0xf3, 0x4b, 0xb4, 0xe4, 0x2b, 0x68, 0x0f, 0x99, 0x64, 0x7d, 0xc9, 0x11, 0xfb, 0xca, 0x22,
+	0xdc, 0x96, 0x8e, 0xb4, 0x9a, 0xb0, 0x66, 0x92, 0x1d, 0x73, 0x44, 0x15, 0x4b, 0xf1, 0x68, 0x0e,
+	0xf3, 0x0a, 0xf2, 0x25, 0xac, 0x9c, 0xb1, 0xc9, 0x0c, 0xf3, 0x69, 0xb7, 0x2f, 0x48, 0xbb, 0xad,
+	0x91, 0xb9, 0xbc, 0xf7, 0xe1, 0xaa, 0x6a, 0x4c, 0x96, 0x48, 0xc0, 0xc2, 0x01, 0xba, 0x2b, 0x0b,
+	0xa9, 0xec, 0x1d, 0xbc, 0x78, 0x96, 0x26, 0xa2, 0x01, 0x2a, 0x95, 0xc4, 0x2f, 0xd3, 0x6e, 0x57,
+	0xa0, 0xcc, 0xb8, 0x2f, 0xbc, 0x5f, 0x8a, 0x50, 0xd6, 0x1d, 0x59, 0x87, 0xc6, 0x10, 0x55, 0xc7,
+	0x63, 0x4d, 0x4b, 0xcd, 0x42, 0x9d, 0xe6, 0x55, 0xc4, 0x85, 0xaa, 0x0c, 0xa6, 0x18, 0xcd, 0xa4,
+	0xee, 0xf8, 0x12, 0x4d, 0x44, 0x72, 0x1d, 0x2a, 0xa6, 0x5a, 0x6e, 0x49, 0xbb, 0x59, 0x89, 0x7c,
+	0x06, 0x30, 0x88, 0xc2, 0x10, 0x07, 0x3a, 0x64, 0x59, 0x33, 0xbd, 0x62, 0x99, 0x3e, 0x49, 0x0d,
+	0x34, 0x07, 0x22, 0xf7, 0xa1, 0x2e, 0x92, 0xc9, 0xd3, 0x73, 0x93, 0x15, 0x77, 0x61, 0x6e, 0x7b,
+	0x05, 0x9a, 0x01, 0xc9, 0xa7, 0x50, 0xf5, 0x51, 0xf6, 0x05, 0x4a, 0x3b, 0x46, 0xc9, 0x29, 0x7b,
+	0x28, 0x8f, 0x50, 0x5a, 0x87, 0x8a, 0xaf, 0x25, 0xd2, 0xcd, 0xcf, 0xa6, 0x19, 0xa1, 0xb6, 0xc5,
+	0x3f, 0xb5, 0x03, 0x9a, 0x1f, 0x56, 0x55, 0x2b, 0x39, 0x8f, 0xd1, 0x63, 0xd0, 0x78, 0xc2, 0x71,
+	0x88, 0xa1, 0x0c, 0xd8, 0x44, 0x90, 0x0e, 0xd4, 0x38, 0x8a, 0x68, 0x72, 0x86, 0xdc, 0x96, 0x2b,
+	0x95, 0x95, 0x6d, 0x26, 0x90, 0x87, 0x6c, 0x8a, 0xba, 0x58, 0x75, 0x9a, 0xca, 0xca, 0x16, 0x33,
+	0x21, 0x7e, 0x88, 0xf8, 0xd0, 0xd6, 0x2b, 0x95, 0xbd, 0xb7, 0x0e, 0x40, 0x56, 0x19, 0x55, 0x58,
+	0xc9, 0xb8, 0x8f, 0xd2, 0x1e, 0x60, 0x25, 0xd5, 0x0a, 0x36, 0x1c, 0x72, 0x14, 0xc2, 0x46, 0x4f,
+	0x44, 0x72, 0x1f, 0x1a, 0x83, 0x8c, 0xa3, 0x8e, 0xdf, 0xd8, 0x22, 0x49, 0xcd, 0x33, 0x0b, 0xcd,
+	0xc3, 0xf2, 0xad, 0x2d, 0x2f, 0xb4, 0xd6, 0x5b, 0x83, 0x5a, 0x52, 0x13, 0x42, 0xa0, 0xac, 0x88,
+	0x6a, 0x2e, 0x35, 0xaa, 0x7f, 0x7b, 0x7f, 0x38, 0x50, 0xb5, 0xdf, 0x1d, 0x59, 0x53, 0x76, 0x39,
+	0xb2, 0x7b, 0x04, 0xcc, 0x1e, 0x51, 0xd3, 0x48, 0xb5, 0x9e, 0xdc, 0x81, 0x72, 0x20, 0x71, 0xea,
+	0x16, 0xd7, 0x4b, 0x1b, 0x8d, 0xad, 0xab, 0x8b, 0x5f, 0x6d, 0xf7, 0x99, 0xc4, 0x29, 0xd5, 0x80,
+	0x4e, 0x08, 0x65, 0x25, 0x91, 0x2e, 0x94, 0xc6, 0x38, 0x77, 0x1d, 0x8d, 0xff, 0xe0, 0x1c, 0x7c,
+	0xf7, 0x39, 0xce, 0x77, 0x43, 0xc9, 0xe7, 0x54, 0x01, 0x3b, 0x0f, 0xa0, 0x96, 0x28, 0xc8, 0x4a,
+	0xe2, 0xab, 0xca, 0xa3, 0x7e, 0x92, 0x55, 0x58, 0xd2, 0xdf, 0x94, 0x2d, 0x99, 0x11, 0xbe, 0x28,
+	0x3e, 0x74, 0xbc, 0x39, 0x90, 0x77, 0x3f, 0x1c, 0x72, 0x13, 0x60, 0x30, 0xc2, 0xc1, 0xb8, 0x8f,
+	0x13, 0x9c, 0xda, 0xa4, 0xeb, 0x5a, 0xb3, 0x3b, 0xc1, 0x29, 0xf9, 0x10, 0x96, 0x8d, 0xd9, 0x76,
+	0xc8, 0x44, 0x6d, 0x68, 0xdd, 0xb1, 0x69, 0x53, 0x0a, 0x89, 0x78, 0xe0, 0x07, 0xa1, 0xed, 0xb6,
+	0x81, 0x1c, 0x6a, 0x95, 0xf7, 0x63, 0x15, 0x9a, 0x3b, 0x7f, 0x5b, 0x12, 0x75, 0x95, 0x68, 0x3f,
+	0x8a, 0xed, 0x5c, 0x35, 0xb6, 0xd6, 0xce, 0x5b, 0x2f, 0x5d, 0xd5, 0x93, 0x6f, 0x66, 0xc8, 0xe7,
+	0xb4, 0xa6, 0xcc, 0x87, 0x31, 0xf2, 0xce, 0x6f, 0x0e, 0xd4, 0xb5, 0xee, 0x48, 0x62, 0xac, 0x1a,
+	0xa6, 0x27, 0xd0, 0x14, 0x41, 0xff, 0x26, 0x8f, 0x4c, 0x5d, 0x4c, 0x0f, 0xee, 0x9c, 0x1b, 0x38,
+	0x0d, 0xb0, 0x58, 0x5e, 0x72, 0x03, 0x6a, 0x63, 0x9c, 0xf7, 0x75, 0x48, 0x93, 0x4a, 0x75, 0x8c,
+	0xf3, 0x03, 0x36, 0xc5, 0xff, 0x5a, 0xf9, 0xce, 0xaf, 0x45, 0xa8, 0xa7, 0x79, 0x90, 0xfb, 0xb0,
+	0x24, 0x24, 0xc6, 0xc2, 0x76, 0x7c, 0xed, 0x72, 0x76, 0xd4, 0x80, 0xc9, 0x0e, 0x34, 0xd5, 0xc7,
+	0x3f, 0x09, 0x84, 0x34, 0xb7, 0x42, 0xf1, 0x92, 0xa2, 0xed, 0x07, 0xf6, 0xb0, 0x5e, 0x81, 0x36,
+	0x7c, 0x94, 0x4a, 0xd6, 0xc3, 0xfb, 0x1c, 0x5a, 0xea, 0x82, 0x0b, 0x38, 0x0e, 0xed, 0x6a, 0x37,
+	0xdf, 0x8e, 0x77, 0x6e, 0x18, 0x6a, 0xa1, 0xe9, 0xa2, 0xe7, 0x79, 0x05, 0x39, 0x80, 0x76, 0x1a,
+	0x4c, 0x27, 0x2b, 0xec, 0xf6, 0xbb, 0x75, 0x69, 0xb4, 0x57, 0x1a, 0xaa, 0xee, 0x3c, 0xbe, 0xa0,
+	0x49, 0x36, 0x50, 0xe7, 0x27, 0x07, 0xea, 0x69, 0x06, 0xaa, 0x1f, 0x67, 0x8c, 0xf7, 0x73, 0x2d,
+	0xae, 0x9e, 0x31, 0xae, 0xfa, 0x41, 0x1e, 0x03, 0x84, 0xf8, 0x46, 0xf6, 0x5f, 0x2b, 0xe0, 0xa5,
+	0x05, 0xc9, 0xa6, 0xa8, 0xae, 0x3c, 0x4c, 0xe4, 0xbb, 0x50, 0x39, 0x0d, 0x26, 0x12, 0xb9, 0x5b,
+	0xd2, 0x9d, 0xb8, 0x66, 0x5d, 0x5f, 0x9a, 0xab, 0x78, 0x86, 0x2f, 0x98, 0x1c, 0x8c, 0xa8, 0x05,
+	0x75, 0xbe, 0x85, 0xe6, 0x42, 0x41, 0x88, 0x07, 0x95, 0x98, 0xe3, 0x69, 0xf0, 0xe6, 0x9c, 0x5d,
+	0x60, 0x2d, 0x64, 0x1d, 0x96, 0x4c, 0x9d, 0xcd, 0x28, 0xe6, 0x21, 0xc6, 0xd0, 0x41, 0x68, 0x2d,
+	0x56, 0xe6, 0x1f, 0xc5, 0xdd, 0x84, 0xea, 0x54, 0xb1, 0xc3, 0x24, 0xf2, 0x05, 0xe4, 0x13, 0x94,
+	0xf7, 0xbb, 0x03, 0xad, 0x45, 0xdb, 0x7b, 0x37, 0xd9, 0x06, 0x2c, 0xe1, 0xeb, 0x19, 0x9b, 0xd8,
+	0xca, 0xae, 0x18, 0xc0, 0xf1, 0x3c, 0xb6, 0x4c, 0x7b, 0x05, 0x6a, 0x00, 0xe4, 0x0e, 0x94, 0x58,
+	0x38, 0x74, 0x57, 0x2f, 0x63, 0xa2, 0x10, 0xe4, 0x63, 0x28, 0x46, 0xdc, 0xbd, 0x76, 0x19, 0xae,
+	0x18, 0xf1, 0x6d, 0x80, 0xda, 0x80, 0x07, 0x12, 0x79, 0xc0, 0xbc, 0xef, 0x80, 0xbc, 0xfb, 0x74,
+	0xc9, 0xd5, 0xa8, 0x78, 0x61, 0x8d, 0xb2, 0xfc, 0x4a, 0xe7, 0xe5, 0xe7, 0x7d, 0x0f, 0x90, 0xdd,
+	0x9c, 0xe4, 0x29, 0xb4, 0xd5, 0x32, 0xca, 0xbf, 0x5a, 0xcc, 0xcd, 0xfc, 0xff, 0x85, 0x5b, 0x36,
+	0x7b, 0xab, 0xd8, 0x1b, 0xb4, 0xa5, 0xbc, 0x32, 0x6d, 0xfa, 0xe6, 0xf8, 0xd9, 0x81, 0xd5, 0xf3,
+	0x5c, 0xc8, 0x0e, 0xb4, 0x83, 0x30, 0x50, 0x57, 0x52, 0x20, 0x30, 0xbf, 0x00, 0x2f, 0x3a, 0x48,
+	0xed, 0x3c, 0xda, 0xca, 0x7c, 0x94, 0x4c, 0x1e, 0xe6, 0x17, 0x68, 0xf1, 0xfd, 0xfe, 0xe9, 0xf6,
+	0xf4, 0xfe, 0x2c, 0xbd, 0x4b, 0x4c, 0x87, 0xfc, 0x08, 0x4a, 0x02, 0x93, 0x07, 0xb2, 0xed, 0xf6,
+	0x11, 0x4a, 0xfb, 0x34, 0xee, 0x15, 0xa8, 0x32, 0x93, 0xbb, 0x70, 0x65, 0x10, 0x4d, 0xa7, 0x51,
+	0xa8, 0x1e, 0x22, 0xc9, 0xa3, 0xba, 0x68, 0xdf, 0xbe, 0x2b, 0xc6, 0x74, 0x94, 0x5a, 0xc8, 0x63,
+	0xa8, 0x08, 0x94, 0xfd, 0x68, 0xac, 0xab, 0xd9, 0xda, 0xba, 0x7d, 0x09, 0xc9, 0xae, 0x66, 0x8a,
+	0x62, 0x36, 0x91, 0x74, 0x49, 0xa0, 0x3c, 0x1c, 0x2b, 0x4e, 0x7e, 0xfa, 0xde, 0xb1, 0x9c, 0xf6,
+	0x32, 0x4e, 0x0e, 0x55, 0xe6, 0x1c, 0x27, 0x3f, 0xe3, 0xb4, 0xac, 0x39, 0x39, 0x09, 0xa7, 0xbd,
+	0x05, 0x4e, 0xbe, 0xe1, 0xb4, 0xfa, 0xef, 0x38, 0xf9, 0x9a, 0xd3, 0x03, 0x58, 0x56, 0xee, 0xc9,
+	0xbf, 0x06, 0xee, 0x35, 0xfb, 0x18, 0xcb, 0xc8, 0x19, 0x43, 0xaf, 0xa8, 0x97, 0x6f, 0x22, 0x92,
+	0x4d, 0x20, 0x79, 0x96, 0xd6, 0xfb, 0xba, 0xa6, 0x59, 0xa4, 0x57, 0x72, 0x34, 0x8d, 0xc9, 0xbb,
+	0x0d, 0x90, 0x9d, 0x4e, 0x96, 0xa1, 0x76, 0x70, 0xd8, 0xdf, 0xa5, 0xf4, 0x90, 0xae, 0x14, 0x08,
+	0x40, 0xe5, 0xe9, 0xd7, 0xcf, 0xf6, 0x77, 0x77, 0x56, 0x9c, 0xed, 0x65, 0x80, 0xac, 0x17, 0x4a,
+	0xca, 0xaa, 0xb0, 0xdd, 0x84, 0x46, 0xee, 0xb4, 0x93, 0x8a, 0xfe, 0x67, 0xe9, 0xf3, 0xbf, 0x02,
+	0x00, 0x00, 0xff, 0xff, 0xaa, 0x91, 0xe1, 0xd7, 0x80, 0x0d, 0x00, 0x00,
 }

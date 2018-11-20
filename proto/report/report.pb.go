@@ -121,9 +121,9 @@ func (MatchResult) EnumDescriptor() ([]byte, []int) {
 // the error returned from Process function of the test.
 type SubscribeResponseResult struct {
 	// gnmi SubscribeResponse received by the test.
-	Response *gnmi.SubscribeResponse `protobuf:"bytes,1,opt,name=response" json:"response,omitempty"`
+	Response *gnmi.SubscribeResponse `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
 	// error returned by Process function of the test.
-	Error                string   `protobuf:"bytes,2,opt,name=error" json:"error,omitempty"`
+	Error                string   `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -171,12 +171,12 @@ func (m *SubscribeResponseResult) GetError() string {
 // suite.SubscribeTest.
 type SubscribeTestResult struct {
 	// SubscribeResponse messages received as a result of subscription.
-	Responses []*SubscribeResponseResult `protobuf:"bytes,1,rep,name=responses" json:"responses,omitempty"`
+	Responses []*SubscribeResponseResult `protobuf:"bytes,1,rep,name=responses,proto3" json:"responses,omitempty"`
 	// If test is stateful, error is set as a result of calling Check function of
 	// the test. If test is stateless, error set here can be ignored.
-	Error string `protobuf:"bytes,2,opt,name=error" json:"error,omitempty"`
+	Error string `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
 	// CompletionStatus indicates why the test ended.
-	Status               CompletionStatus `protobuf:"varint,3,opt,name=status,enum=report.CompletionStatus" json:"status,omitempty"`
+	Status               CompletionStatus `protobuf:"varint,3,opt,name=status,proto3,enum=report.CompletionStatus" json:"status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -229,13 +229,13 @@ func (m *SubscribeTestResult) GetStatus() CompletionStatus {
 
 // GetSetTestResult is the result of a GetSet test towards a target.
 type GetSetTestResult struct {
-	Test *tests.Test `protobuf:"bytes,1,opt,name=test" json:"test,omitempty"`
+	Test *tests.Test `protobuf:"bytes,1,opt,name=test,proto3" json:"test,omitempty"`
 	// Result of running the test.
-	Result Status `protobuf:"varint,2,opt,name=result,enum=report.Status" json:"result,omitempty"`
+	Result Status `protobuf:"varint,2,opt,name=result,proto3,enum=report.Status" json:"result,omitempty"`
 	// Result of the initialisation operation specified in the input test.
-	InitialiseOper *GetSetOperResult `protobuf:"bytes,3,opt,name=initialise_oper,json=initialiseOper" json:"initialise_oper,omitempty"`
+	InitialiseOper *GetSetOperResult `protobuf:"bytes,3,opt,name=initialise_oper,json=initialiseOper,proto3" json:"initialise_oper,omitempty"`
 	// Result of the test operation specified in the input test.
-	TestOper             *GetSetOperResult `protobuf:"bytes,4,opt,name=test_oper,json=testOper" json:"test_oper,omitempty"`
+	TestOper             *GetSetOperResult `protobuf:"bytes,4,opt,name=test_oper,json=testOper,proto3" json:"test_oper,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -297,20 +297,20 @@ func (m *GetSetTestResult) GetTestOper() *GetSetOperResult {
 // GetSetTest.
 type GetSetOperResult struct {
 	// Result of the operation.
-	Result Status `protobuf:"varint,1,opt,name=result,enum=report.Status" json:"result,omitempty"`
+	Result Status `protobuf:"varint,1,opt,name=result,proto3,enum=report.Status" json:"result,omitempty"`
 	// set_responses is the SetResponse message received from the target.
-	SetResponse *gnmi.SetResponse `protobuf:"bytes,2,opt,name=set_response,json=setResponse" json:"set_response,omitempty"`
+	SetResponse *gnmi.SetResponse `protobuf:"bytes,2,opt,name=set_response,json=setResponse,proto3" json:"set_response,omitempty"`
 	// set_status is the status.proto message received from the target in
 	// response to the Set RPC within the operation.
-	SetStatus *status.Status `protobuf:"bytes,3,opt,name=set_status,json=setStatus" json:"set_status,omitempty"`
+	SetStatus *status.Status `protobuf:"bytes,3,opt,name=set_status,json=setStatus,proto3" json:"set_status,omitempty"`
 	// get_response is the GetResponse received from the target.
-	GetResponse *gnmi.GetResponse `protobuf:"bytes,4,opt,name=get_response,json=getResponse" json:"get_response,omitempty"`
+	GetResponse *gnmi.GetResponse `protobuf:"bytes,4,opt,name=get_response,json=getResponse,proto3" json:"get_response,omitempty"`
 	// get_status is the status.proto message received from the target in
 	// response to the Get RPC within the operation.
-	GetStatus *status.Status `protobuf:"bytes,5,opt,name=get_status,json=getStatus" json:"get_status,omitempty"`
+	GetStatus *status.Status `protobuf:"bytes,5,opt,name=get_status,json=getStatus,proto3" json:"get_status,omitempty"`
 	// get_response_matched indicates whether the GetResponse received from
 	// the target matched that specified in the test.
-	GetResponseMatched   MatchResult `protobuf:"varint,6,opt,name=get_response_matched,json=getResponseMatched,enum=report.MatchResult" json:"get_response_matched,omitempty"`
+	GetResponseMatched   MatchResult `protobuf:"varint,6,opt,name=get_response_matched,json=getResponseMatched,proto3,enum=report.MatchResult" json:"get_response_matched,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
 	XXX_sizecache        int32       `json:"-"`
@@ -384,9 +384,9 @@ func (m *GetSetOperResult) GetGetResponseMatched() MatchResult {
 
 // Test is used to pair a tests.Test and its result.
 type TestResult struct {
-	Test *tests.Test `protobuf:"bytes,1,opt,name=test" json:"test,omitempty"`
+	Test *tests.Test `protobuf:"bytes,1,opt,name=test,proto3" json:"test,omitempty"`
 	// Result of running the test.
-	Result Status `protobuf:"varint,2,opt,name=result,enum=report.Status" json:"result,omitempty"`
+	Result Status `protobuf:"varint,2,opt,name=result,proto3,enum=report.Status" json:"result,omitempty"`
 	// Oneof field can be expanded to include results of other gnmi RPCs.
 	//
 	// Types that are valid to be assigned to Type:
@@ -427,10 +427,10 @@ type isTestResult_Type interface {
 }
 
 type TestResult_Subscribe struct {
-	Subscribe *SubscribeTestResult `protobuf:"bytes,10,opt,name=subscribe,oneof"`
+	Subscribe *SubscribeTestResult `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
 }
 type TestResult_Getset struct {
-	Getset *GetSetTestResult `protobuf:"bytes,11,opt,name=getset,oneof"`
+	Getset *GetSetTestResult `protobuf:"bytes,11,opt,name=getset,proto3,oneof"`
 }
 
 func (*TestResult_Subscribe) isTestResult_Type() {}
@@ -547,9 +547,9 @@ func _TestResult_OneofSizer(msg proto.Message) (n int) {
 
 // Instance stores test results of main test and its extensions.
 type Instance struct {
-	Description          string        `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
-	Test                 *TestResult   `protobuf:"bytes,2,opt,name=test" json:"test,omitempty"`
-	Extensions           []*TestResult `protobuf:"bytes,3,rep,name=extensions" json:"extensions,omitempty"`
+	Description          string        `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Test                 *TestResult   `protobuf:"bytes,2,opt,name=test,proto3" json:"test,omitempty"`
+	Extensions           []*TestResult `protobuf:"bytes,3,rep,name=extensions,proto3" json:"extensions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -602,11 +602,11 @@ func (m *Instance) GetExtensions() []*TestResult {
 
 // InstanceGroup stores a set of Instances.
 type InstanceGroup struct {
-	Description string      `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
-	Instance    []*Instance `protobuf:"bytes,2,rep,name=instance" json:"instance,omitempty"`
+	Description string      `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Instance    []*Instance `protobuf:"bytes,2,rep,name=instance,proto3" json:"instance,omitempty"`
 	// Skipped indicates whether the instance group was skipped during
 	// test execution based on a prior group being fatal.
-	Skipped              bool     `protobuf:"varint,3,opt,name=skipped" json:"skipped,omitempty"`
+	Skipped              bool     `protobuf:"varint,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -659,7 +659,7 @@ func (m *InstanceGroup) GetSkipped() bool {
 
 // Report is result of running suite.Suite
 type Report struct {
-	Results              []*InstanceGroup `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
+	Results              []*InstanceGroup `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`

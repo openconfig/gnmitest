@@ -33,8 +33,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for GNMITest service
-
+// GNMITestClient is the client API for GNMITest service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GNMITestClient interface {
 	// Run runs the given Suite proto and returns Report proto.
 	Run(ctx context.Context, in *suite.Suite, opts ...grpc.CallOption) (*report.Report, error)
@@ -50,15 +51,14 @@ func NewGNMITestClient(cc *grpc.ClientConn) GNMITestClient {
 
 func (c *gNMITestClient) Run(ctx context.Context, in *suite.Suite, opts ...grpc.CallOption) (*report.Report, error) {
 	out := new(report.Report)
-	err := grpc.Invoke(ctx, "/gnmitest.GNMITest/Run", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/gnmitest.GNMITest/Run", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for GNMITest service
-
+// GNMITestServer is the server API for GNMITest service.
 type GNMITestServer interface {
 	// Run runs the given Suite proto and returns Report proto.
 	Run(context.Context, *suite.Suite) (*report.Report, error)
