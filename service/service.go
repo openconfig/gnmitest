@@ -19,9 +19,9 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmitest/config"
 	"github.com/openconfig/gnmitest/runner"

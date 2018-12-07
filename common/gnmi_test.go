@@ -17,13 +17,13 @@ limitations under the License.
 package common
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strconv"
 	"strings"
 	"testing"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"

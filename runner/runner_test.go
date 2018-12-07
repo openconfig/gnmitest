@@ -18,6 +18,7 @@ package runner
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -25,7 +26,6 @@ import (
 	"testing"
 	"time"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
 	"github.com/kylelemons/godebug/pretty"

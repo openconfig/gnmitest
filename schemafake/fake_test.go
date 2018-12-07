@@ -1,13 +1,13 @@
 package schemafake
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"

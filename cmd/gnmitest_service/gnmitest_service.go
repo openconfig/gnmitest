@@ -20,11 +20,11 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net"
 
-	"context"
 	log "github.com/golang/glog"
 	"github.com/openconfig/gnmi/client/gnmi"
 	"github.com/openconfig/gnmitest/service"

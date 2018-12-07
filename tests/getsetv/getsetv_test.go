@@ -17,11 +17,11 @@ limitations under the License.
 package getsetv
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
-	"context"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmitest/schemafake"

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -10,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
 	"github.com/openconfig/gnmi/client/gnmi"
@@ -174,7 +174,7 @@ func TestIntegration(t *testing.T) {
 					return true
 				}
 				return false
-			}, cmp.Comparer(testutil.GetResponseEqual))); diff != "" {
+			}, cmp.Comparer(func(a, b *gpb.GetResponse) bool { return testutil.GetResponseEqual(a, b) }))); diff != "" {
 				t.Fatalf("did not get expected report proto, diff(-got,+want):\n%s", diff)
 			}
 		})

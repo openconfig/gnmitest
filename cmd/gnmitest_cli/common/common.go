@@ -19,12 +19,12 @@ limitations under the License.
 package common
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 

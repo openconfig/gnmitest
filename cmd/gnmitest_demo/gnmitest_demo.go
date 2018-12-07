@@ -20,6 +20,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -27,7 +28,6 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"context"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmi/client/gnmi"

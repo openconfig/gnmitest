@@ -1,9 +1,9 @@
 package resolver
 
 import (
+	"context"
 	"testing"
 
-	"context"
 	"github.com/kylelemons/godebug/pretty"
 
 	tpb "github.com/openconfig/gnmitest/proto/tests"

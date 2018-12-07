@@ -2,7 +2,6 @@ package resolver
 
 import (
 	"context"
-
 	tpb "github.com/openconfig/gnmitest/proto/tests"
 )
 

@@ -20,10 +20,9 @@ limitations under the License.
 package resolver
 
 import (
+	"context"
 	"fmt"
 	"sync"
-
-	"context"
 
 	tpb "github.com/openconfig/gnmitest/proto/tests"
 )

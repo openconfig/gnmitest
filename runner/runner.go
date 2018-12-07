@@ -21,11 +21,11 @@ limitations under the License.
 package runner
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"time"
 
-	"context"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmi/client"
@@ -381,12 +381,14 @@ func (e *extensionTest) Update(l interface{}) {
 	status, err := e.t.Process(sr)
 
 	// update extension test report.
-	srr := &rpb.SubscribeResponseResult{Response: sr}
+	srr := &rpb.SubscribeResponseResult{}
+	if e.logResponses {
+		srr.Response = sr
+	}
 	if err != nil {
 		srr.Error = err.Error()
 	}
-
-	if e.logResponses {
+	if e.logResponses || err != nil {
 		e.r.Responses = append(e.r.Responses, srr)
 	}
 
@@ -426,12 +428,14 @@ func (p *parentTest) Update(l interface{}) {
 	status, err := p.ti.Process(sr)
 
 	// update parent test report.
-	srr := &rpb.SubscribeResponseResult{Response: sr}
+	srr := &rpb.SubscribeResponseResult{}
+	if p.logResponses {
+		srr.Response = sr
+	}
 	if err != nil {
 		srr.Error = err.Error()
 	}
-
-	if p.logResponses {
+	if p.logResponses || err != nil {
 		p.subRes.Responses = append(p.subRes.Responses, srr)
 	}
 

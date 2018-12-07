@@ -18,6 +18,7 @@
 package schemafake
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -26,7 +27,6 @@ import (
 	"sync"
 	"time"
 
-	"context"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmi/unimplemented"
 	"github.com/openconfig/gnmitest/common"

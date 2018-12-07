@@ -19,13 +19,13 @@ limitations under the License.
 package common
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
 	"time"
 
-	"context"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmitest/creds"

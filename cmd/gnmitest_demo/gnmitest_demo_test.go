@@ -17,12 +17,12 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
-	"context"
 	"flag"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmitest/common/report"

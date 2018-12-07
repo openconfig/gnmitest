@@ -38,9 +38,9 @@ limitations under the License.
 package getsetv
 
 import (
+	"context"
 	"fmt"
 
-	"context"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmitest/common"
