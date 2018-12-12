@@ -19,6 +19,7 @@ syntax = "proto3";
 import "github.com/openconfig/gnmi/proto/gnmi/gnmi.proto";
 import "github.com/openconfig/gnmitest/proto/tests/tests.proto";
 import "google/rpc/status.proto";
+import "google/protobuf/any.proto";
 
 package report;
 
@@ -46,6 +47,18 @@ message SubscribeResponseResult {
   string error = 2;
 }
 
+// TestError corresponds to a single error case reported during execution of a
+// test. Test can emit multiple errors as a result of processing single
+// SubscribeResponse message.
+message TestError {
+  // Message has human readable error that is set by the test.
+  string message = 1;
+  // gnmi path corresponding to the message set. path is set by test as well.
+  gnmi.Path path = 2;
+  // Additional details test can provide in the error.
+  google.protobuf.Any details = 3;
+}
+
 // SubscribeTestResult is result of running an individual
 // suite.SubscribeTest.
 message SubscribeTestResult {
@@ -53,9 +66,11 @@ message SubscribeTestResult {
   repeated SubscribeResponseResult responses = 1;
   // If test is stateful, error is set as a result of calling Check function of
   // the test. If test is stateless, error set here can be ignored.
-  string error = 2;
+  string error = 2 [deprecated=true];
   // CompletionStatus indicates why the test ended.
   CompletionStatus status = 3;
+  // List of errors received while running the test.
+  repeated TestError errors = 4;
 }
 
 // Result of running an individual test.

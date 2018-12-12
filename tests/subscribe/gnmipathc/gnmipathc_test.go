@@ -17,12 +17,15 @@ limitations under the License.
 package gnmipathc
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
-	"github.com/openconfig/gnmi/errdiff"
+	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/gnmitest/schemas/openconfig/register"
 	"github.com/openconfig/ygot/ygot"
 
+	"github.com/openconfig/gnmi/errdiff"
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	tpb "github.com/openconfig/gnmitest/proto/tests"
 )
@@ -61,10 +64,10 @@ func noti(target, origin, prefixPath, updatePath string, v *gpb.TypedValue, slic
 
 func TestGNMIPathCompliance(t *testing.T) {
 	tests := []struct {
-		desc    string
-		upd     *gpb.SubscribeResponse
-		inArgs  *tpb.SubscribeTest
-		wantErr string
+		desc     string
+		upd      *gpb.SubscribeResponse
+		inArgs   *tpb.SubscribeTest
+		wantErrs []string
 	}{
 		{
 			desc: "target and origin must exist, but can be anything",
@@ -97,7 +100,7 @@ func TestGNMIPathCompliance(t *testing.T) {
 					},
 				},
 			},
-			wantErr: "target isn't set in prefix gNMI Path",
+			wantErrs: []string{"target isn't set in prefix gNMI Path"},
 		},
 		{
 			desc: "target and origin must exist, but they are missing",
@@ -110,7 +113,10 @@ func TestGNMIPathCompliance(t *testing.T) {
 					},
 				},
 			},
-			wantErr: "target isn't set in prefix gNMI Path , origin isn't set in prefix gNMI Path ",
+			wantErrs: []string{
+				"target isn't set in prefix gNMI Path",
+				"origin isn't set in prefix gNMI Path",
+			},
 		},
 		{
 			desc: `target must exist and equal to "myDev"`,
@@ -122,7 +128,7 @@ func TestGNMIPathCompliance(t *testing.T) {
 					},
 				},
 			},
-			wantErr: `target in gNMI Path target:"dev"  is "dev", expect "myDev"`,
+			wantErrs: []string{`target in gNMI Path target:"dev"  is "dev", expect "myDev"`},
 		},
 		{
 
@@ -148,7 +154,7 @@ func TestGNMIPathCompliance(t *testing.T) {
 					},
 				},
 			},
-			wantErr: "element field is used in gNMI Path",
+			wantErrs: []string{"element field is used in gNMI Path"},
 		},
 		{
 			desc: "target, origin and elem are all correctly used",
@@ -172,9 +178,32 @@ func TestGNMIPathCompliance(t *testing.T) {
 				t.Fatalf("newTest failed: %v", err)
 			}
 
-			_, err = gt.Process(tt.upd)
-			if diff := errdiff.Substring(err, tt.wantErr); diff != "" {
-				t.Fatalf("did not get expected error, %s", diff)
+			_, gotErr := gt.Process(tt.upd)
+
+			foundErrs := map[string]bool{}
+			hasFalse := func(errs map[string]bool) []string {
+				s := []string{}
+				for k, v := range errs {
+					if !v {
+						s = append(s, fmt.Sprintf("did not find error %s", k))
+					}
+				}
+				return s
+			}
+
+			for _, want := range tt.wantErrs {
+				foundErrs[want] = false
+				listErrs := gotErr.(*testerror.List).Errors()
+				for _, got := range listErrs {
+					if diff := errdiff.Substring(errors.New(got.GetMessage()), want); diff == "" {
+						foundErrs[want] = true
+						break
+					}
+				}
+			}
+
+			if f := hasFalse(foundErrs); len(f) > 0 {
+				t.Errorf("did not get expected errors, %v", f)
 			}
 		})
 	}

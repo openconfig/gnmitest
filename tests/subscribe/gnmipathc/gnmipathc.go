@@ -24,7 +24,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/openconfig/gnmi/errlist"
+	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/subscribe"
 
@@ -85,40 +85,44 @@ func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
 	return subscribe.Running, fmt.Errorf("unexpected message: %T", sr.Response)
 }
 
-// pathValidate performes required validations on provided gNMI Path.
+// pathValidate performs required validations on provided gNMI Path.
 // Checking target and origin fields are only performed if function is dealing
 // with a prefix gNMI Path.
 func (t *test) pathValidate(p *gpb.Path, prefix bool) error {
-	var errs errlist.List
-	if prefix && (t.gpc.CheckTarget != "" || t.gpc.CheckOrigin != "") {
-		if p == nil {
-			return errors.New("prefix gNMI Path must be non-nil, origin and/or target are missing")
-		}
-
-		switch {
-		case t.gpc.CheckTarget == "": // Validation on target field isn't requested.
-		case t.gpc.CheckTarget == "*":
-			if p.Target == "" {
-				errs.Add(fmt.Errorf("target isn't set in prefix gNMI Path %v", p))
-			}
-		case t.gpc.CheckTarget != p.Target:
-			errs.Add(fmt.Errorf("target in gNMI Path %v is %q, expect %q", p, p.Target, t.gpc.CheckTarget))
-		}
-
-		switch {
-		case t.gpc.CheckOrigin == "": // Validation on origin field isn't requested.
-		case t.gpc.CheckOrigin == "*":
-			if p.Origin == "" {
-				errs.Add(fmt.Errorf("origin isn't set in prefix gNMI Path %v", p))
-			}
-		case t.gpc.CheckOrigin != p.Origin:
-			errs.Add(fmt.Errorf("origin in gNMI Path %v is %q, expect %q", p, p.Origin, t.gpc.CheckOrigin))
-		}
-	}
+	errs := &testerror.List{}
 
 	if t.gpc.CheckElem && p != nil && len(p.Element) > 0 {
-		errs.Add(fmt.Errorf("element field is used in gNMI Path %v", p))
+		errs.AddErr(fmt.Errorf("element field is used in gNMI Path %v", p))
 	}
 
-	return errs.Err()
+	if !prefix || (t.gpc.CheckTarget == "" && t.gpc.CheckOrigin == "") {
+		return errs
+	}
+
+	if p == nil {
+		errs.AddErr(fmt.Errorf("prefix gNMI Path must be non-nil, origin and/or target are missing"))
+		return errs
+	}
+
+	switch {
+	case t.gpc.CheckTarget == "": // Validation on target field isn't requested.
+	case t.gpc.CheckTarget == "*":
+		if p.Target == "" {
+			errs.AddErr(fmt.Errorf("target isn't set in prefix gNMI Path %v", p))
+		}
+	case t.gpc.CheckTarget != p.Target:
+		errs.AddErr(fmt.Errorf("target in gNMI Path %v is %q, expect %q", p, p.Target, t.gpc.CheckTarget))
+	}
+
+	switch {
+	case t.gpc.CheckOrigin == "": // Validation on origin field isn't requested.
+	case t.gpc.CheckOrigin == "*":
+		if p.Origin == "" {
+			errs.AddErr(fmt.Errorf("origin isn't set in prefix gNMI Path %v", p))
+		}
+	case t.gpc.CheckOrigin != p.Origin:
+		errs.AddErr(fmt.Errorf("origin in gNMI Path %v is %q, expect %q", p, p.Origin, t.gpc.CheckOrigin))
+	}
+
+	return errs
 }

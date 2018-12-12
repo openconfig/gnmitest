@@ -29,10 +29,9 @@ import (
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmi/client"
-	"github.com/openconfig/gnmi/match"
-	"github.com/openconfig/gnmi/path"
 	"github.com/openconfig/gnmitest/common"
 	"github.com/openconfig/gnmitest/common/report"
+	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/gnmitest/config"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/subscribe"
@@ -48,8 +47,18 @@ import (
 // a single spb.InstanceGroup is finished.
 type PartialReportFunc func(*rpb.InstanceGroup)
 
-// Inlined functions are overridden in the tests.
+// Runner object encapsulates the config, report and logging to run
+// a Suite of tests.
+type Runner struct {
+	cfg    *config.Config    // object that contains the Suite proto.
+	report PartialReportFunc // used to update caller incrementally.
+}
+
 var (
+	// createSubscription creates a gNMI subscription with the provided
+	// gpb.SubscribeRequest and tpb.Connection parameters. Received messages
+	// are dispatched to the provided ProtoHandler. clientType defines the
+	// type of the client that needs to be created.
 	createSubscription = func(ctx context.Context, sr *gpb.SubscribeRequest, pHandler client.ProtoHandler, conn *tpb.Connection, clientType string) error {
 		log.Infof("creating Subscribe client subscription with %s", proto.MarshalTextString(sr))
 		q, err := client.NewQuery(sr)
@@ -84,13 +93,6 @@ var (
 		return c.Subscribe(ctx, q, clientType)
 	}
 )
-
-// Runner object encapsulates the config, report and logging to run
-// a Suite of tests.
-type Runner struct {
-	cfg    *config.Config    // object that contains the Suite proto.
-	report PartialReportFunc // used to update caller incrementally.
-}
 
 // New creates an instance of runner. It receives;
 // - config that contains the Suite proto
@@ -221,39 +223,28 @@ func (r *Runner) runSubscribeTest(ctx context.Context, ins *spb.Instance, insRes
 		return fmt.Errorf("failed getting an instance of %T test: %v", v.Args, err)
 	}
 
-	// create a match tree to set extension tests as clients with query paths being
-	// subsription paths of the tests
-	m := match.New()
-	var exts []updater
-	for _, el := range ins.ExtensionList {
-		ext, err := setExtensions(m, r.cfg.Suite.ExtensionList[el], insRes)
-		if err != nil {
-			return fmt.Errorf("failed setting extensions; %v", err)
-		}
-		exts = append(exts, ext...)
-	}
-
 	// create a child context with the test timeout
 	tCtx, cancel := context.WithTimeout(ctx, time.Duration(ins.GetTest().GetTimeout())*time.Second)
 	defer cancel()
 	ctx = nil
 
-	// add parent test into match tree as well, but with glob query path
-	// note that parent has a callback to cancel context when it is done.
-	pt := &parentTest{ti: ti, subRes: subRes, finish: cancel, logResponses: ins.GetTest().GetSubscribe().GetLogResponses()}
-	m.AddQuery([]string{"*"}, pt)
+	// Note that subscribe test has a callback to cancel context when it is done.
+	// That allows test to finish earlier than its subscription.
+	subTest := &subscribeTest{
+		ti:           ti,
+		subRes:       subRes,
+		finish:       cancel,
+		logResponses: ins.GetTest().GetSubscribe().GetLogResponses(),
+		errs:         &testerror.List{},
+	}
+
 	err = createSubscription(tCtx, v.Request, func(msg proto.Message) error {
 		sr, ok := msg.(*gpb.SubscribeResponse)
 		if !ok {
 			return fmt.Errorf("update has unknown type: %T", msg)
 		}
 
-		p, err := getQueryPath(sr)
-		if err != nil {
-			return fmt.Errorf("query path couldn't be extracted for %v: %v", sr, err)
-		}
-		// dispatch message to parent and extensions
-		m.Update(sr, p)
+		subTest.Update(sr)
 		return nil
 	}, ins.GetTest().GetConnection(), r.cfg.ClientType)
 
@@ -266,234 +257,64 @@ func (r *Runner) runSubscribeTest(ctx context.Context, ins *spb.Instance, insRes
 		subRes.Status = rpb.CompletionStatus_TIMEOUT
 	case err != nil:
 		subRes.Status = rpb.CompletionStatus_RPC_ERROR
-		subRes.Error = fmt.Sprintf("%v", err)
+		subRes.Errors = append(subRes.Errors, &rpb.TestError{Message: err.Error()})
 		// We still return nil, so that the overall test execution is not
 		// fatal, and we continue with other tests.
 		return nil
 	}
 
-	// end the extensions that haven't ended before.
-	for _, e := range exts {
-		e.End()
+	insRes.Test.Result = rpb.Status_SUCCESS
+	if len(subTest.End()) > 0 {
+		insRes.Test.Result = rpb.Status_FAIL
 	}
-	pt.End()
-
-	setTestResult(insRes)
 
 	return nil
 }
 
-// getQueryPath returns the gNMI path as indexed strings for the given SubscribeResponse.
-// If the response is a sync response, "*" is returned to indicate that the message will
-// be dispatched to all extensions.
-func getQueryPath(sr *gpb.SubscribeResponse) ([]string, error) {
-	switch v := sr.Response.(type) {
-	case *gpb.SubscribeResponse_Update:
-		pr := path.ToStrings(v.Update.Prefix, true)
-		if len(v.Update.Update) > 0 {
-			return append(pr, path.ToStrings(v.Update.Update[0].Path, false)...), nil
-		} else if len(v.Update.Delete) > 0 {
-			return append(pr, path.ToStrings(v.Update.Delete[0], false)...), nil
-		}
-		return pr, nil
-	case *gpb.SubscribeResponse_SyncResponse:
-		return []string{"*"}, nil
-	case *gpb.SubscribeResponse_Error:
-		return nil, fmt.Errorf("error occurred: %v", v.Error.Message)
-	}
-	return nil, fmt.Errorf("%T type isn't expected as subscription response", sr)
-}
-
-// setExtensions sets the extension tests in the given match tree. Test results
-// are appended in the given rpb.Instance into Extensions field.
-func setExtensions(m *match.Match, extensions *spb.ExtensionList, insRes *rpb.Instance) ([]updater, error) {
-	var extTests []updater
-	if extensions != nil {
-		for _, e := range extensions.Extension {
-			switch v := e.Type.(type) {
-			case *tpb.Test_Subscribe:
-				// get the registered test by its oneof type from the SubscribeTest message
-				// in tests.proto.
-				ti, err := register.GetSubscribeTest(v.Subscribe.Args, e)
-				if err != nil {
-					return nil, fmt.Errorf("error while getting an instance of %T test; %v", v.Subscribe.Args, err)
-				}
-
-				// Create test report instance for individual extension
-				extRes := &rpb.SubscribeTestResult{}
-
-				insRes.Extensions = append(insRes.Extensions, &rpb.TestResult{
-					Test: e,
-					Type: &rpb.TestResult_Subscribe{Subscribe: extRes},
-				})
-				et := &extensionTest{t: ti, r: extRes, logResponses: e.GetSubscribe().GetLogResponses()}
-				extTests = append(extTests, et)
-				addSubscription(m, v.Subscribe.Request.GetSubscribe(), et)
-			}
-		}
-	}
-	return extTests, nil
-}
-
-// addSubscription registers given extensionTest as match tree client.
-func addSubscription(m *match.Match, s *gpb.SubscriptionList, et updater) {
-	pr := path.ToStrings(s.Prefix, true)
-	for _, p := range s.Subscription {
-		if p.Path == nil {
-			continue
-		}
-		path := append(pr, path.ToStrings(p.Path, false)...)
-		// TODO(yusufsn): Removing queries individually can be supported for multi-subscription
-		// requests.
-		m.AddQuery(path, et)
-	}
-}
-
-type updater interface {
-	Update(interface{})
-	End()
-}
-
-// extensionTest is the match tree client. It is used to dispatch indidividual
-// messages to the tests which are clients in match tree.
-type extensionTest struct {
-	// Subscribe test instance to dispatch messages.
-	t subscribe.Subscribe
-	// Result object that is meant to be populated by the extension.
-	r *rpb.SubscribeTestResult
-	// Indicates whether extension test is done with receiving updates.
-	done bool
+// subscribeTest represents a working subscribe test and messages
+// can be dispatched by using Update function. When the test ends,
+// End function must be called, otherwise test may not report properly.
+type subscribeTest struct {
+	// ti is the subscribe test that the SubscribeResponse
+	// messages are being dispatched.
+	ti subscribe.Subscribe
 	// logResponses indicates whether SubscribeResponses should be logged
 	// in the report proto.
 	logResponses bool
+	// subRes is used to store received SubscribeResponse messages
+	// as well as errors if logResponses is set to true.
+	subRes *rpb.SubscribeTestResult
+	// errs is the list of errors received during the execution of test.
+	errs *testerror.List
+	// finish is a callback to cancel the context if test indicates to
+	// finish execution.
+	finish func()
 }
 
-// Update function is used to deliver gNMI message to matching test.
-func (e *extensionTest) Update(l interface{}) {
-	// check whether test is done with receiving updates.
-	if e.done {
-		return
-	}
-
+func (s *subscribeTest) Update(l interface{}) {
 	sr := l.(*gpb.SubscribeResponse)
+	status, err := s.ti.Process(sr)
+	s.errs.AddErr(err)
 
-	// dispatch message to extension test.
-	status, err := e.t.Process(sr)
-
-	// update extension test report.
-	srr := &rpb.SubscribeResponseResult{}
-	if e.logResponses {
-		srr.Response = sr
-	}
-	if err != nil {
-		srr.Error = err.Error()
-	}
-	if e.logResponses || err != nil {
-		e.r.Responses = append(e.r.Responses, srr)
+	if s.logResponses {
+		s.subRes.Responses = append(s.subRes.Responses, &rpb.SubscribeResponseResult{Response: sr})
 	}
 
 	if status == subscribe.Complete {
-		if err := e.t.Check(); err != nil {
-			e.r.Error = err.Error()
-		}
-		e.r.Status = rpb.CompletionStatus_EARLY_FINISHED
-
-		// don't dispatch messages any more to the encapsulated test.
-		e.done = true
+		s.subRes.Status = rpb.CompletionStatus_EARLY_FINISHED
+		s.finish()
 	}
 }
 
-// End is called by parent test when the parent test is getting prepared to finish.
-// This gives a chance to extensions to evaluate their situation and return a final
-// result.
-func (e *extensionTest) End() {
-	if e.done {
-		return
+func (s *subscribeTest) End() []*rpb.TestError {
+	if err := s.ti.Check(); err != nil {
+		s.errs.AddErr(err)
 	}
-	if err := e.t.Check(); err != nil {
-		e.r.Error = err.Error()
-	}
-	e.r.Status = rpb.CompletionStatus_FINISHED
-}
-
-type parentTest struct {
-	ti           subscribe.Subscribe
-	subRes       *rpb.SubscribeTestResult
-	logResponses bool
-	finish       func()
-}
-
-func (p *parentTest) Update(l interface{}) {
-	sr := l.(*gpb.SubscribeResponse)
-	status, err := p.ti.Process(sr)
-
-	// update parent test report.
-	srr := &rpb.SubscribeResponseResult{}
-	if p.logResponses {
-		srr.Response = sr
-	}
-	if err != nil {
-		srr.Error = err.Error()
-	}
-	if p.logResponses || err != nil {
-		p.subRes.Responses = append(p.subRes.Responses, srr)
+	if s.subRes.Status == rpb.CompletionStatus_UNKNOWN {
+		s.subRes.Status = rpb.CompletionStatus_FINISHED
 	}
 
-	if status == subscribe.Complete {
-		p.subRes.Status = rpb.CompletionStatus_EARLY_FINISHED
-		p.finish()
-	}
-}
-
-func (p *parentTest) End() {
-	if err := p.ti.Check(); err != nil {
-		p.subRes.Error = err.Error()
-	}
-	if p.subRes.Status == rpb.CompletionStatus_UNKNOWN {
-		p.subRes.Status = rpb.CompletionStatus_FINISHED
-	}
-}
-
-func setTestResult(ir *rpb.Instance) {
-	anyFailed := false
-	// set results of extension tests.
-	for _, extRes := range ir.Extensions {
-		var err error
-		if v, ok := extRes.Type.(*rpb.TestResult_Subscribe); ok {
-			err = getSubscribeTestResult(v.Subscribe)
-		}
-
-		if err == nil {
-			extRes.Result = rpb.Status_SUCCESS
-		} else {
-			anyFailed = true
-			extRes.Result = rpb.Status_FAIL
-		}
-	}
-
-	// set parent test result.
-	var err error
-	if v, ok := ir.Test.Type.(*rpb.TestResult_Subscribe); ok {
-		err = getSubscribeTestResult(v.Subscribe)
-	}
-
-	switch {
-	case err == nil && !anyFailed:
-		ir.Test.Result = rpb.Status_SUCCESS
-	default:
-		// if any of the extensions failed, parent test is reported as failed.
-		ir.Test.Result = rpb.Status_FAIL
-	}
-}
-
-func getSubscribeTestResult(sRes *rpb.SubscribeTestResult) error {
-	for _, res := range sRes.Responses {
-		if res.Error != "" {
-			return fmt.Errorf("failure returned for %v; %v", res.Response, res.Error)
-		}
-	}
-	if sRes.Error != "" {
-		return fmt.Errorf("failure returned; %v", sRes.Error)
-	}
-	return nil
+	// Update the result proto with the errors received in the test.
+	s.subRes.Errors = s.errs.Errors()
+	return s.errs.Errors()
 }

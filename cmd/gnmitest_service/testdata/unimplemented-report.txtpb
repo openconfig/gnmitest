@@ -37,7 +37,9 @@ results: {
         }
       }
       subscribe: {
-        error: "rpc error: code = Unimplemented desc = Subscription modes other than ONCE are not implemented"
+        errors: {
+          message: "rpc error: code = Unimplemented desc = Subscription modes other than ONCE are not implemented"
+        }
         status: RPC_ERROR
       }
     }

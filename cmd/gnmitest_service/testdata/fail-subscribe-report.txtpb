@@ -53,7 +53,9 @@ results {
       }
       result: FAIL
       subscribe {
-        error: "did not receive update for path /interfaces/interface/state/admin-status"
+      errors: {
+        message: "did not receive update for path /interfaces/interface/state/admin-status"
+      }
         status: EARLY_FINISHED
       }
     }
@@ -109,7 +111,9 @@ results {
       }
       result: FAIL
       subscribe {
-        error: "no nodes found for requested path elem: <\n  name: \"interfaces\"\n>\nelem: <\n  name: \"interface\"\n  key: <\n    key: \"name\"\n    value: \"eth2\"\n  >\n>\n"
+      errors: {
+        message: "no nodes found for requested path elem: <\n  name: \"interfaces\"\n>\nelem: <\n  name: \"interface\"\n  key: <\n    key: \"name\"\n    value: \"eth2\"\n  >\n>\n"
+      }
         status: EARLY_FINISHED
       }
     }
@@ -183,7 +187,9 @@ results {
       }
       result: FAIL
       subscribe {
-        error: "/interfaces/interface[name=eth0]/state/description: got nil data for path, /interfaces/interface[name=eth1]/state/description: got nil data for path"
+      errors: {
+        message: "/interfaces/interface[name=eth0]/state/description: got nil data for path, /interfaces/interface[name=eth1]/state/description: got nil data for path"
+      }
         status: EARLY_FINISHED
       }
     }

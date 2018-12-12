@@ -1,0 +1,44 @@
+results: <
+  description: "Subscription tests"
+  instance: <
+    description: "Interfaces tests"
+    test: <
+      test: <
+        description: "Value validation"
+        timeout: 20
+        schema: "openconfig"
+        connection: <
+          address: "%%ADDRESS%%"
+          timeout: 20
+        >
+        subscribe: <
+          request: <
+            subscribe: <
+              prefix: <
+                origin: "openconfig"
+                target: "DUT"
+              >
+              subscription: <
+                path: <
+                  elem: <
+                    name: "interfaces"
+                  >
+                >
+              >
+              mode: ONCE
+            >
+          >
+          value_validation: <
+          >
+        >
+      >
+      result: FAIL
+      subscribe: <
+        errors: <
+          message: "rpc error: code = Unknown desc = failed to update struct field Ifindex in *gostructs.OpenconfigInterfaces_Interfaces_Interface_Subinterfaces_Subinterface_State with value string_val:\"4242424242424242\" ; failed to unmarshal &{4242424242424242} into uint32"
+        >
+        status: EARLY_FINISHED
+      >
+    >
+  >
+>

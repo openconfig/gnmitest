@@ -22,12 +22,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/google/go-cmp/cmp"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/client"
 	"github.com/openconfig/gnmitest/config"
@@ -40,79 +38,6 @@ import (
 	tpb "github.com/openconfig/gnmitest/proto/tests"
 )
 
-var (
-	tests = map[string]subscribe.Subscribe{
-		"test11": &test1{},
-		"test12": &test1{},
-	}
-)
-
-func TestMain(m *testing.M) {
-	register.NewSubscribeTest(&tpb.SubscribeTest_FakeTest{}, newFake)
-	os.Exit(m.Run())
-}
-
-func newFake(t *tpb.Test) (subscribe.Subscribe, error) {
-	s := t.GetSubscribe().GetFakeTest()
-	test, ok := tests[s]
-	if !ok {
-		return nil, fmt.Errorf("no such test: %q", s)
-	}
-	return test, nil
-}
-
-type test1 struct {
-	subscribe.Test
-}
-
-// Process is placeholder to satisfy subscribe.Subscribe interface.
-func (test1) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	return subscribe.Running, nil
-}
-
-func createTest(test, target string, sub *gpb.Path, mode gpb.SubscriptionList_Mode, logResponses bool) *tpb.Test {
-	return &tpb.Test{
-		Description: test,
-		Type: &tpb.Test_Subscribe{
-			Subscribe: &tpb.SubscribeTest{
-				Request: &gpb.SubscribeRequest{
-					Request: &gpb.SubscribeRequest_Subscribe{
-						Subscribe: &gpb.SubscriptionList{
-							Prefix: &gpb.Path{
-								Target: target,
-							},
-							Mode:         mode,
-							Subscription: []*gpb.Subscription{{Path: sub}},
-						},
-					},
-				},
-				LogResponses: logResponses,
-				Args: &tpb.SubscribeTest_FakeTest{
-					FakeTest: test,
-				},
-			},
-		},
-	}
-}
-
-func createNoti(t string, p *gpb.Path, sync bool) *gpb.SubscribeResponse {
-	if sync {
-		return &gpb.SubscribeResponse{
-			Response: &gpb.SubscribeResponse_SyncResponse{
-				SyncResponse: true,
-			},
-		}
-	}
-	return &gpb.SubscribeResponse{
-		Response: &gpb.SubscribeResponse_Update{
-			Update: &gpb.Notification{
-				Prefix: &gpb.Path{Target: t},
-				Update: []*gpb.Update{{Path: p}},
-			},
-		},
-	}
-}
-
 func configFromProto(s *spb.Suite) (*config.Config, error) {
 	b := &bytes.Buffer{}
 	if err := proto.MarshalText(b, s); err != nil {
@@ -123,428 +48,6 @@ func configFromProto(s *spb.Suite) (*config.Config, error) {
 		return nil, fmt.Errorf("cannot create config, %v", err)
 	}
 	return cfg, nil
-}
-
-func TestRunnerSequentialInstances(t *testing.T) {
-	tests := []struct {
-		desc    string
-		spb     *spb.Suite
-		upd     []*gpb.SubscribeResponse
-		want    map[string][]*gpb.SubscribeResponse
-		timeout int
-		comSt   rpb.CompletionStatus
-	}{
-		{
-			desc: "test finishes before timeout",
-			spb: &spb.Suite{
-				Name:       "",
-				Connection: &tpb.Connection{},
-				Timeout:    4,
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_ONCE, true),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
-						},
-					},
-				},
-			},
-			upd: []*gpb.SubscribeResponse{
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "c"}}, false),
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "d"}}, false),
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "c", "d"}}, false),
-				createNoti("dev1", nil, true),
-			},
-			want: map[string][]*gpb.SubscribeResponse{
-				"test11": {
-					createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "c"}}, false),
-					createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "d"}}, false),
-					createNoti("dev1", nil, true)},
-				"test12": {
-					createNoti("dev1", &gpb.Path{Element: []string{"a", "c", "d"}}, false),
-					createNoti("dev1", nil, true)},
-			},
-			timeout: 2,
-			comSt:   rpb.CompletionStatus_FINISHED,
-		},
-		{
-			desc: "test finishes before timeout - no logging",
-			spb: &spb.Suite{
-				Name:       "",
-				Connection: &tpb.Connection{},
-				Timeout:    4,
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_ONCE, false),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, false),
-							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, false),
-						},
-					},
-				},
-			},
-			upd: []*gpb.SubscribeResponse{
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "c"}}, false),
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "d"}}, false),
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "c", "d"}}, false),
-				createNoti("dev1", nil, true),
-			},
-			want: map[string][]*gpb.SubscribeResponse{
-				"test11": {},
-				"test12": {},
-			},
-			timeout: 2,
-			comSt:   rpb.CompletionStatus_FINISHED,
-		},
-		{
-			desc: "test timeouts",
-			spb: &spb.Suite{
-				Timeout:    2,
-				Connection: &tpb.Connection{},
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test11", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test11", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test12", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
-						},
-					},
-				},
-			},
-			upd: []*gpb.SubscribeResponse{
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "c"}}, false),
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "d"}}, false),
-				createNoti("dev1", &gpb.Path{Element: []string{"a", "c", "d"}}, false),
-				createNoti("dev1", nil, true),
-			},
-			want: map[string][]*gpb.SubscribeResponse{
-				"test11": {
-					createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "c"}}, false),
-					createNoti("dev1", &gpb.Path{Element: []string{"a", "b", "d"}}, false),
-					createNoti("dev1", nil, true)},
-				"test12": {
-					createNoti("dev1", &gpb.Path{Element: []string{"a", "c", "d"}}, false),
-					createNoti("dev1", nil, true)},
-			},
-			timeout: 4,
-			comSt:   rpb.CompletionStatus_TIMEOUT,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.desc, func(t *testing.T) {
-			cfg, err := configFromProto(tt.spb)
-			if err != nil {
-				t.Fatalf("config.New failed: %v", err)
-			}
-
-			createSubscription = func(ctx context.Context, _ *gpb.SubscribeRequest, pHandler client.ProtoHandler, _ *tpb.Connection, _ string) error {
-				// send all the updates upon calling createSubscription
-				for _, r := range tt.upd {
-					pHandler(r)
-				}
-				// wait until either context times out or time set for testing times out
-				select {
-				case <-ctx.Done():
-				case <-time.After(time.Duration(tt.timeout) * time.Second):
-				}
-				return nil
-			}
-			var reports []*rpb.InstanceGroup
-			r := New(cfg, func(ir *rpb.InstanceGroup) {
-				reports = append(reports, ir)
-			})
-			if err := r.Start(context.Background()); err != nil {
-				t.Fatalf("error occurred during test execution %v", err)
-			}
-			if len(reports) != len(tt.spb.InstanceGroupList) {
-				t.Errorf("got %d, want %d instance group reports", len(reports), len(tt.spb.InstanceGroupList))
-			}
-			for _, rep := range reports {
-				if len(rep.Instance) != len(tt.spb.InstanceGroupList[0].Instance) {
-					t.Fatalf("got %d instance report want %d instance report", len(rep.Instance), len(tt.spb.InstanceGroupList[0].Instance))
-				}
-				for i, ext := range rep.Instance[0].Extensions {
-					got := ext.GetSubscribe().Responses
-					want := tt.want[ext.Test.Description]
-					if len(got) != len(want) {
-						t.Fatalf("extension #%d: got %v, want %v updates", i, len(got), len(want))
-					}
-					for j, r := range got {
-						if diff := cmp.Diff(r.Response, want[j]); diff != "" {
-							t.Errorf("extension #%d: got %v, want %v:\n%v", i, r.Response, want[j], diff)
-						}
-					}
-				}
-				if rep.Instance[0].Test.GetSubscribe().Status != tt.comSt {
-					t.Errorf("got %v, want %v completion status", rep.Instance[0].Test.GetSubscribe().Status, tt.comSt)
-				}
-			}
-		})
-	}
-}
-
-func processHookGenerator(m map[string]int, stateful bool) func(string) (subscribe.Status, error) {
-	return func(test string) (subscribe.Status, error) {
-		i, ok := m[test]
-		if !ok {
-			return subscribe.Running, nil
-		}
-		if i == 0 {
-			delete(m, test)
-			if stateful {
-				return subscribe.Complete, nil
-			}
-			return subscribe.Running, errors.New("closure parameter is exhausted")
-		}
-		m[test]--
-		return subscribe.Running, nil
-	}
-}
-
-type test2 struct {
-	subscribe.Test
-	name string
-}
-
-var processHook func(string) (subscribe.Status, error)
-
-func (t test2) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	return processHook(t.name)
-}
-
-func TestParentResult(t *testing.T) {
-	for i := 0; i < 10; i++ {
-		tests[fmt.Sprintf("test2%d", i)] = &test2{name: fmt.Sprintf("test2%d", i)}
-	}
-	defer func() {
-		for i := 0; i < 10; i++ {
-			delete(tests, fmt.Sprintf("test2%d", i))
-		}
-	}()
-
-	tests := []struct {
-		inDesc  string
-		inSuite *spb.Suite
-		// Specifies after how many messages test returns error.
-		inStats map[string]int
-		// Specifies how many messages are going to be sent to the given path.
-		numMessage map[string]int
-		// Triggers test to return Complete status.
-		stateful bool
-		// Specifies the test result of the Instance.
-		outResult rpb.Status
-	}{
-		{
-			inDesc: "success - all tests pass",
-			inSuite: &spb.Suite{
-				Name:       "",
-				Timeout:    3,
-				Connection: &tpb.Connection{},
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
-						},
-					},
-				},
-			},
-			numMessage: map[string]int{"a/b": 10, "a/c": 10, "a/d": 10, "a/e": 10},
-			outResult:  rpb.Status_SUCCESS,
-		},
-		{
-			inDesc: "fail - parent test fails",
-			inSuite: &spb.Suite{
-				Name:       "",
-				Timeout:    3,
-				Connection: &tpb.Connection{},
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
-						},
-					},
-				},
-			},
-			inStats:    map[string]int{"test21": 30},
-			numMessage: map[string]int{"a/b": 10, "a/c": 10, "a/d": 10, "a/e": 10},
-			outResult:  rpb.Status_FAIL,
-		},
-		{
-			inDesc: "fail - extension test fails",
-			inSuite: &spb.Suite{
-				Name:       "",
-				Timeout:    3,
-				Connection: &tpb.Connection{},
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
-						},
-					},
-				},
-			},
-			inStats:    map[string]int{"test22": 5},
-			numMessage: map[string]int{"a/b": 10, "a/c": 10, "a/d": 10, "a/e": 10},
-			outResult:  rpb.Status_FAIL,
-		},
-		{
-			inDesc: "success - parent test finishes early due to returning Complete status",
-			inSuite: &spb.Suite{
-				Name:       "",
-				Timeout:    3,
-				Connection: &tpb.Connection{},
-				InstanceGroupList: []*spb.InstanceGroup{
-					{
-						Description: "instance group",
-						Instance: []*spb.Instance{
-							{
-								Description:   "instance with query path a",
-								ExtensionList: []string{"exts"},
-								Test:          createTest("test21", "dev1", &gpb.Path{Element: []string{"a"}}, gpb.SubscriptionList_STREAM, true),
-							},
-						},
-					},
-				},
-				ExtensionList: map[string]*spb.ExtensionList{
-					"exts": {
-						Extension: []*tpb.Test{
-							createTest("test22", "dev1", &gpb.Path{Element: []string{"a", "b"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test23", "dev1", &gpb.Path{Element: []string{"a", "c"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test24", "dev1", &gpb.Path{Element: []string{"a", "d"}}, gpb.SubscriptionList_STREAM, true),
-							createTest("test25", "dev1", &gpb.Path{Element: []string{"a", "e"}}, gpb.SubscriptionList_STREAM, true),
-						},
-					},
-				},
-			},
-			inStats:    map[string]int{"test21": 5},
-			numMessage: map[string]int{"a/b": 10, "a/c": 10, "a/d": 10, "a/e": 10},
-			stateful:   true,
-			outResult:  rpb.Status_SUCCESS,
-		},
-	}
-
-	for testIndex, tt := range tests {
-		t.Run(tt.inDesc, func(t *testing.T) {
-			b := &bytes.Buffer{}
-			if err := proto.MarshalText(b, tt.inSuite); err != nil {
-				t.Fatalf("marshalling proto failed: %v", err)
-			}
-			cfg, err := config.New(b.Bytes(), "<client type>")
-			if err != nil {
-				t.Fatalf("config.New failed: %v", err)
-			}
-
-			createSubscription = func(ctx context.Context, _ *gpb.SubscribeRequest, pHandler client.ProtoHandler, _ *tpb.Connection, _ string) error {
-				// send all the updates upon calling createSubscription
-				for k, v := range tt.numMessage {
-					for i := 0; i < v; i++ {
-						pHandler(createNoti("dev1", &gpb.Path{Element: strings.Split(k, "/")}, false))
-					}
-				}
-
-				// wait until either context times out or time set for testing times out
-				<-ctx.Done()
-				return ctx.Err()
-			}
-			var reports []*rpb.InstanceGroup
-			r := New(cfg, func(ir *rpb.InstanceGroup) {
-				reports = append(reports, ir)
-			})
-			processHook = processHookGenerator(tt.inStats, tt.stateful)
-			if err := r.Start(context.Background()); err != nil {
-				t.Fatalf("error occurred during test execution %v", err)
-			}
-			switch {
-			case len(reports) != len(tt.inSuite.InstanceGroupList):
-				t.Fatalf("#%d %s got %d, want %d instance groups", testIndex, tt.inDesc, len(reports), len(tt.inSuite.InstanceGroupList))
-			case len(reports[0].Instance) != len(tt.inSuite.InstanceGroupList[0].Instance):
-				t.Fatalf("#%d %s got %d, want %d instances", testIndex, tt.inDesc, len(reports[0].Instance), len(tt.inSuite.InstanceGroupList[0].Instance))
-			}
-			if reports[0].Instance[0].Test.Result != tt.outResult {
-				t.Fatalf("#%d %s got %v, want %v report status", testIndex, tt.inDesc, reports[0].Instance[0].Test.Result, tt.outResult)
-			}
-		})
-	}
 }
 
 func TestSimpleRunner(t *testing.T) {
@@ -722,6 +225,262 @@ func TestSimpleRunner(t *testing.T) {
 				t.Fatalf("error occurred during test execution, %v", err)
 			}
 
+			if diff := pretty.Compare(got, tt.wantReport); diff != "" {
+				t.Fatalf("did not get expected result, diff(-got,+want):\n%s", diff)
+			}
+		})
+	}
+}
+
+var (
+	tests = map[string]subscribe.Subscribe{
+		"test11": &test1{},
+	}
+)
+
+func TestMain(m *testing.M) {
+	register.NewSubscribeTest(&tpb.SubscribeTest_FakeTest{}, newFake)
+	os.Exit(m.Run())
+}
+
+func newFake(t *tpb.Test) (subscribe.Subscribe, error) {
+	s := t.GetSubscribe().GetFakeTest()
+	test, ok := tests[s]
+	if !ok {
+		return nil, fmt.Errorf("no such test: %q", s)
+	}
+	return test, nil
+}
+
+type test1 struct {
+	subscribe.Test
+}
+
+// Process is placeholder to satisfy subscribe.Subscribe interface.
+func (test1) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
+	if sr.GetUpdate().GetPrefix().GetOrigin() != "stop" {
+		return subscribe.Running, nil
+	}
+	return subscribe.Complete, nil
+}
+
+func TestSubscriptionEndReason(t *testing.T) {
+	tests := []struct {
+		name                   string
+		inSuite                *spb.Suite
+		inSubscriptionTimeSpan time.Duration
+		inEarlyFinish          bool
+		inRPCErrors            bool
+		wantReport             *rpb.Report
+	}{{
+		name:                   "test times out with an outliving subscription",
+		inSubscriptionTimeSpan: time.Second * 5,
+		inSuite: &spb.Suite{
+			Name:       "simple suite",
+			Timeout:    3,
+			Connection: &tpb.Connection{},
+			InstanceGroupList: []*spb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*spb.Instance{{
+					Description: "test",
+					Test: &tpb.Test{
+						Description: "fake test",
+						Type:        &tpb.Test_Subscribe{Subscribe: &tpb.SubscribeTest{Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"}}},
+					},
+				}},
+			}},
+		},
+		wantReport: &rpb.Report{
+			Results: []*rpb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*rpb.Instance{{
+					Description: "test",
+					Test: &rpb.TestResult{
+						Test: &tpb.Test{
+							Description: "fake test",
+							Connection:  &tpb.Connection{},
+							Timeout:     3,
+							Schema:      "openconfig",
+							Type: &tpb.Test_Subscribe{
+								Subscribe: &tpb.SubscribeTest{
+									Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"},
+								},
+							},
+						},
+						Result: rpb.Status_SUCCESS,
+						Type: &rpb.TestResult_Subscribe{
+							Subscribe: &rpb.SubscribeTestResult{
+								Status: rpb.CompletionStatus_TIMEOUT,
+							},
+						},
+					},
+				}},
+			}},
+		},
+	}, {
+		name:                   "test finishs early with an outliving subscription",
+		inSubscriptionTimeSpan: time.Second * 5,
+		inEarlyFinish:          true,
+		inSuite: &spb.Suite{
+			Name:       "simple suite",
+			Connection: &tpb.Connection{},
+			InstanceGroupList: []*spb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*spb.Instance{{
+					Description: "test",
+					Test: &tpb.Test{
+						Description: "fake test",
+						Type:        &tpb.Test_Subscribe{Subscribe: &tpb.SubscribeTest{Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"}}},
+					},
+				}},
+			}},
+		},
+		wantReport: &rpb.Report{
+			Results: []*rpb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*rpb.Instance{{
+					Description: "test",
+					Test: &rpb.TestResult{
+						Test: &tpb.Test{
+							Description: "fake test",
+							Connection:  &tpb.Connection{},
+							Timeout:     60,
+							Schema:      "openconfig",
+							Type: &tpb.Test_Subscribe{
+								Subscribe: &tpb.SubscribeTest{
+									Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"},
+								},
+							},
+						},
+						Result: rpb.Status_SUCCESS,
+						Type: &rpb.TestResult_Subscribe{
+							Subscribe: &rpb.SubscribeTestResult{
+								Status: rpb.CompletionStatus_EARLY_FINISHED,
+							},
+						},
+					},
+				}},
+			}},
+		},
+	}, {
+		name:                   "test finishs with the subscription",
+		inSubscriptionTimeSpan: time.Second * 5,
+		inSuite: &spb.Suite{
+			Name:       "simple suite",
+			Connection: &tpb.Connection{},
+			InstanceGroupList: []*spb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*spb.Instance{{
+					Description: "test",
+					Test: &tpb.Test{
+						Description: "fake test",
+						Type:        &tpb.Test_Subscribe{Subscribe: &tpb.SubscribeTest{Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"}}},
+					},
+				}},
+			}},
+		},
+		wantReport: &rpb.Report{
+			Results: []*rpb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*rpb.Instance{{
+					Description: "test",
+					Test: &rpb.TestResult{
+						Test: &tpb.Test{
+							Description: "fake test",
+							Connection:  &tpb.Connection{},
+							Timeout:     60,
+							Schema:      "openconfig",
+							Type: &tpb.Test_Subscribe{
+								Subscribe: &tpb.SubscribeTest{
+									Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"},
+								},
+							},
+						},
+						Result: rpb.Status_SUCCESS,
+						Type: &rpb.TestResult_Subscribe{
+							Subscribe: &rpb.SubscribeTestResult{
+								Status: rpb.CompletionStatus_FINISHED,
+							},
+						},
+					},
+				}},
+			}},
+		},
+	}, {
+		name:        "test finishes due to rpc error",
+		inRPCErrors: true,
+		inSuite: &spb.Suite{
+			Name:       "simple suite",
+			Connection: &tpb.Connection{},
+			InstanceGroupList: []*spb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*spb.Instance{{
+					Description: "test",
+					Test: &tpb.Test{
+						Description: "fake test",
+						Type:        &tpb.Test_Subscribe{Subscribe: &tpb.SubscribeTest{Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"}}},
+					},
+				}},
+			}},
+		},
+		wantReport: &rpb.Report{
+			Results: []*rpb.InstanceGroup{{
+				Description: "instance group",
+				Instance: []*rpb.Instance{{
+					Description: "test",
+					Test: &rpb.TestResult{
+						Test: &tpb.Test{
+							Description: "fake test",
+							Connection:  &tpb.Connection{},
+							Timeout:     60,
+							Schema:      "openconfig",
+							Type: &tpb.Test_Subscribe{
+								Subscribe: &tpb.SubscribeTest{
+									Args: &tpb.SubscribeTest_FakeTest{FakeTest: "test11"},
+								},
+							},
+						},
+						Result: rpb.Status_UNSET,
+						Type: &rpb.TestResult_Subscribe{
+							Subscribe: &rpb.SubscribeTestResult{
+								Errors: []*rpb.TestError{{Message: "fake rpc error"}},
+								Status: rpb.CompletionStatus_RPC_ERROR,
+							},
+						},
+					},
+				}},
+			}},
+		},
+	}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			createSubscription = func(ctx context.Context, sr *gpb.SubscribeRequest, handler client.ProtoHandler, conn *tpb.Connection, s string) error {
+				if tt.inRPCErrors {
+					return errors.New("fake rpc error")
+				}
+				handler(&gpb.SubscribeResponse{Response: &gpb.SubscribeResponse_Update{Update: &gpb.Notification{Prefix: &gpb.Path{Origin: "go on"}}}})
+
+				if tt.inEarlyFinish {
+					handler(&gpb.SubscribeResponse{Response: &gpb.SubscribeResponse_Update{Update: &gpb.Notification{Prefix: &gpb.Path{Origin: "stop"}}}})
+				}
+				time.Sleep(tt.inSubscriptionTimeSpan)
+				return nil
+			}
+
+			cfg, err := configFromProto(tt.inSuite)
+			if err != nil {
+				t.Fatalf("cannot create config, got: %v, want: nil", err)
+			}
+
+			got := &rpb.Report{}
+			r := New(cfg, func(ig *rpb.InstanceGroup) {
+				got.Results = append(got.Results, ig)
+			})
+
+			if err := r.Start(context.Background()); err != nil {
+				t.Fatalf("error occurred during test execution, %v", err)
+			}
 			if diff := pretty.Compare(got, tt.wantReport); diff != "" {
 				t.Fatalf("did not get expected result, diff(-got,+want):\n%s", diff)
 			}
