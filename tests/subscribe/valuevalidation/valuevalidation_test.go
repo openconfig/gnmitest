@@ -104,7 +104,6 @@ func TestValueValidation(t *testing.T) {
 			_, err = gt.Process(tt.upd)
 			if diff := errdiff.Substring(err, tt.wantErr); diff != "" {
 				t.Fatalf("did not get expected error, %s", diff)
-
 			}
 		})
 	}

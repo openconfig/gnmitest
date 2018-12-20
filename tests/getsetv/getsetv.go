@@ -218,7 +218,7 @@ func doOper(ctx context.Context, conn gpb.GNMIClient, oper *tpb.GetSetValidation
 		}
 
 		if wantRes := oper.GetGetResponse(); err == nil && wantRes != nil {
-			switch tr := testutil.GetResponseEqual(gr, wantRes); tr {
+			switch tr := testutil.GetResponseEqual(gr, wantRes, testutil.IgnoreTimestamp{}); tr {
 			case false:
 				r.Result = rpb.Status_FAIL
 				r.GetResponseMatched = rpb.MatchResult_MR_UNEQUAL

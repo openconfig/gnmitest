@@ -36,3 +36,6 @@ set completeness) will be implemented within this directory.
 The `getsetv` directory contains tests that relate to the Get and Set RPCs.
 Particularly, these tests allow the retrieval and manipulation of configuration
 on a device.
+
+You can also learn about [executing gnmitest `Suite`](https://github.com/openconfig/gnmitest/tree/master/docs/running_gnmitest.md)
+and [extending gnmitest `Subscribe` tests](https://github.com/openconfig/gnmitest/tree/master/docs/extending_gnmitest_subscribe_tests.md).

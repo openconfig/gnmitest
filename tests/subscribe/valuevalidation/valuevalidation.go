@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/schemas"
 	"github.com/openconfig/gnmitest/subscribe"
@@ -76,4 +77,16 @@ func newTest(st *tpb.Test) (subscribe.Subscribe, error) {
 // message is received, it returns Complete status.
 func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
 	return subscribe.OneShotSetNode(t.schema, t.dataTree, sr, &ytypes.InitMissingElements{})
+}
+
+// Check function is called when Process function returns Complete,
+// test times out or subscription fails.
+func (t *test) Check() error {
+	errs := &testerror.List{}
+	uErrs := ytypes.Validate(t.schema, t.dataTree)
+	for _, e := range uErrs {
+		errs.AddErr(e)
+	}
+
+	return errs
 }

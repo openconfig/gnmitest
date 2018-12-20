@@ -21,11 +21,13 @@ package subscribe
 import (
 	"fmt"
 
+	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/ygot"
 	"github.com/openconfig/ygot/ytypes"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
+	rpb "github.com/openconfig/gnmitest/proto/report"
 )
 
 // Status is a type that is used by test to notify test framework.
@@ -126,11 +128,13 @@ func OneShotGetOrCreate(schema *yang.Entry, root ygot.GoStruct, sr *gpb.Subscrib
 func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeResponse, opts ...ytypes.SetNodeOpt) (Status, error) {
 	switch v := sr.Response.(type) {
 	case *gpb.SubscribeResponse_Update:
+		errs := &testerror.List{}
+
 		pe := v.Update.GetPrefix().GetElem()
 		for _, u := range v.Update.Update {
 			if u != nil && u.Path != nil {
 				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, u.Path.GetElem()...)}, u.GetVal(), opts...); err != nil {
-					return Running, err
+					errs.AddTestErr(&rpb.TestError{Message: err.Error(), Path: joinPath(v.Update.GetPrefix(), u.GetPath())})
 				}
 			}
 		}
@@ -140,11 +144,14 @@ func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeRes
 				// TODO(yusufsn): Support removing the value from GoStruct. Setting
 				// value to nil will not modify anything.
 				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, d.GetElem()...)}, nil, opts...); err != nil {
-					return Running, err
+					errs.AddTestErr(&rpb.TestError{Message: err.Error(), Path: joinPath(v.Update.GetPrefix(), d)})
 				}
 			}
 		}
 
+		if len(errs.Errors()) > 0 {
+			return Running, errs
+		}
 		return Running, nil
 	case *gpb.SubscribeResponse_SyncResponse:
 		//Once the subscription has received all paths at least once - i.e., sync_response is

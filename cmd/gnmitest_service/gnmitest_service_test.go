@@ -284,6 +284,15 @@ func TestIntegrationWithFakeGNMIAgent(t *testing.T) {
 		},
 		wantReportFile: filepath.Join("testdata", "fakeagent-fail-valuevalidation-report.txtpb"),
 	}, {
+		name:        "failing value validation validate test",
+		inSuiteFile: filepath.Join("testdata", "fakeagent-fail-valuevalidation-validate-suite.txtpb"),
+		inSubscribeResponses: []*gpb.SubscribeResponse{
+			noti(target, "openconfig",
+				asElem([][]string{{"components"}}),
+				asElem([][]string{{"component", "name", "FOO"}, {"subcomponents"}, {"subcomponent", "name", "BAR"}, {"config"}, {"name"}}), "forty two"),
+		},
+		wantReportFile: filepath.Join("testdata", "fakeagent-fail-valuevalidation-validate-report.txtpb"),
+	}, {
 		name:        "failing gnmi path compliance test",
 		inSuiteFile: filepath.Join("testdata", "fakeagent-fail-gnmipathcompliance-suite.txtpb"),
 		inSubscribeResponses: []*gpb.SubscribeResponse{

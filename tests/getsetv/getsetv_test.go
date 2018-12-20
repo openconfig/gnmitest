@@ -259,6 +259,55 @@ func TestGetSetValidateInternal(t *testing.T) {
 			},
 		},
 	}, {
+		name: "matching interfaces, with mismatched timestamp",
+		inTestInst: &tpb.GetSetValidationTest{
+			TestOper: &tpb.GetSetValidationOper{
+				Getrequest: &tpb.GetSetValidationOper_Get{
+					&gpb.GetRequest{
+						Path: []*gpb.Path{
+							mustPath("/interfaces"),
+						},
+					},
+				},
+				Getresponse: &tpb.GetSetValidationOper_GetResponse{
+					&gpb.GetResponse{
+						Notification: []*gpb.Notification{{
+							Timestamp: 84,
+							Update: []*gpb.Update{{
+								Path: mustPath("/interfaces"),
+							}},
+						}},
+					},
+				},
+			},
+		},
+		inSpec: &Specification{
+			Connection: commonConnectionArgs,
+			Result:     &rpb.Instance{},
+		},
+		wantResult: &rpb.Instance{
+			Test: &rpb.TestResult{
+				Result: rpb.Status_SUCCESS,
+				Type: &rpb.TestResult_Getset{
+					&rpb.GetSetTestResult{
+						Result: rpb.Status_SUCCESS,
+						TestOper: &rpb.GetSetOperResult{
+							Result: rpb.Status_SUCCESS,
+							GetResponse: &gpb.GetResponse{
+								Notification: []*gpb.Notification{{
+									Timestamp: 42,
+									Update: []*gpb.Update{{
+										Path: mustPath("/interfaces"),
+									}},
+								}},
+							},
+							GetResponseMatched: rpb.MatchResult_MR_EQUAL,
+						},
+					},
+				},
+			},
+		},
+	}, {
 		name: "non-matching interfaces",
 		inTestInst: &tpb.GetSetValidationTest{
 			TestOper: &tpb.GetSetValidationOper{
