@@ -125,6 +125,47 @@ func (m *SubscribeTest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SubscribeTest proto.InternalMessageInfo
 
+type isSubscribeTest_Args interface {
+	isSubscribeTest_Args()
+}
+
+type SubscribeTest_FakeTest struct {
+	FakeTest string `protobuf:"bytes,10,opt,name=fake_test,json=fakeTest,proto3,oneof"`
+}
+type SubscribeTest_PathValidation struct {
+	PathValidation *Default `protobuf:"bytes,11,opt,name=path_validation,json=pathValidation,proto3,oneof"`
+}
+type SubscribeTest_HasKeys struct {
+	HasKeys *HasKeys `protobuf:"bytes,12,opt,name=has_keys,json=hasKeys,proto3,oneof"`
+}
+type SubscribeTest_SchemapathComplete struct {
+	SchemapathComplete *SchemaPathComplete `protobuf:"bytes,13,opt,name=schemapath_complete,json=schemapathComplete,proto3,oneof"`
+}
+type SubscribeTest_DataTreePaths struct {
+	DataTreePaths *DataTreePaths `protobuf:"bytes,14,opt,name=data_tree_paths,json=dataTreePaths,proto3,oneof"`
+}
+type SubscribeTest_ValueValidation struct {
+	ValueValidation *Default `protobuf:"bytes,15,opt,name=value_validation,json=valueValidation,proto3,oneof"`
+}
+type SubscribeTest_GnmipathCompliance struct {
+	GnmipathCompliance *GNMIPathCompliance `protobuf:"bytes,16,opt,name=gnmipath_compliance,json=gnmipathCompliance,proto3,oneof"`
+}
+
+func (*SubscribeTest_FakeTest) isSubscribeTest_Args()           {}
+func (*SubscribeTest_PathValidation) isSubscribeTest_Args()     {}
+func (*SubscribeTest_HasKeys) isSubscribeTest_Args()            {}
+func (*SubscribeTest_SchemapathComplete) isSubscribeTest_Args() {}
+func (*SubscribeTest_DataTreePaths) isSubscribeTest_Args()      {}
+func (*SubscribeTest_ValueValidation) isSubscribeTest_Args()    {}
+func (*SubscribeTest_GnmipathCompliance) isSubscribeTest_Args() {}
+
+func (m *SubscribeTest) GetArgs() isSubscribeTest_Args {
+	if m != nil {
+		return m.Args
+	}
+	return nil
+}
+
 func (m *SubscribeTest) GetRequest() *gnmi.SubscribeRequest {
 	if m != nil {
 		return m.Request
@@ -137,59 +178,6 @@ func (m *SubscribeTest) GetLogResponses() bool {
 		return m.LogResponses
 	}
 	return false
-}
-
-type isSubscribeTest_Args interface {
-	isSubscribeTest_Args()
-}
-
-type SubscribeTest_FakeTest struct {
-	FakeTest string `protobuf:"bytes,10,opt,name=fake_test,json=fakeTest,proto3,oneof"`
-}
-
-type SubscribeTest_PathValidation struct {
-	PathValidation *Default `protobuf:"bytes,11,opt,name=path_validation,json=pathValidation,proto3,oneof"`
-}
-
-type SubscribeTest_HasKeys struct {
-	HasKeys *HasKeys `protobuf:"bytes,12,opt,name=has_keys,json=hasKeys,proto3,oneof"`
-}
-
-type SubscribeTest_SchemapathComplete struct {
-	SchemapathComplete *SchemaPathComplete `protobuf:"bytes,13,opt,name=schemapath_complete,json=schemapathComplete,proto3,oneof"`
-}
-
-type SubscribeTest_DataTreePaths struct {
-	DataTreePaths *DataTreePaths `protobuf:"bytes,14,opt,name=data_tree_paths,json=dataTreePaths,proto3,oneof"`
-}
-
-type SubscribeTest_ValueValidation struct {
-	ValueValidation *Default `protobuf:"bytes,15,opt,name=value_validation,json=valueValidation,proto3,oneof"`
-}
-
-type SubscribeTest_GnmipathCompliance struct {
-	GnmipathCompliance *GNMIPathCompliance `protobuf:"bytes,16,opt,name=gnmipath_compliance,json=gnmipathCompliance,proto3,oneof"`
-}
-
-func (*SubscribeTest_FakeTest) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_PathValidation) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_HasKeys) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_SchemapathComplete) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_DataTreePaths) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_ValueValidation) isSubscribeTest_Args() {}
-
-func (*SubscribeTest_GnmipathCompliance) isSubscribeTest_Args() {}
-
-func (m *SubscribeTest) GetArgs() isSubscribeTest_Args {
-	if m != nil {
-		return m.Args
-	}
-	return nil
 }
 
 func (m *SubscribeTest) GetFakeTest() string {
@@ -458,6 +446,31 @@ func (m *Test) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Test proto.InternalMessageInfo
 
+type isTest_Type interface {
+	isTest_Type()
+}
+
+type Test_Subscribe struct {
+	Subscribe *SubscribeTest `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
+}
+type Test_GetSet struct {
+	GetSet *GetSetTest `protobuf:"bytes,11,opt,name=get_set,json=getSet,proto3,oneof"`
+}
+type Test_FakeTest struct {
+	FakeTest *FakeTest `protobuf:"bytes,12,opt,name=fake_test,json=fakeTest,proto3,oneof"`
+}
+
+func (*Test_Subscribe) isTest_Type() {}
+func (*Test_GetSet) isTest_Type()    {}
+func (*Test_FakeTest) isTest_Type()  {}
+
+func (m *Test) GetType() isTest_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
 func (m *Test) GetDescription() string {
 	if m != nil {
 		return m.Description
@@ -482,35 +495,6 @@ func (m *Test) GetSchema() string {
 func (m *Test) GetConnection() *Connection {
 	if m != nil {
 		return m.Connection
-	}
-	return nil
-}
-
-type isTest_Type interface {
-	isTest_Type()
-}
-
-type Test_Subscribe struct {
-	Subscribe *SubscribeTest `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
-}
-
-type Test_GetSet struct {
-	GetSet *GetSetTest `protobuf:"bytes,11,opt,name=get_set,json=getSet,proto3,oneof"`
-}
-
-type Test_FakeTest struct {
-	FakeTest *FakeTest `protobuf:"bytes,12,opt,name=fake_test,json=fakeTest,proto3,oneof"`
-}
-
-func (*Test_Subscribe) isTest_Type() {}
-
-func (*Test_GetSet) isTest_Type() {}
-
-func (*Test_FakeTest) isTest_Type() {}
-
-func (m *Test) GetType() isTest_Type {
-	if m != nil {
-		return m.Type
 	}
 	return nil
 }
@@ -1332,13 +1316,6 @@ func (m *DataTreePaths_TestQuery) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DataTreePaths_TestQuery proto.InternalMessageInfo
 
-func (m *DataTreePaths_TestQuery) GetSteps() []*DataTreePaths_QueryStep {
-	if m != nil {
-		return m.Steps
-	}
-	return nil
-}
-
 type isDataTreePaths_TestQuery_Type interface {
 	isDataTreePaths_TestQuery_Type()
 }
@@ -1346,24 +1323,27 @@ type isDataTreePaths_TestQuery_Type interface {
 type DataTreePaths_TestQuery_GetListKeys struct {
 	GetListKeys *DataTreePaths_ListQuery `protobuf:"bytes,2,opt,name=get_list_keys,json=getListKeys,proto3,oneof"`
 }
-
 type DataTreePaths_TestQuery_RequiredPaths struct {
 	RequiredPaths *DataTreePaths_RequiredPaths `protobuf:"bytes,3,opt,name=required_paths,json=requiredPaths,proto3,oneof"`
 }
-
 type DataTreePaths_TestQuery_RequiredValues struct {
 	RequiredValues *DataTreePaths_RequiredValues `protobuf:"bytes,4,opt,name=required_values,json=requiredValues,proto3,oneof"`
 }
 
-func (*DataTreePaths_TestQuery_GetListKeys) isDataTreePaths_TestQuery_Type() {}
-
-func (*DataTreePaths_TestQuery_RequiredPaths) isDataTreePaths_TestQuery_Type() {}
-
+func (*DataTreePaths_TestQuery_GetListKeys) isDataTreePaths_TestQuery_Type()    {}
+func (*DataTreePaths_TestQuery_RequiredPaths) isDataTreePaths_TestQuery_Type()  {}
 func (*DataTreePaths_TestQuery_RequiredValues) isDataTreePaths_TestQuery_Type() {}
 
 func (m *DataTreePaths_TestQuery) GetType() isDataTreePaths_TestQuery_Type {
 	if m != nil {
 		return m.Type
+	}
+	return nil
+}
+
+func (m *DataTreePaths_TestQuery) GetSteps() []*DataTreePaths_QueryStep {
+	if m != nil {
+		return m.Steps
 	}
 	return nil
 }
@@ -1772,13 +1752,6 @@ func (m *PathValueMatch) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PathValueMatch proto.InternalMessageInfo
 
-func (m *PathValueMatch) GetPath() *gnmi.Path {
-	if m != nil {
-		return m.Path
-	}
-	return nil
-}
-
 type isPathValueMatch_Criteria interface {
 	isPathValueMatch_Criteria()
 }
@@ -1792,6 +1765,13 @@ func (*PathValueMatch_Equal) isPathValueMatch_Criteria() {}
 func (m *PathValueMatch) GetCriteria() isPathValueMatch_Criteria {
 	if m != nil {
 		return m.Criteria
+	}
+	return nil
+}
+
+func (m *PathValueMatch) GetPath() *gnmi.Path {
+	if m != nil {
+		return m.Path
 	}
 	return nil
 }
@@ -2165,22 +2145,54 @@ var xxx_messageInfo_GetSetValidationOper proto.InternalMessageInfo
 type isGetSetValidationOper_Setrequest interface {
 	isGetSetValidationOper_Setrequest()
 }
+type isGetSetValidationOper_Getrequest interface {
+	isGetSetValidationOper_Getrequest()
+}
+type isGetSetValidationOper_Getresponse interface {
+	isGetSetValidationOper_Getresponse()
+}
 
 type GetSetValidationOper_Set struct {
 	Set *gnmi.SetRequest `protobuf:"bytes,1,opt,name=set,proto3,oneof"`
 }
-
 type GetSetValidationOper_CommonSetrequest struct {
 	CommonSetrequest string `protobuf:"bytes,2,opt,name=common_setrequest,json=commonSetrequest,proto3,oneof"`
 }
+type GetSetValidationOper_Get struct {
+	Get *gnmi.GetRequest `protobuf:"bytes,11,opt,name=get,proto3,oneof"`
+}
+type GetSetValidationOper_CommonGetrequest struct {
+	CommonGetrequest string `protobuf:"bytes,12,opt,name=common_getrequest,json=commonGetrequest,proto3,oneof"`
+}
+type GetSetValidationOper_GetResponse struct {
+	GetResponse *gnmi.GetResponse `protobuf:"bytes,21,opt,name=get_response,json=getResponse,proto3,oneof"`
+}
+type GetSetValidationOper_CommonGetresponse struct {
+	CommonGetresponse string `protobuf:"bytes,22,opt,name=common_getresponse,json=commonGetresponse,proto3,oneof"`
+}
 
-func (*GetSetValidationOper_Set) isGetSetValidationOper_Setrequest() {}
-
-func (*GetSetValidationOper_CommonSetrequest) isGetSetValidationOper_Setrequest() {}
+func (*GetSetValidationOper_Set) isGetSetValidationOper_Setrequest()                {}
+func (*GetSetValidationOper_CommonSetrequest) isGetSetValidationOper_Setrequest()   {}
+func (*GetSetValidationOper_Get) isGetSetValidationOper_Getrequest()                {}
+func (*GetSetValidationOper_CommonGetrequest) isGetSetValidationOper_Getrequest()   {}
+func (*GetSetValidationOper_GetResponse) isGetSetValidationOper_Getresponse()       {}
+func (*GetSetValidationOper_CommonGetresponse) isGetSetValidationOper_Getresponse() {}
 
 func (m *GetSetValidationOper) GetSetrequest() isGetSetValidationOper_Setrequest {
 	if m != nil {
 		return m.Setrequest
+	}
+	return nil
+}
+func (m *GetSetValidationOper) GetGetrequest() isGetSetValidationOper_Getrequest {
+	if m != nil {
+		return m.Getrequest
+	}
+	return nil
+}
+func (m *GetSetValidationOper) GetGetresponse() isGetSetValidationOper_Getresponse {
+	if m != nil {
+		return m.Getresponse
 	}
 	return nil
 }
@@ -2206,29 +2218,6 @@ func (m *GetSetValidationOper) GetSetOk() GetSetValidationOper_OperResult {
 	return GetSetValidationOper_NO_ERROR
 }
 
-type isGetSetValidationOper_Getrequest interface {
-	isGetSetValidationOper_Getrequest()
-}
-
-type GetSetValidationOper_Get struct {
-	Get *gnmi.GetRequest `protobuf:"bytes,11,opt,name=get,proto3,oneof"`
-}
-
-type GetSetValidationOper_CommonGetrequest struct {
-	CommonGetrequest string `protobuf:"bytes,12,opt,name=common_getrequest,json=commonGetrequest,proto3,oneof"`
-}
-
-func (*GetSetValidationOper_Get) isGetSetValidationOper_Getrequest() {}
-
-func (*GetSetValidationOper_CommonGetrequest) isGetSetValidationOper_Getrequest() {}
-
-func (m *GetSetValidationOper) GetGetrequest() isGetSetValidationOper_Getrequest {
-	if m != nil {
-		return m.Getrequest
-	}
-	return nil
-}
-
 func (m *GetSetValidationOper) GetGet() *gnmi.GetRequest {
 	if x, ok := m.GetGetrequest().(*GetSetValidationOper_Get); ok {
 		return x.Get
@@ -2248,29 +2237,6 @@ func (m *GetSetValidationOper) GetGetOk() GetSetValidationOper_OperResult {
 		return m.GetOk
 	}
 	return GetSetValidationOper_NO_ERROR
-}
-
-type isGetSetValidationOper_Getresponse interface {
-	isGetSetValidationOper_Getresponse()
-}
-
-type GetSetValidationOper_GetResponse struct {
-	GetResponse *gnmi.GetResponse `protobuf:"bytes,21,opt,name=get_response,json=getResponse,proto3,oneof"`
-}
-
-type GetSetValidationOper_CommonGetresponse struct {
-	CommonGetresponse string `protobuf:"bytes,22,opt,name=common_getresponse,json=commonGetresponse,proto3,oneof"`
-}
-
-func (*GetSetValidationOper_GetResponse) isGetSetValidationOper_Getresponse() {}
-
-func (*GetSetValidationOper_CommonGetresponse) isGetSetValidationOper_Getresponse() {}
-
-func (m *GetSetValidationOper) GetGetresponse() isGetSetValidationOper_Getresponse {
-	if m != nil {
-		return m.Getresponse
-	}
-	return nil
 }
 
 func (m *GetSetValidationOper) GetGetResponse() *gnmi.GetResponse {

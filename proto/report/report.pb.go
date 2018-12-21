@@ -58,7 +58,7 @@ func (x CompletionStatus) String() string {
 	return proto.EnumName(CompletionStatus_name, int32(x))
 }
 func (CompletionStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{0}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{0}
 }
 
 // Result of running an individual test.
@@ -88,7 +88,7 @@ func (x Status) String() string {
 	return proto.EnumName(Status_name, int32(x))
 }
 func (Status) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{1}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{1}
 }
 
 // MatchResult enumerates the outcome of a match comparison.
@@ -115,7 +115,7 @@ func (x MatchResult) String() string {
 	return proto.EnumName(MatchResult_name, int32(x))
 }
 func (MatchResult) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{2}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{2}
 }
 
 // SubscribeResponseResult proto is used to pair a gnmi SubscribeResponse and
@@ -134,7 +134,7 @@ func (m *SubscribeResponseResult) Reset()         { *m = SubscribeResponseResult
 func (m *SubscribeResponseResult) String() string { return proto.CompactTextString(m) }
 func (*SubscribeResponseResult) ProtoMessage()    {}
 func (*SubscribeResponseResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{0}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{0}
 }
 func (m *SubscribeResponseResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscribeResponseResult.Unmarshal(m, b)
@@ -187,7 +187,7 @@ func (m *TestError) Reset()         { *m = TestError{} }
 func (m *TestError) String() string { return proto.CompactTextString(m) }
 func (*TestError) ProtoMessage()    {}
 func (*TestError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{1}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{1}
 }
 func (m *TestError) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TestError.Unmarshal(m, b)
@@ -249,7 +249,7 @@ func (m *SubscribeTestResult) Reset()         { *m = SubscribeTestResult{} }
 func (m *SubscribeTestResult) String() string { return proto.CompactTextString(m) }
 func (*SubscribeTestResult) ProtoMessage()    {}
 func (*SubscribeTestResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{2}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{2}
 }
 func (m *SubscribeTestResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscribeTestResult.Unmarshal(m, b)
@@ -316,7 +316,7 @@ func (m *GetSetTestResult) Reset()         { *m = GetSetTestResult{} }
 func (m *GetSetTestResult) String() string { return proto.CompactTextString(m) }
 func (*GetSetTestResult) ProtoMessage()    {}
 func (*GetSetTestResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{3}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{3}
 }
 func (m *GetSetTestResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetTestResult.Unmarshal(m, b)
@@ -391,7 +391,7 @@ func (m *GetSetOperResult) Reset()         { *m = GetSetOperResult{} }
 func (m *GetSetOperResult) String() string { return proto.CompactTextString(m) }
 func (*GetSetOperResult) ProtoMessage()    {}
 func (*GetSetOperResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{4}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{4}
 }
 func (m *GetSetOperResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSetOperResult.Unmarshal(m, b)
@@ -473,7 +473,7 @@ func (m *TestResult) Reset()         { *m = TestResult{} }
 func (m *TestResult) String() string { return proto.CompactTextString(m) }
 func (*TestResult) ProtoMessage()    {}
 func (*TestResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{5}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{5}
 }
 func (m *TestResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TestResult.Unmarshal(m, b)
@@ -493,6 +493,27 @@ func (m *TestResult) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_TestResult proto.InternalMessageInfo
 
+type isTestResult_Type interface {
+	isTestResult_Type()
+}
+
+type TestResult_Subscribe struct {
+	Subscribe *SubscribeTestResult `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
+}
+type TestResult_Getset struct {
+	Getset *GetSetTestResult `protobuf:"bytes,11,opt,name=getset,proto3,oneof"`
+}
+
+func (*TestResult_Subscribe) isTestResult_Type() {}
+func (*TestResult_Getset) isTestResult_Type()    {}
+
+func (m *TestResult) GetType() isTestResult_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
 func (m *TestResult) GetTest() *tests.Test {
 	if m != nil {
 		return m.Test
@@ -505,29 +526,6 @@ func (m *TestResult) GetResult() Status {
 		return m.Result
 	}
 	return Status_UNSET
-}
-
-type isTestResult_Type interface {
-	isTestResult_Type()
-}
-
-type TestResult_Subscribe struct {
-	Subscribe *SubscribeTestResult `protobuf:"bytes,10,opt,name=subscribe,proto3,oneof"`
-}
-
-type TestResult_Getset struct {
-	Getset *GetSetTestResult `protobuf:"bytes,11,opt,name=getset,proto3,oneof"`
-}
-
-func (*TestResult_Subscribe) isTestResult_Type() {}
-
-func (*TestResult_Getset) isTestResult_Type() {}
-
-func (m *TestResult) GetType() isTestResult_Type {
-	if m != nil {
-		return m.Type
-	}
-	return nil
 }
 
 func (m *TestResult) GetSubscribe() *SubscribeTestResult {
@@ -632,7 +630,7 @@ func (m *Instance) Reset()         { *m = Instance{} }
 func (m *Instance) String() string { return proto.CompactTextString(m) }
 func (*Instance) ProtoMessage()    {}
 func (*Instance) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{6}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{6}
 }
 func (m *Instance) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Instance.Unmarshal(m, b)
@@ -689,7 +687,7 @@ func (m *InstanceGroup) Reset()         { *m = InstanceGroup{} }
 func (m *InstanceGroup) String() string { return proto.CompactTextString(m) }
 func (*InstanceGroup) ProtoMessage()    {}
 func (*InstanceGroup) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{7}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{7}
 }
 func (m *InstanceGroup) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InstanceGroup.Unmarshal(m, b)
@@ -742,7 +740,7 @@ func (m *Report) Reset()         { *m = Report{} }
 func (m *Report) String() string { return proto.CompactTextString(m) }
 func (*Report) ProtoMessage()    {}
 func (*Report) Descriptor() ([]byte, []int) {
-	return fileDescriptor_report_a16157961d14bbb8, []int{8}
+	return fileDescriptor_report_49cbbbadf9dd36ae, []int{8}
 }
 func (m *Report) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Report.Unmarshal(m, b)
@@ -784,9 +782,9 @@ func init() {
 	proto.RegisterEnum("report.MatchResult", MatchResult_name, MatchResult_value)
 }
 
-func init() { proto.RegisterFile("proto/report/report.proto", fileDescriptor_report_a16157961d14bbb8) }
+func init() { proto.RegisterFile("proto/report/report.proto", fileDescriptor_report_49cbbbadf9dd36ae) }
 
-var fileDescriptor_report_a16157961d14bbb8 = []byte{
+var fileDescriptor_report_49cbbbadf9dd36ae = []byte{
 	// 836 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0x5f, 0x8f, 0xdb, 0x44,
 	0x10, 0x3f, 0xfb, 0x7c, 0xbe, 0x78, 0xdc, 0x06, 0x77, 0x7b, 0xe8, 0xdc, 0x22, 0xd1, 0x93, 0x1f,
