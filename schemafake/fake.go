@@ -28,7 +28,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/openconfig/gnmi/unimplemented"
 	"github.com/openconfig/gnmitest/common"
 	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/util"
@@ -51,8 +50,8 @@ var (
 
 // Target defines the gNMI fake target.
 type Target struct {
-	unimplemented.Server                    // Implement the gNMI server interface.
-	schema               map[string]*origin // schema is a map, keyed by origin name, of the schemas supported by the fake.
+	gpb.UnimplementedGNMIServer                    // Implement the gNMI server interface.
+	schema                      map[string]*origin // schema is a map, keyed by origin name, of the schemas supported by the fake.
 }
 
 // origin stores the internal state for a gNMI target's origins, supporting mixed schema

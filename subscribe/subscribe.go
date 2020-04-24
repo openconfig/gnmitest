@@ -123,9 +123,26 @@ func OneShotGetOrCreate(schema *yang.Entry, root ygot.GoStruct, sr *gpb.Subscrib
 	return Running, fmt.Errorf("unexpected message: %T", sr.Response)
 }
 
+// OneShotSetNodeArgs describes the options to be supplied to the OneShotSetNode
+// function.
+type OneShotSetNodeArgs struct {
+	// YtypesArgs is the set of Args that are handed to the ytypes.SetNode function
+	// directly.
+	YtypesArgs []ytypes.SetNodeOpt
+	// IgnoreInvalidPaths determines whether errors should be returned when
+	// a particular value cannot be deserialised. This option is intended to be used
+	// when a subscription returns invalid paths which are not of interest to the
+	// test being run. It should be used with caution since it will result in masking
+	// of error cases, with no warnings or errors returned.
+	IgnoreInvalidPaths bool
+}
+
 // OneShotSetNode unmarshals the values in gpb.SubscribeResponse into the given
-// GoStruct with the provided schema.
-func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeResponse, opts ...ytypes.SetNodeOpt) (Status, error) {
+// GoStruct with the provided schema. The sr SubscribeResponse is deserialised into
+// the supplied root, using the supplied schema. The args struct controls the behaviour
+// used for deserialisation.
+func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeResponse, args OneShotSetNodeArgs) (Status, error) {
+
 	switch v := sr.Response.(type) {
 	case *gpb.SubscribeResponse_Update:
 		errs := &testerror.List{}
@@ -133,7 +150,7 @@ func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeRes
 		pe := v.Update.GetPrefix().GetElem()
 		for _, u := range v.Update.Update {
 			if u != nil && u.Path != nil {
-				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, u.Path.GetElem()...)}, u.GetVal(), opts...); err != nil {
+				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, u.Path.GetElem()...)}, u.GetVal(), args.YtypesArgs...); err != nil && !args.IgnoreInvalidPaths {
 					errs.AddTestErr(&rpb.TestError{Message: err.Error(), Path: joinPath(v.Update.GetPrefix(), u.GetPath())})
 				}
 			}
@@ -143,7 +160,7 @@ func OneShotSetNode(schema *yang.Entry, root ygot.GoStruct, sr *gpb.SubscribeRes
 			if d != nil {
 				// TODO(yusufsn): Support removing the value from GoStruct. Setting
 				// value to nil will not modify anything.
-				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, d.GetElem()...)}, nil, opts...); err != nil {
+				if err := ytypes.SetNode(schema, root, &gpb.Path{Elem: append(pe, d.GetElem()...)}, nil, args.YtypesArgs...); err != nil && !args.IgnoreInvalidPaths {
 					errs.AddTestErr(&rpb.TestError{Message: err.Error(), Path: joinPath(v.Update.GetPrefix(), d)})
 				}
 			}

@@ -76,7 +76,11 @@ func newTest(st *tpb.Test) (subscribe.Subscribe, error) {
 // deserialises each subscription response into the dataTree. When the sync_response
 // message is received, it returns Complete status.
 func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	return subscribe.OneShotSetNode(t.schema, t.dataTree, sr, &ytypes.InitMissingElements{})
+	return subscribe.OneShotSetNode(t.schema, t.dataTree, sr, subscribe.OneShotSetNodeArgs{
+		YtypesArgs: []ytypes.SetNodeOpt{
+			&ytypes.InitMissingElements{},
+		},
+	})
 }
 
 // Check function is called when Process function returns Complete,

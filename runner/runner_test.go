@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/kylelemons/godebug/pretty"
+	"github.com/google/go-cmp/cmp"
 	"github.com/openconfig/gnmi/client"
 	"github.com/openconfig/gnmitest/config"
 	"github.com/openconfig/gnmitest/register"
@@ -225,7 +225,7 @@ func TestSimpleRunner(t *testing.T) {
 				t.Fatalf("error occurred during test execution, %v", err)
 			}
 
-			if diff := pretty.Compare(got, tt.wantReport); diff != "" {
+			if diff := cmp.Diff(got, tt.wantReport, cmp.Comparer(proto.Equal)); diff != "" {
 				t.Fatalf("did not get expected result, diff(-got,+want):\n%s", diff)
 			}
 		})
@@ -481,7 +481,7 @@ func TestSubscriptionEndReason(t *testing.T) {
 			if err := r.Start(context.Background()); err != nil {
 				t.Fatalf("error occurred during test execution, %v", err)
 			}
-			if diff := pretty.Compare(got, tt.wantReport); diff != "" {
+			if diff := cmp.Diff(got, tt.wantReport, cmp.Comparer(proto.Equal)); diff != "" {
 				t.Fatalf("did not get expected result, diff(-got,+want):\n%s", diff)
 			}
 		})

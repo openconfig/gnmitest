@@ -37,13 +37,16 @@ var (
 	// Dialer to use while calling into gnmitest service. It can be overridden
 	// by an external package to use a custom dialer.
 	Dialer = grpc.Dial
+	// Opts is a list of grpc.DialOption passed the the Dialer.  It can be
+	// overridden by an external package to use custom options.
+	Opts = []grpc.DialOption{grpc.WithInsecure()}
 )
 
 // runSuite dials into given address(a) and calls Run RPC of gnmitest service
 // with the given suite proto(s). It returns a test report if running suite is
 // successful. Otherwise an error is returned.
 func runSuite(ctx context.Context, a string, s *spb.Suite) (*rpb.Report, error) {
-	conn, err := Dialer(a, grpc.WithInsecure())
+	conn, err := Dialer(a, Opts...)
 	if err != nil {
 		return nil, fmt.Errorf("dial func failed for %q; %v", a, err)
 	}

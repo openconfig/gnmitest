@@ -22,7 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kylelemons/godebug/pretty"
+	"github.com/golang/protobuf/proto"
+	"github.com/google/go-cmp/cmp"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmitest/schemafake"
 	"github.com/openconfig/gnmitest/schemas/openconfig"
@@ -172,7 +173,7 @@ func TestResolveOper(t *testing.T) {
 				t.Fatalf("did not get expected error, %s", diff)
 			}
 
-			if diff := pretty.Compare(got, tt.want); diff != "" {
+			if diff := cmp.Diff(got, tt.want, cmp.Comparer(proto.Equal)); diff != "" {
 				t.Fatalf("did not get expected operation, diff(-got,+want):\n%s", diff)
 			}
 		})
@@ -369,7 +370,7 @@ func TestGetSetValidateInternal(t *testing.T) {
 				}
 			}
 
-			if diff := pretty.Compare(tt.inSpec.Result, tt.wantResult); diff != "" {
+			if diff := cmp.Diff(tt.inSpec.Result, tt.wantResult, cmp.Comparer(proto.Equal)); diff != "" {
 				t.Fatalf("did not get expected result, diff(-got,+want):\n%s", diff)
 			}
 		})
