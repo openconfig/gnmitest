@@ -20,10 +20,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='proto/tests/tests.proto',
   package='tests',
   syntax='proto3',
-  serialized_pb=_b('\n\x17proto/tests/tests.proto\x12\x05tests\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\"\t\n\x07\x44\x65\x66\x61ult\"\x8c\x03\n\rSubscribeTest\x12\'\n\x07request\x18\x01 \x01(\x0b\x32\x16.gnmi.SubscribeRequest\x12\x15\n\rlog_responses\x18\x02 \x01(\x08\x12\x13\n\tfake_test\x18\n \x01(\tH\x00\x12)\n\x0fpath_validation\x18\x0b \x01(\x0b\x32\x0e.tests.DefaultH\x00\x12\"\n\x08has_keys\x18\x0c \x01(\x0b\x32\x0e.tests.HasKeysH\x00\x12\x38\n\x13schemapath_complete\x18\r \x01(\x0b\x32\x19.tests.SchemaPathCompleteH\x00\x12/\n\x0f\x64\x61ta_tree_paths\x18\x0e \x01(\x0b\x32\x14.tests.DataTreePathsH\x00\x12*\n\x10value_validation\x18\x0f \x01(\x0b\x32\x0e.tests.DefaultH\x00\x12\x38\n\x13gnmipath_compliance\x18\x10 \x01(\x0b\x32\x19.tests.GNMIPathComplianceH\x00\x42\x06\n\x04\x61rgs\"\xe2\x01\n\x04Test\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\x0f\n\x07timeout\x18\x02 \x01(\x05\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12%\n\nconnection\x18\x04 \x01(\x0b\x32\x11.tests.Connection\x12)\n\tsubscribe\x18\n \x01(\x0b\x32\x14.tests.SubscribeTestH\x00\x12$\n\x07get_set\x18\x0b \x01(\x0b\x32\x11.tests.GetSetTestH\x00\x12$\n\tfake_test\x18\x0c \x01(\x0b\x32\x0f.tests.FakeTestH\x00\x42\x06\n\x04type\"C\n\x0b\x43redentials\x12\x10\n\x08resolver\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"g\n\nConnection\x12\x0e\n\x06target\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\'\n\x0b\x63redentials\x18\x03 \x01(\x0b\x32\x12.tests.Credentials\x12\x0f\n\x07timeout\x18\x04 \x01(\x05\"\x18\n\x08\x46\x61keTest\x12\x0c\n\x04pass\x18\x01 \x01(\x08\"\xa5\x01\n\x07HasKeys\x12\x18\n\x04path\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12!\n\x04item\x18\x02 \x03(\x0b\x32\x13.tests.HasKeys.Item\x1a]\n\x04Item\x12)\n\x03key\x18\x01 \x03(\x0b\x32\x1c.tests.HasKeys.Item.KeyEntry\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"T\n\x12GNMIPathCompliance\x12\x12\n\ncheck_elem\x18\x01 \x01(\x08\x12\x14\n\x0c\x63heck_target\x18\x02 \x01(\t\x12\x14\n\x0c\x63heck_origin\x18\x03 \x01(\t\"\xe6\x05\n\rDataTreePaths\x12\x31\n\ttest_oper\x18\x01 \x01(\x0b\x32\x1e.tests.DataTreePaths.TestQuery\x1a\x8d\x01\n\tQueryStep\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x34\n\x03key\x18\x02 \x03(\x0b\x32\'.tests.DataTreePaths.QueryStep.KeyEntry\x12\x10\n\x08key_name\x18\x03 \x01(\t\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\xf9\x01\n\tTestQuery\x12-\n\x05steps\x18\x01 \x03(\x0b\x32\x1e.tests.DataTreePaths.QueryStep\x12\x37\n\rget_list_keys\x18\x02 \x01(\x0b\x32\x1e.tests.DataTreePaths.ListQueryH\x00\x12<\n\x0erequired_paths\x18\x03 \x01(\x0b\x32\".tests.DataTreePaths.RequiredPathsH\x00\x12>\n\x0frequired_values\x18\x04 \x01(\x0b\x32#.tests.DataTreePaths.RequiredValuesH\x00\x42\x06\n\x04type\x1ax\n\tListQuery\x12\x10\n\x08var_name\x18\x01 \x01(\t\x12\x32\n\nnext_query\x18\x02 \x01(\x0b\x32\x1e.tests.DataTreePaths.TestQuery\x12%\n\x06\x66ilter\x18\x03 \x03(\x0b\x32\x15.tests.PathValueMatch\x1a\x46\n\rRequiredPaths\x12\x1a\n\x06prefix\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12\x19\n\x05paths\x18\x02 \x03(\x0b\x32\n.gnmi.Path\x1aT\n\x0eRequiredValues\x12\x1a\n\x06prefix\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12&\n\x07matches\x18\x02 \x03(\x0b\x32\x15.tests.PathValueMatch\"\xa0\x01\n\x0ePathValueMatch\x12\x18\n\x04path\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12!\n\x05\x65qual\x18\x02 \x01(\x0b\x32\x10.gnmi.TypedValueH\x00\x12\"\n\x03\x61nd\x18\x14 \x03(\x0b\x32\x15.tests.PathValueMatch\x12!\n\x02or\x18\x15 \x03(\x0b\x32\x15.tests.PathValueMatchB\n\n\x08\x63riteria\"J\n\x12SchemaPathComplete\x12\x1a\n\x06prefix\x18\x02 \x01(\x0b\x32\n.gnmi.Path\x12\x18\n\x04path\x18\x01 \x03(\x0b\x32\n.gnmi.Path\"L\n\nGetSetTest\x12\x36\n\x0foper_validation\x18\n \x01(\x0b\x32\x1b.tests.GetSetValidationTestH\x00\x42\x06\n\x04\x61rgs\"|\n\x14GetSetValidationTest\x12\x34\n\x0finitialise_oper\x18\x01 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\x12.\n\ttest_oper\x18\x02 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\"\x9e\x03\n\x14GetSetValidationOper\x12\x1f\n\x03set\x18\x01 \x01(\x0b\x32\x10.gnmi.SetRequestH\x00\x12\x1b\n\x11\x63ommon_setrequest\x18\x02 \x01(\tH\x00\x12\x36\n\x06set_ok\x18\n \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12\x1f\n\x03get\x18\x0b \x01(\x0b\x32\x10.gnmi.GetRequestH\x01\x12\x1b\n\x11\x63ommon_getrequest\x18\x0c \x01(\tH\x01\x12\x36\n\x06get_ok\x18\x14 \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12)\n\x0cget_response\x18\x15 \x01(\x0b\x32\x11.gnmi.GetResponseH\x02\x12\x1c\n\x12\x63ommon_getresponse\x18\x16 \x01(\tH\x02\"&\n\nOperResult\x12\x0c\n\x08NO_ERROR\x10\x00\x12\n\n\x06\x46\x41ILED\x10\x01\x42\x0c\n\nsetrequestB\x0c\n\ngetrequestB\r\n\x0bgetresponseb\x06proto3')
+  serialized_pb=_b('\n\x17proto/tests/tests.proto\x12\x05tests\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\"\t\n\x07\x44\x65\x66\x61ult\"\xaa\x03\n\rSubscribeTest\x12\'\n\x07request\x18\x01 \x01(\x0b\x32\x16.gnmi.SubscribeRequest\x12\x15\n\rlog_responses\x18\x02 \x01(\x08\x12\x1c\n\x14ignore_invalid_paths\x18\x03 \x01(\x08\x12\x13\n\tfake_test\x18\n \x01(\tH\x00\x12)\n\x0fpath_validation\x18\x0b \x01(\x0b\x32\x0e.tests.DefaultH\x00\x12\"\n\x08has_keys\x18\x0c \x01(\x0b\x32\x0e.tests.HasKeysH\x00\x12\x38\n\x13schemapath_complete\x18\r \x01(\x0b\x32\x19.tests.SchemaPathCompleteH\x00\x12/\n\x0f\x64\x61ta_tree_paths\x18\x0e \x01(\x0b\x32\x14.tests.DataTreePathsH\x00\x12*\n\x10value_validation\x18\x0f \x01(\x0b\x32\x0e.tests.DefaultH\x00\x12\x38\n\x13gnmipath_compliance\x18\x10 \x01(\x0b\x32\x19.tests.GNMIPathComplianceH\x00\x42\x06\n\x04\x61rgs\"\xe2\x01\n\x04Test\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\x0f\n\x07timeout\x18\x02 \x01(\x05\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12%\n\nconnection\x18\x04 \x01(\x0b\x32\x11.tests.Connection\x12)\n\tsubscribe\x18\n \x01(\x0b\x32\x14.tests.SubscribeTestH\x00\x12$\n\x07get_set\x18\x0b \x01(\x0b\x32\x11.tests.GetSetTestH\x00\x12$\n\tfake_test\x18\x0c \x01(\x0b\x32\x0f.tests.FakeTestH\x00\x42\x06\n\x04type\"C\n\x0b\x43redentials\x12\x10\n\x08resolver\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"g\n\nConnection\x12\x0e\n\x06target\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\'\n\x0b\x63redentials\x18\x03 \x01(\x0b\x32\x12.tests.Credentials\x12\x0f\n\x07timeout\x18\x04 \x01(\x05\"\x18\n\x08\x46\x61keTest\x12\x0c\n\x04pass\x18\x01 \x01(\x08\"\xa5\x01\n\x07HasKeys\x12\x18\n\x04path\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12!\n\x04item\x18\x02 \x03(\x0b\x32\x13.tests.HasKeys.Item\x1a]\n\x04Item\x12)\n\x03key\x18\x01 \x03(\x0b\x32\x1c.tests.HasKeys.Item.KeyEntry\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"T\n\x12GNMIPathCompliance\x12\x12\n\ncheck_elem\x18\x01 \x01(\x08\x12\x14\n\x0c\x63heck_target\x18\x02 \x01(\t\x12\x14\n\x0c\x63heck_origin\x18\x03 \x01(\t\"\xe6\x05\n\rDataTreePaths\x12\x31\n\ttest_oper\x18\x01 \x01(\x0b\x32\x1e.tests.DataTreePaths.TestQuery\x1a\x8d\x01\n\tQueryStep\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x34\n\x03key\x18\x02 \x03(\x0b\x32\'.tests.DataTreePaths.QueryStep.KeyEntry\x12\x10\n\x08key_name\x18\x03 \x01(\t\x1a*\n\x08KeyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\xf9\x01\n\tTestQuery\x12-\n\x05steps\x18\x01 \x03(\x0b\x32\x1e.tests.DataTreePaths.QueryStep\x12\x37\n\rget_list_keys\x18\x02 \x01(\x0b\x32\x1e.tests.DataTreePaths.ListQueryH\x00\x12<\n\x0erequired_paths\x18\x03 \x01(\x0b\x32\".tests.DataTreePaths.RequiredPathsH\x00\x12>\n\x0frequired_values\x18\x04 \x01(\x0b\x32#.tests.DataTreePaths.RequiredValuesH\x00\x42\x06\n\x04type\x1ax\n\tListQuery\x12\x10\n\x08var_name\x18\x01 \x01(\t\x12\x32\n\nnext_query\x18\x02 \x01(\x0b\x32\x1e.tests.DataTreePaths.TestQuery\x12%\n\x06\x66ilter\x18\x03 \x01(\x0b\x32\x15.tests.PathValueMatch\x1a\x46\n\rRequiredPaths\x12\x1a\n\x06prefix\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12\x19\n\x05paths\x18\x02 \x03(\x0b\x32\n.gnmi.Path\x1aT\n\x0eRequiredValues\x12\x1a\n\x06prefix\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12&\n\x07matches\x18\x02 \x03(\x0b\x32\x15.tests.PathValueMatch\"\xed\x01\n\x0ePathValueMatch\x12\x18\n\x04path\x18\x01 \x01(\x0b\x32\n.gnmi.Path\x12!\n\x05\x65qual\x18\x02 \x01(\x0b\x32\x10.gnmi.TypedValueH\x00\x12\x12\n\x08is_unset\x18\x03 \x01(\x08H\x00\x12\x10\n\x06is_set\x18\x04 \x01(\x08H\x00\x12%\n\tnot_equal\x18\x05 \x01(\x0b\x32\x10.gnmi.TypedValueH\x00\x12\"\n\x03\x61nd\x18\x14 \x03(\x0b\x32\x15.tests.PathValueMatch\x12!\n\x02or\x18\x15 \x03(\x0b\x32\x15.tests.PathValueMatchB\n\n\x08\x63riteria\"J\n\x12SchemaPathComplete\x12\x1a\n\x06prefix\x18\x02 \x01(\x0b\x32\n.gnmi.Path\x12\x18\n\x04path\x18\x01 \x03(\x0b\x32\n.gnmi.Path\"L\n\nGetSetTest\x12\x36\n\x0foper_validation\x18\n \x01(\x0b\x32\x1b.tests.GetSetValidationTestH\x00\x42\x06\n\x04\x61rgs\"|\n\x14GetSetValidationTest\x12\x34\n\x0finitialise_oper\x18\x01 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\x12.\n\ttest_oper\x18\x02 \x01(\x0b\x32\x1b.tests.GetSetValidationOper\"\x9e\x03\n\x14GetSetValidationOper\x12\x1f\n\x03set\x18\x01 \x01(\x0b\x32\x10.gnmi.SetRequestH\x00\x12\x1b\n\x11\x63ommon_setrequest\x18\x02 \x01(\tH\x00\x12\x36\n\x06set_ok\x18\n \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12\x1f\n\x03get\x18\x0b \x01(\x0b\x32\x10.gnmi.GetRequestH\x01\x12\x1b\n\x11\x63ommon_getrequest\x18\x0c \x01(\tH\x01\x12\x36\n\x06get_ok\x18\x14 \x01(\x0e\x32&.tests.GetSetValidationOper.OperResult\x12)\n\x0cget_response\x18\x15 \x01(\x0b\x32\x11.gnmi.GetResponseH\x02\x12\x1c\n\x12\x63ommon_getresponse\x18\x16 \x01(\tH\x02\"&\n\nOperResult\x12\x0c\n\x08NO_ERROR\x10\x00\x12\n\n\x06\x46\x41ILED\x10\x01\x42\x0c\n\nsetrequestB\x0c\n\ngetrequestB\r\n\x0bgetresponseb\x06proto3')
   ,
   dependencies=[github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -44,8 +43,8 @@ _GETSETVALIDATIONOPER_OPERRESULT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2699,
-  serialized_end=2737,
+  serialized_start=2806,
+  serialized_end=2844,
 )
 _sym_db.RegisterEnumDescriptor(_GETSETVALIDATIONOPER_OPERRESULT)
 
@@ -87,63 +86,70 @@ _SUBSCRIBETEST = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='log_responses', full_name='tests.SubscribeTest.log_responses', index=1,
       number=2, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='fake_test', full_name='tests.SubscribeTest.fake_test', index=2,
+      name='ignore_invalid_paths', full_name='tests.SubscribeTest.ignore_invalid_paths', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='fake_test', full_name='tests.SubscribeTest.fake_test', index=3,
       number=10, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='path_validation', full_name='tests.SubscribeTest.path_validation', index=3,
+      name='path_validation', full_name='tests.SubscribeTest.path_validation', index=4,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='has_keys', full_name='tests.SubscribeTest.has_keys', index=4,
+      name='has_keys', full_name='tests.SubscribeTest.has_keys', index=5,
       number=12, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='schemapath_complete', full_name='tests.SubscribeTest.schemapath_complete', index=5,
+      name='schemapath_complete', full_name='tests.SubscribeTest.schemapath_complete', index=6,
       number=13, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='data_tree_paths', full_name='tests.SubscribeTest.data_tree_paths', index=6,
+      name='data_tree_paths', full_name='tests.SubscribeTest.data_tree_paths', index=7,
       number=14, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='value_validation', full_name='tests.SubscribeTest.value_validation', index=7,
+      name='value_validation', full_name='tests.SubscribeTest.value_validation', index=8,
       number=15, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gnmipath_compliance', full_name='tests.SubscribeTest.gnmipath_compliance', index=8,
+      name='gnmipath_compliance', full_name='tests.SubscribeTest.gnmipath_compliance', index=9,
       number=16, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -160,7 +166,7 @@ _SUBSCRIBETEST = _descriptor.Descriptor(
       index=0, containing_type=None, fields=[]),
   ],
   serialized_start=96,
-  serialized_end=492,
+  serialized_end=522,
 )
 
 
@@ -177,49 +183,49 @@ _TEST = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='timeout', full_name='tests.Test.timeout', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='schema', full_name='tests.Test.schema', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='connection', full_name='tests.Test.connection', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='subscribe', full_name='tests.Test.subscribe', index=4,
       number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get_set', full_name='tests.Test.get_set', index=5,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='fake_test', full_name='tests.Test.fake_test', index=6,
       number=12, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -235,8 +241,8 @@ _TEST = _descriptor.Descriptor(
       name='type', full_name='tests.Test.type',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=495,
-  serialized_end=721,
+  serialized_start=525,
+  serialized_end=751,
 )
 
 
@@ -253,21 +259,21 @@ _CREDENTIALS = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='username', full_name='tests.Credentials.username', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='password', full_name='tests.Credentials.password', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -280,8 +286,8 @@ _CREDENTIALS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=723,
-  serialized_end=790,
+  serialized_start=753,
+  serialized_end=820,
 )
 
 
@@ -298,28 +304,28 @@ _CONNECTION = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='address', full_name='tests.Connection.address', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='credentials', full_name='tests.Connection.credentials', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='timeout', full_name='tests.Connection.timeout', index=3,
       number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -332,8 +338,8 @@ _CONNECTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=792,
-  serialized_end=895,
+  serialized_start=822,
+  serialized_end=925,
 )
 
 
@@ -350,7 +356,7 @@ _FAKETEST = _descriptor.Descriptor(
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -363,8 +369,8 @@ _FAKETEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=897,
-  serialized_end=921,
+  serialized_start=927,
+  serialized_end=951,
 )
 
 
@@ -381,14 +387,14 @@ _HASKEYS_ITEM_KEYENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='tests.HasKeys.Item.KeyEntry.value', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -401,8 +407,8 @@ _HASKEYS_ITEM_KEYENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1047,
-  serialized_end=1089,
+  serialized_start=1077,
+  serialized_end=1119,
 )
 
 _HASKEYS_ITEM = _descriptor.Descriptor(
@@ -418,7 +424,7 @@ _HASKEYS_ITEM = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -431,8 +437,8 @@ _HASKEYS_ITEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=996,
-  serialized_end=1089,
+  serialized_start=1026,
+  serialized_end=1119,
 )
 
 _HASKEYS = _descriptor.Descriptor(
@@ -448,14 +454,14 @@ _HASKEYS = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='item', full_name='tests.HasKeys.item', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -468,8 +474,8 @@ _HASKEYS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=924,
-  serialized_end=1089,
+  serialized_start=954,
+  serialized_end=1119,
 )
 
 
@@ -486,21 +492,21 @@ _GNMIPATHCOMPLIANCE = _descriptor.Descriptor(
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='check_target', full_name='tests.GNMIPathCompliance.check_target', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='check_origin', full_name='tests.GNMIPathCompliance.check_origin', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -513,8 +519,8 @@ _GNMIPATHCOMPLIANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1091,
-  serialized_end=1175,
+  serialized_start=1121,
+  serialized_end=1205,
 )
 
 
@@ -531,14 +537,14 @@ _DATATREEPATHS_QUERYSTEP_KEYENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='tests.DataTreePaths.QueryStep.KeyEntry.value', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -551,8 +557,8 @@ _DATATREEPATHS_QUERYSTEP_KEYENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1047,
-  serialized_end=1089,
+  serialized_start=1077,
+  serialized_end=1119,
 )
 
 _DATATREEPATHS_QUERYSTEP = _descriptor.Descriptor(
@@ -568,21 +574,21 @@ _DATATREEPATHS_QUERYSTEP = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='key', full_name='tests.DataTreePaths.QueryStep.key', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='key_name', full_name='tests.DataTreePaths.QueryStep.key_name', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -595,8 +601,8 @@ _DATATREEPATHS_QUERYSTEP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1247,
-  serialized_end=1388,
+  serialized_start=1277,
+  serialized_end=1418,
 )
 
 _DATATREEPATHS_TESTQUERY = _descriptor.Descriptor(
@@ -612,28 +618,28 @@ _DATATREEPATHS_TESTQUERY = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get_list_keys', full_name='tests.DataTreePaths.TestQuery.get_list_keys', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='required_paths', full_name='tests.DataTreePaths.TestQuery.required_paths', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='required_values', full_name='tests.DataTreePaths.TestQuery.required_values', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -649,8 +655,8 @@ _DATATREEPATHS_TESTQUERY = _descriptor.Descriptor(
       name='type', full_name='tests.DataTreePaths.TestQuery.type',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1391,
-  serialized_end=1640,
+  serialized_start=1421,
+  serialized_end=1670,
 )
 
 _DATATREEPATHS_LISTQUERY = _descriptor.Descriptor(
@@ -666,21 +672,21 @@ _DATATREEPATHS_LISTQUERY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='next_query', full_name='tests.DataTreePaths.ListQuery.next_query', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='filter', full_name='tests.DataTreePaths.ListQuery.filter', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -693,8 +699,8 @@ _DATATREEPATHS_LISTQUERY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1642,
-  serialized_end=1762,
+  serialized_start=1672,
+  serialized_end=1792,
 )
 
 _DATATREEPATHS_REQUIREDPATHS = _descriptor.Descriptor(
@@ -710,14 +716,14 @@ _DATATREEPATHS_REQUIREDPATHS = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='paths', full_name='tests.DataTreePaths.RequiredPaths.paths', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -730,8 +736,8 @@ _DATATREEPATHS_REQUIREDPATHS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1764,
-  serialized_end=1834,
+  serialized_start=1794,
+  serialized_end=1864,
 )
 
 _DATATREEPATHS_REQUIREDVALUES = _descriptor.Descriptor(
@@ -747,14 +753,14 @@ _DATATREEPATHS_REQUIREDVALUES = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='matches', full_name='tests.DataTreePaths.RequiredValues.matches', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -767,8 +773,8 @@ _DATATREEPATHS_REQUIREDVALUES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1836,
-  serialized_end=1920,
+  serialized_start=1866,
+  serialized_end=1950,
 )
 
 _DATATREEPATHS = _descriptor.Descriptor(
@@ -784,7 +790,7 @@ _DATATREEPATHS = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -797,8 +803,8 @@ _DATATREEPATHS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1178,
-  serialized_end=1920,
+  serialized_start=1208,
+  serialized_end=1950,
 )
 
 
@@ -815,28 +821,49 @@ _PATHVALUEMATCH = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='equal', full_name='tests.PathValueMatch.equal', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='and', full_name='tests.PathValueMatch.and', index=2,
+      name='is_unset', full_name='tests.PathValueMatch.is_unset', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='is_set', full_name='tests.PathValueMatch.is_set', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='not_equal', full_name='tests.PathValueMatch.not_equal', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='and', full_name='tests.PathValueMatch.and', index=5,
       number=20, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='or', full_name='tests.PathValueMatch.or', index=3,
+      name='or', full_name='tests.PathValueMatch.or', index=6,
       number=21, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -852,8 +879,8 @@ _PATHVALUEMATCH = _descriptor.Descriptor(
       name='criteria', full_name='tests.PathValueMatch.criteria',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1923,
-  serialized_end=2083,
+  serialized_start=1953,
+  serialized_end=2190,
 )
 
 
@@ -870,14 +897,14 @@ _SCHEMAPATHCOMPLETE = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='path', full_name='tests.SchemaPathComplete.path', index=1,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -890,8 +917,8 @@ _SCHEMAPATHCOMPLETE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2085,
-  serialized_end=2159,
+  serialized_start=2192,
+  serialized_end=2266,
 )
 
 
@@ -908,7 +935,7 @@ _GETSETTEST = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -924,8 +951,8 @@ _GETSETTEST = _descriptor.Descriptor(
       name='args', full_name='tests.GetSetTest.args',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=2161,
-  serialized_end=2237,
+  serialized_start=2268,
+  serialized_end=2344,
 )
 
 
@@ -942,14 +969,14 @@ _GETSETVALIDATIONTEST = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='test_oper', full_name='tests.GetSetValidationTest.test_oper', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -962,8 +989,8 @@ _GETSETVALIDATIONTEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2239,
-  serialized_end=2363,
+  serialized_start=2346,
+  serialized_end=2470,
 )
 
 
@@ -980,56 +1007,56 @@ _GETSETVALIDATIONOPER = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='common_setrequest', full_name='tests.GetSetValidationOper.common_setrequest', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='set_ok', full_name='tests.GetSetValidationOper.set_ok', index=2,
       number=10, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get', full_name='tests.GetSetValidationOper.get', index=3,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='common_getrequest', full_name='tests.GetSetValidationOper.common_getrequest', index=4,
       number=12, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get_ok', full_name='tests.GetSetValidationOper.get_ok', index=5,
       number=20, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get_response', full_name='tests.GetSetValidationOper.get_response', index=6,
       number=21, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='common_getresponse', full_name='tests.GetSetValidationOper.common_getresponse', index=7,
       number=22, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -1052,8 +1079,8 @@ _GETSETVALIDATIONOPER = _descriptor.Descriptor(
       name='getresponse', full_name='tests.GetSetValidationOper.getresponse',
       index=2, containing_type=None, fields=[]),
   ],
-  serialized_start=2366,
-  serialized_end=2780,
+  serialized_start=2473,
+  serialized_end=2887,
 )
 
 _SUBSCRIBETEST.fields_by_name['request'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._SUBSCRIBEREQUEST
@@ -1132,11 +1159,21 @@ _DATATREEPATHS_REQUIREDVALUES.containing_type = _DATATREEPATHS
 _DATATREEPATHS.fields_by_name['test_oper'].message_type = _DATATREEPATHS_TESTQUERY
 _PATHVALUEMATCH.fields_by_name['path'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
 _PATHVALUEMATCH.fields_by_name['equal'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._TYPEDVALUE
+_PATHVALUEMATCH.fields_by_name['not_equal'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._TYPEDVALUE
 _PATHVALUEMATCH.fields_by_name['and'].message_type = _PATHVALUEMATCH
 _PATHVALUEMATCH.fields_by_name['or'].message_type = _PATHVALUEMATCH
 _PATHVALUEMATCH.oneofs_by_name['criteria'].fields.append(
   _PATHVALUEMATCH.fields_by_name['equal'])
 _PATHVALUEMATCH.fields_by_name['equal'].containing_oneof = _PATHVALUEMATCH.oneofs_by_name['criteria']
+_PATHVALUEMATCH.oneofs_by_name['criteria'].fields.append(
+  _PATHVALUEMATCH.fields_by_name['is_unset'])
+_PATHVALUEMATCH.fields_by_name['is_unset'].containing_oneof = _PATHVALUEMATCH.oneofs_by_name['criteria']
+_PATHVALUEMATCH.oneofs_by_name['criteria'].fields.append(
+  _PATHVALUEMATCH.fields_by_name['is_set'])
+_PATHVALUEMATCH.fields_by_name['is_set'].containing_oneof = _PATHVALUEMATCH.oneofs_by_name['criteria']
+_PATHVALUEMATCH.oneofs_by_name['criteria'].fields.append(
+  _PATHVALUEMATCH.fields_by_name['not_equal'])
+_PATHVALUEMATCH.fields_by_name['not_equal'].containing_oneof = _PATHVALUEMATCH.oneofs_by_name['criteria']
 _SCHEMAPATHCOMPLETE.fields_by_name['prefix'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
 _SCHEMAPATHCOMPLETE.fields_by_name['path'].message_type = github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2._PATH
 _GETSETTEST.fields_by_name['oper_validation'].message_type = _GETSETVALIDATIONTEST
@@ -1183,6 +1220,7 @@ DESCRIPTOR.message_types_by_name['SchemaPathComplete'] = _SCHEMAPATHCOMPLETE
 DESCRIPTOR.message_types_by_name['GetSetTest'] = _GETSETTEST
 DESCRIPTOR.message_types_by_name['GetSetValidationTest'] = _GETSETVALIDATIONTEST
 DESCRIPTOR.message_types_by_name['GetSetValidationOper'] = _GETSETVALIDATIONOPER
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Default = _reflection.GeneratedProtocolMessageType('Default', (_message.Message,), dict(
   DESCRIPTOR = _DEFAULT,
