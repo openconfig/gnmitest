@@ -7,7 +7,7 @@ require (
 	github.com/golang/protobuf v1.4.0
 	github.com/google/go-cmp v0.4.0
 	github.com/kylelemons/godebug v1.1.0
-	github.com/openconfig/gnmi v0.0.0-20200428190816-9dc21dc0fa28
+	github.com/openconfig/gnmi v0.0.0-20200414194230-1597cc0f2600
 	github.com/openconfig/goyang v0.0.0-20200328051049-f3d50fd25b33
 	github.com/openconfig/ygot v0.7.3
 	google.golang.org/genproto v0.0.0-20200428115010-c45acf45369a
