@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/subscribe"
@@ -92,7 +93,7 @@ func (t *test) pathValidate(p *gpb.Path, prefix bool) error {
 	errs := &testerror.List{}
 
 	if t.gpc.CheckElem && p != nil && len(p.Element) > 0 {
-		errs.AddErr(fmt.Errorf("element field is used in gNMI Path %v", p))
+		errs.AddErr(fmt.Errorf("element field is used in gNMI Path %v", proto.CompactTextString(p)))
 	}
 
 	if !prefix || (t.gpc.CheckTarget == "" && t.gpc.CheckOrigin == "") {
@@ -108,20 +109,20 @@ func (t *test) pathValidate(p *gpb.Path, prefix bool) error {
 	case t.gpc.CheckTarget == "": // Validation on target field isn't requested.
 	case t.gpc.CheckTarget == "*":
 		if p.Target == "" {
-			errs.AddErr(fmt.Errorf("target isn't set in prefix gNMI Path %v", p))
+			errs.AddErr(fmt.Errorf("target isn't set in prefix gNMI Path %v", proto.CompactTextString(p)))
 		}
 	case t.gpc.CheckTarget != p.Target:
-		errs.AddErr(fmt.Errorf("target in gNMI Path %v is %q, expect %q", p, p.Target, t.gpc.CheckTarget))
+		errs.AddErr(fmt.Errorf("target in gNMI Path %v is %q, expect %q", proto.CompactTextString(p), p.Target, t.gpc.CheckTarget))
 	}
 
 	switch {
 	case t.gpc.CheckOrigin == "": // Validation on origin field isn't requested.
 	case t.gpc.CheckOrigin == "*":
 		if p.Origin == "" {
-			errs.AddErr(fmt.Errorf("origin isn't set in prefix gNMI Path %v", p))
+			errs.AddErr(fmt.Errorf("origin isn't set in prefix gNMI Path %v", proto.CompactTextString(p)))
 		}
 	case t.gpc.CheckOrigin != p.Origin:
-		errs.AddErr(fmt.Errorf("origin in gNMI Path %v is %q, expect %q", p, p.Origin, t.gpc.CheckOrigin))
+		errs.AddErr(fmt.Errorf("origin in gNMI Path %v is %q, expect %q", proto.CompactTextString(p), p.Origin, t.gpc.CheckOrigin))
 	}
 
 	return errs

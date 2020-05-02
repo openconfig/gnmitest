@@ -24,7 +24,6 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   serialized_pb=_b('\n\x17proto/suite/suite.proto\x12\x05suite\x1a\x36github.com/openconfig/gnmitest/proto/tests/tests.proto\x1a\x30github.com/openconfig/gnmi/proto/gnmi/gnmi.proto\"\xbc\x02\n\x05Suite\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07timeout\x18\x02 \x01(\x05\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12%\n\nconnection\x18\x04 \x01(\x0b\x32\x11.tests.Connection\x12\x37\n\x0e\x65xtension_list\x18\n \x03(\x0b\x32\x1f.suite.Suite.ExtensionListEntry\x12\x31\n\x13instance_group_list\x18\x0f \x03(\x0b\x32\x14.suite.InstanceGroup\x12%\n\x06\x63ommon\x18\x10 \x01(\x0b\x32\x15.suite.CommonMessages\x1aJ\n\x12\x45xtensionListEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.suite.ExtensionList:\x02\x38\x01\"V\n\rInstanceGroup\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12!\n\x08instance\x18\x02 \x03(\x0b\x32\x0f.suite.Instance\x12\r\n\x05\x66\x61tal\x18\x03 \x01(\x08\"R\n\x08Instance\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12\x19\n\x04test\x18\x02 \x01(\x0b\x32\x0b.tests.Test\x12\x16\n\x0e\x65xtension_list\x18\x03 \x03(\t\"/\n\rExtensionList\x12\x1e\n\textension\x18\x01 \x03(\x0b\x32\x0b.tests.Test\"\xbc\x04\n\x0e\x43ommonMessages\x12<\n\x0cset_requests\x18\x01 \x03(\x0b\x32&.suite.CommonMessages.SetRequestsEntry\x12<\n\x0cget_requests\x18\x03 \x03(\x0b\x32&.suite.CommonMessages.GetRequestsEntry\x12>\n\rget_responses\x18\x04 \x03(\x0b\x32\'.suite.CommonMessages.GetResponsesEntry\x12H\n\x12subscribe_requests\x18\x05 \x03(\x0b\x32,.suite.CommonMessages.SubscribeRequestsEntry\x1a\x44\n\x10SetRequestsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1f\n\x05value\x18\x02 \x01(\x0b\x32\x10.gnmi.SetRequest:\x02\x38\x01\x1a\x44\n\x10GetRequestsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1f\n\x05value\x18\x02 \x01(\x0b\x32\x10.gnmi.GetRequest:\x02\x38\x01\x1a\x46\n\x11GetResponsesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12 \n\x05value\x18\x02 \x01(\x0b\x32\x11.gnmi.GetResponse:\x02\x38\x01\x1aP\n\x16SubscribeRequestsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.gnmi.SubscribeRequest:\x02\x38\x01\x62\x06proto3')
   ,
   dependencies=[github_dot_com_dot_openconfig_dot_gnmitest_dot_proto_dot_tests_dot_tests__pb2.DESCRIPTOR,github_dot_com_dot_openconfig_dot_gnmi_dot_proto_dot_gnmi_dot_gnmi__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -42,14 +41,14 @@ _SUITE_EXTENSIONLISTENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='suite.Suite.ExtensionListEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -79,49 +78,49 @@ _SUITE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='timeout', full_name='suite.Suite.timeout', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='schema', full_name='suite.Suite.schema', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='connection', full_name='suite.Suite.connection', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='extension_list', full_name='suite.Suite.extension_list', index=4,
       number=10, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='instance_group_list', full_name='suite.Suite.instance_group_list', index=5,
       number=15, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='common', full_name='suite.Suite.common', index=6,
       number=16, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -152,21 +151,21 @@ _INSTANCEGROUP = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='instance', full_name='suite.InstanceGroup.instance', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='fatal', full_name='suite.InstanceGroup.fatal', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -197,21 +196,21 @@ _INSTANCE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='test', full_name='suite.Instance.test', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='extension_list', full_name='suite.Instance.extension_list', index=2,
       number=3, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -242,7 +241,7 @@ _EXTENSIONLIST = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -273,14 +272,14 @@ _COMMONMESSAGES_SETREQUESTSENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='suite.CommonMessages.SetRequestsEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -310,14 +309,14 @@ _COMMONMESSAGES_GETREQUESTSENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='suite.CommonMessages.GetRequestsEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -347,14 +346,14 @@ _COMMONMESSAGES_GETRESPONSESENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='suite.CommonMessages.GetResponsesEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -384,14 +383,14 @@ _COMMONMESSAGES_SUBSCRIBEREQUESTSENTRY = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='value', full_name='suite.CommonMessages.SubscribeRequestsEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -421,28 +420,28 @@ _COMMONMESSAGES = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get_requests', full_name='suite.CommonMessages.get_requests', index=1,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='get_responses', full_name='suite.CommonMessages.get_responses', index=2,
       number=4, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='subscribe_requests', full_name='suite.CommonMessages.subscribe_requests', index=3,
       number=5, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -485,6 +484,7 @@ DESCRIPTOR.message_types_by_name['InstanceGroup'] = _INSTANCEGROUP
 DESCRIPTOR.message_types_by_name['Instance'] = _INSTANCE
 DESCRIPTOR.message_types_by_name['ExtensionList'] = _EXTENSIONLIST
 DESCRIPTOR.message_types_by_name['CommonMessages'] = _COMMONMESSAGES
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Suite = _reflection.GeneratedProtocolMessageType('Suite', (_message.Message,), dict(
 

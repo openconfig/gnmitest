@@ -35,6 +35,16 @@ message SubscribeTest {
   // log_responses indicates to the test whether it should log all
   // SubscribeResponse messages that are received from the target.
   bool log_responses = 2;
+  // ignore_invalid_paths specifies whether invalid paths that are received
+  // from the target should be ignored, or treated as a test error. If this
+  // field is set to a non-nil value, then errors in deserialisation are
+  // ignored by the test.
+  //
+  // USE CAUTION WHEN ENABLING THIS OPTION - since invalid output from the
+  // target will not be treated as an error. It should be used solely when
+  // the test pass/fail criteria DO NOT depend on the correctness of all
+  // updates.
+  bool ignore_invalid_paths = 3;
   oneof args {
     string fake_test = 10;
     Default path_validation = 11;
@@ -270,8 +280,8 @@ message GNMIPathCompliance {
 // within the OpenConfig schema by specifying a filter:
 //
 // {
-//   steps: "components"
-//   steps: "component"
+//   steps: { name: "components" }
+//   steps: { name: "component" }
 //   get_list_keys {
 //     var_name: "%%component_name%%"
 //     filter {
@@ -282,6 +292,8 @@ message GNMIPathCompliance {
 //       equal { string_val: "TRANSCEIVER" }
 //     }
 //     next_query {
+//       steps: { name: "components" }
+//       steps: { name: "component" key_name: "%%component_name%%" }
 //       required_paths {
 //         prefix { name: "state" }
 //         paths { name: "mfg-name" }
@@ -417,10 +429,11 @@ message DataTreePaths {
     // next_query specifies a query that should be run for each key that
     // is retrieved by the ListQuery operation.
     TestQuery next_query = 2;
-    // filter specifies a set of filters that must be met for each entry
+    // filter specifies a filter that must be met for each entry
     // in the list for it to be included in subsequent iterations. If it
-    // is not set then all entries are iterated.
-    repeated PathValueMatch filter = 3;
+    // is not set then all entries are iterated. Logical AND/ORs can
+    // be specified within the filter.
+    PathValueMatch filter = 3;
   }
   // RequiredPaths specifies an operation that checks for paths within
   // the data tree.
@@ -448,6 +461,50 @@ message DataTreePaths {
 
 // PathValueMatch specifies a match critiera for a set of gNMI paths.
 // It is used to express criteria that a gNMI path must match.
+//
+// Both AND and OR logical expressions are contained within the PathValue
+// message and explained in further detail below. The order of operations
+// that is implemented within the frameworks is AND and then OR. The following
+// examples illustrate the use of the message for form a variety of different
+// logical expressions:
+//
+// (a == "a" AND b == "b" ) OR c == "c"
+//
+// {
+//   path { elem { name: "a" } }
+//   equal { string_val: "a" }
+//   and {
+//    path { elem { name: "b" } }
+//    equal { string_val: "b" }
+//   }
+//   or {
+//    path { elem { name: "c" } }
+//    equal { string_val: "c" }
+//   }
+// }
+//
+// In this message (a AND b) is evaluated and if true, the expression returns
+// true, if false, c is evaluated and the operation returns the result of the
+// equality comparison.
+//
+// (a == "a" ) OR (b == "b" AND c == "c")
+//
+// {
+//   path { elem { name: "a" } }
+//   equal { string_val: "a" } }
+//   or {
+//    path { elem { name: "b" } }
+//    equal { string_val: "b" }
+//    and {
+//      path { elem { name: "c" } }
+//      equal { string_val: "c" }
+//    }
+//   }
+// }
+//
+// In this message a is evaluated, and if true, the result is returned. If it is
+// false, the (b AND C) criteria is evaluated in whole (since it is encapsulated
+// within a new PathValue message) and the result is subsequently returned.
 message PathValueMatch {
   // path is the path to be verified. It can be absolute or relative
   // based pon the context that the PathValueMatch message is used.
@@ -458,6 +515,16 @@ message PathValueMatch {
     // equal is a gNMI TypedValue that the value found at the path must
     // be equal to.
     gnmi.TypedValue equal = 2;
+    // is_unset specifies that the value found at the path must not be
+    // set in the schema.
+    bool is_unset = 3;
+    // is_set specifies that the value found at the path must be set -
+    // it is typically used to filter based on a particular container
+    // existing.
+    bool is_set = 4;
+    // not_equal specifies a gNMI TypedValue that the value found at the
+    // path must not be equal to.
+    gnmi.TypedValue not_equal = 5;
   }
   // and specifies a set of additional matches that must be met for
   // the test to evaluate to true. If any matches are not met, the

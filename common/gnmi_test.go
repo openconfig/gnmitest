@@ -27,12 +27,11 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"
-	"github.com/openconfig/gnmi/unimplemented"
+	"github.com/openconfig/gnmitest/creds"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
-	"github.com/openconfig/gnmitest/creds"
 	tpb "github.com/openconfig/gnmitest/proto/tests"
 )
 
@@ -41,7 +40,7 @@ var (
 )
 
 type gnmiServer struct {
-	unimplemented.Server
+	gpb.UnimplementedGNMIServer
 }
 
 // Get implements the Get RPC for the faked gNMI server.
