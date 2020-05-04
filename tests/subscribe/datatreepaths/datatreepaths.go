@@ -5,14 +5,13 @@
 package datatreepaths
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"sort"
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/openconfig/gnmi/errlist"
+	"github.com/openconfig/gnmitest/common/testerror"
 	"github.com/openconfig/gnmitest/register"
 	"github.com/openconfig/gnmitest/schemas"
 	"github.com/openconfig/gnmitest/subscribe"
@@ -20,8 +19,11 @@ import (
 	"github.com/openconfig/ygot/util"
 	"github.com/openconfig/ygot/ygot"
 	"github.com/openconfig/ygot/ytypes"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
+	rpb "github.com/openconfig/gnmitest/proto/report"
 	tpb "github.com/openconfig/gnmitest/proto/tests"
 )
 
@@ -37,6 +39,9 @@ type test struct {
 	// testSpec is the configuration for the test specified in the
 	// suite protobuf.
 	testSpec *tpb.DataTreePaths
+	// ignoreInvalidPaths specifies whether the test has been asked
+	// to ignore paths that do not deserialise correctly.
+	ignoreInvalidPaths bool
 }
 
 // init statically registers the test against the gnmitest framework.
@@ -59,9 +64,10 @@ func newTest(st *tpb.Test) (subscribe.Subscribe, error) {
 	}
 
 	return &test{
-		dataTree: root,
-		schema:   schema,
-		testSpec: st.GetSubscribe().GetDataTreePaths(),
+		dataTree:           root,
+		schema:             schema,
+		testSpec:           st.GetSubscribe().GetDataTreePaths(),
+		ignoreInvalidPaths: st.GetSubscribe().GetIgnoreInvalidPaths(),
 	}, nil
 }
 
@@ -74,68 +80,107 @@ func (t *test) Check() error {
 		return fmt.Errorf("cannot resolve paths to query, %v", err)
 	}
 
-	var errs []error
-	addErr := func(e error) { errs = append(errs, e) }
-	for _, q := range queries {
+	errs := &testerror.List{}
+	// Check the required paths that are specified in the operation.
+	for _, q := range queries.paths {
 		nodes, err := ytypes.GetNode(t.schema, t.dataTree, q)
-		var retErr error
 		switch {
 		case err != nil:
-			retErr = fmt.Errorf("got error, %v", err)
+			errs.AddTestErr(&rpb.TestError{
+				Path:    q,
+				Message: fmt.Sprintf("cannot retrieve node, %v", err),
+			})
 		case len(nodes) == 1:
 			_, isGoEnum := nodes[0].Data.(ygot.GoEnum)
 			vv := reflect.ValueOf(nodes[0].Data)
 			switch {
 			case util.IsValuePtr(vv) && (util.IsValueNil(vv.Elem()) || !vv.Elem().IsValid()):
-				retErr = errors.New("got nil data for path")
+				errs.AddTestErr(&rpb.TestError{
+					Path:    q,
+					Message: "got nil data for path",
+				})
 			case isGoEnum:
 				// This is an enumerated value -- check whether it is set to 0
 				// which means it was not set.
 				if vv.Int() == 0 {
-					retErr = fmt.Errorf("enum type %T was UNSET", vv.Interface())
+					errs.AddTestErr(&rpb.TestError{
+						Path:    q,
+						Message: fmt.Sprintf("enum type %T was UNSET", vv.Interface()),
+					})
 				}
 			}
 		case len(nodes) == 0:
-			retErr = errors.New("no matches for path")
-		}
-
-		if retErr != nil {
-			estr := proto.MarshalTextString(q)
-			if ps, err := ygot.PathToString(q); err == nil {
-				estr = ps
-			}
-			addErr(fmt.Errorf("%s: %v", estr, retErr))
+			errs.AddTestErr(&rpb.TestError{
+				Path:    q,
+				Message: "no matches for path",
+			})
 		}
 	}
 
-	sortedErrs := errlist.List{}
-	if len(errs) != 0 {
-		se := map[string]error{}
-		es := []string{}
-		for _, e := range errs {
-			se[e.Error()] = e
-			es = append(es, e.Error())
-		}
-		sort.Strings(es)
-		for _, ename := range es {
-			sortedErrs.Append(se[ename])
+	for _, v := range queries.vals {
+		ok, err := valueMatched(&ytypes.TreeNode{
+			Schema: t.schema,
+			Data:   t.dataTree,
+		}, v)
+
+		switch {
+		case err != nil:
+			errs.AddTestErr(&rpb.TestError{
+				Path:    v.Path,
+				Message: fmt.Sprintf("cannot check node value, %v", err),
+			})
+		case !ok:
+			errs.AddTestErr(&rpb.TestError{
+				Path:    v.Path,
+				Message: fmt.Sprintf("did not match expected value, %v", v),
+			})
 		}
 	}
 
-	return sortedErrs.Err()
+	if len(errs.Errors()) == 0 {
+		return nil
+	}
+
+	sortedErrs := &testerror.List{}
+	paths := []string{}
+	errMap := map[string]*rpb.TestError{}
+	for _, e := range errs.Errors() {
+		s, err := ygot.PathToString(e.Path)
+		if err != nil {
+			// If there's no way we can sort the errors, then just prefer to
+			// ensure that we return some error condition.
+			return errs
+		}
+		paths = append(paths, s)
+		errMap[s] = e
+	}
+
+	sort.Strings(paths)
+	for _, p := range paths {
+		sortedErrs.AddTestErr(errMap[p])
+	}
+
+	return sortedErrs
 }
 
 // Process is called for each response received from the target for the test.
 // It returns the current status of the test (running, or complete) based
 // on the contents of the sr SubscribeResponse.
 func (t *test) Process(sr *gpb.SubscribeResponse) (subscribe.Status, error) {
-	return subscribe.OneShotSetNode(t.schema, t.dataTree, sr, &ytypes.InitMissingElements{})
+	return subscribe.OneShotSetNode(t.schema, t.dataTree, sr,
+		subscribe.OneShotSetNodeArgs{
+			YtypesArgs: []ytypes.SetNodeOpt{
+				&ytypes.InitMissingElements{},
+			},
+			IgnoreInvalidPaths: t.ignoreInvalidPaths,
+		},
+	)
 }
 
 // queries resolves the contents of the testSpec into the exact paths to be
 // queried from the data tree. It should be called after the data tree has been
 // fully populated.
-func (t *test) queries() ([]*gpb.Path, error) {
+func (t *test) queries() (*resolvedOperation, error) {
 	cfg := t.testSpec.GetTestOper()
 	if cfg == nil {
 		return nil, fmt.Errorf("invalid nil test specification")
@@ -150,17 +195,34 @@ func (t *test) queries() ([]*gpb.Path, error) {
 	return queryPaths, nil
 }
 
+// resolvedOperation stores a fully defined test operation that has been resolved
+// from the query specification.
+type resolvedOperation struct {
+	// paths stores a resolved set of gNMI paths. Each path that is stored
+	// in the paths set is from the required_paths argument of the test. The
+	// pass/fail criteria for these paths is that they must be set to a non-nil
+	// value within the datatree after the SubscribeResponse messages received
+	// on the subscription are processed into the datatree.
+	paths []*gpb.Path
+	// vals stores a set of fully resolved path, value specifications. These
+	// criteria are extracted from the required_values argument of the test. The
+	// pass/fail criteria for each path is that it conforms to the value criteria
+	// that are specified within the test after each of the SubscribeResponse messages
+	// received from the subscription are processed into the datatree.
+	vals []*tpb.PathValueMatch
+}
+
 // resolveQuery resolves an individual query into the set of paths that it
 // corresponds to. The query is specified by the op specified, and the
 // knownVars are used to extract values that have already been queried from the
 // data tree. It returns the set of paths.
-func (t *test) resolveQuery(op *tpb.DataTreePaths_TestQuery, knownVars keyQuery) ([]*gpb.Path, error) {
+func (t *test) resolveQuery(op *tpb.DataTreePaths_TestQuery, knownVars keyQuery) (*resolvedOperation, error) {
 	q, err := makeQuery(op.Steps, knownVars)
 	if err != nil {
 		return nil, fmt.Errorf("cannot resolve query %s, %v", op, err)
 	}
 
-	returnPaths := []*gpb.Path{}
+	rOps := &resolvedOperation{}
 
 	for _, path := range q {
 		// Make sure we append to a new map.
@@ -172,7 +234,16 @@ func (t *test) resolveQuery(op *tpb.DataTreePaths_TestQuery, knownVars keyQuery)
 				tp := path.GetElem()
 				tp = append(tp, v.RequiredPaths.GetPrefix().GetElem()...)
 				tp = append(tp, rp.GetElem()...)
-				returnPaths = append(returnPaths, &gpb.Path{Elem: tp})
+				rOps.paths = append(rOps.paths, &gpb.Path{Elem: tp})
+			}
+		case *tpb.DataTreePaths_TestQuery_RequiredValues:
+			for _, rv := range v.RequiredValues.GetMatches() {
+				tp := path.GetElem()
+				tp = append(tp, v.RequiredValues.GetPrefix().GetElem()...)
+				tp = append(tp, rv.GetPath().GetElem()...)
+				newOper := proto.Clone(rv).(*tpb.PathValueMatch)
+				newOper.Path = &gpb.Path{Elem: tp}
+				rOps.vals = append(rOps.vals, newOper)
 			}
 		case *tpb.DataTreePaths_TestQuery_GetListKeys:
 			nextQ := v.GetListKeys.GetNextQuery()
@@ -180,7 +251,7 @@ func (t *test) resolveQuery(op *tpb.DataTreePaths_TestQuery, knownVars keyQuery)
 				return nil, fmt.Errorf("get_list_keys query %s specified nil next_query", v)
 			}
 
-			queriedKeys, err := t.queryListKeys(path)
+			queriedKeys, err := t.queryListKeys(path, v.GetListKeys.GetFilter())
 			if err != nil {
 				return nil, fmt.Errorf("cannot resolve query, failed get_list_keys, %v", err)
 			}
@@ -190,14 +261,16 @@ func (t *test) resolveQuery(op *tpb.DataTreePaths_TestQuery, knownVars keyQuery)
 				if err != nil {
 					return nil, fmt.Errorf("cannot resolve query %s, %v", nextQ, err)
 				}
-				returnPaths = append(returnPaths, retp...)
+				// A resolved operation for a GetListKey cannot specify a value required, and
+				// hence we just append the paths.
+				rOps.paths = append(rOps.paths, retp.paths...)
 			}
 		default:
 			return nil, fmt.Errorf("got unhandled type in operation type, %T", v)
 		}
 	}
 
-	return returnPaths, nil
+	return rOps, nil
 }
 
 // joinVars merges the contents of the two keyQuery maps into a single map, overwriting
@@ -213,9 +286,10 @@ func joinVars(a, b keyQuery) keyQuery {
 }
 
 // queryListKeys queries the dataTree stored in the test receiver for the path
-// specified by p, returning the keys of the list found at p. If the value returned
-// is not a list, an error is returned.
-func (t *test) queryListKeys(path *gpb.Path) ([]map[string]string, error) {
+// specified by p, returning the keys of the list found at p. If a filter is
+// specified, only list entries that meet the specified criteria are returned.
+// If the value found at the specified path is not a list, an error is returned.
+func (t *test) queryListKeys(path *gpb.Path, filter *tpb.PathValueMatch) ([]map[string]string, error) {
 	nodes, err := ytypes.GetNode(t.schema, t.dataTree, path, &ytypes.GetPartialKeyMatch{})
 	if err != nil {
 		return nil, fmt.Errorf("cannot query for path %s, %v", path, err)
@@ -226,10 +300,175 @@ func (t *test) queryListKeys(path *gpb.Path) ([]map[string]string, error) {
 		if !n.Schema.IsList() {
 			return nil, fmt.Errorf("path %s returned by query %s was not a list, was: %v", path, n.Path, n.Schema.Kind)
 		}
+
+		if filter != nil {
+			match, err := valueMatched(n, filter)
+			switch {
+			case err != nil:
+				return nil, fmt.Errorf("invalid filter criteria for %s, %v", path, err)
+			case match == false:
+				continue
+			}
+		}
 		keys = append(keys, n.Path.GetElem()[len(n.Path.GetElem())-1].Key)
 	}
 
 	return keys, nil
+}
+
+// valueMatched determines whether the specified val matches the spec specified.
+// It returns true if the value matches.
+func valueMatched(val *ytypes.TreeNode, spec *tpb.PathValueMatch) (bool, error) {
+	if spec == nil {
+		return true, nil
+	}
+
+	if val.Data == nil {
+		return false, fmt.Errorf("tried to apply match against a nil node")
+	}
+
+	specMatched, matchErr := nodeMatchesCriteria(val.Schema, val.Data, spec)
+
+	andMatched := true
+	// First check whether all AND criteria match. If there are any that do not match,
+	// then we return false.
+	for _, and := range spec.And {
+		match, err := valueMatched(val, and)
+		if err != nil {
+			return false, fmt.Errorf("cannot parse match criteria %v, %v", and, err)
+		}
+		if !match {
+			andMatched = false
+		}
+	}
+
+	if len(spec.Or) == 0 {
+		// If there are no OR criteria, we can return immediately if the spec
+		// and all its AND conditions matched.
+		return specMatched && andMatched, matchErr
+	}
+
+	if !specMatched {
+		// Check any of the OR criteria specified in the query - we only check if
+		// the initial critiera was not matched.
+		for _, or := range spec.Or {
+			match, err := valueMatched(val, or)
+			if err != nil {
+				return false, fmt.Errorf("cannot parse match criteria %v, %v", or, err)
+			}
+			if match {
+				return true, nil
+			}
+		}
+	}
+
+	return specMatched, matchErr
+
+}
+
+// nodeMatchesCriteria evaluates whether the spec supplied is matched for the provided root.
+// AND and OR criteria are not matched.
+func nodeMatchesCriteria(rootSchema *yang.Entry, root interface{}, spec *tpb.PathValueMatch) (bool, error) {
+	// nil criteria are considered to match.
+	if spec == nil {
+		return true, nil
+	}
+
+	goStruct, ok := root.(ygot.ValidatedGoStruct)
+	if !ok {
+		return false, fmt.Errorf("matches can only be applied against YANG containers or lists, invalid root type %T", root)
+	}
+
+	nodes, err := ytypes.GetNode(rootSchema, goStruct, spec.Path, &ytypes.GetPartialKeyMatch{})
+	getNodeErr, ok := status.FromError(err)
+	if !ok {
+		return false, fmt.Errorf("got invalid error from GetNode, %T", err)
+	}
+
+	switch v := spec.Criteria.(type) {
+	case *tpb.PathValueMatch_Equal:
+		return matchNodeEqual(nodes, getNodeErr, v.Equal)
+	case *tpb.PathValueMatch_NotEqual:
+		m, err := matchNodeEqual(nodes, getNodeErr, v.NotEqual)
+		return !m, err
+	case *tpb.PathValueMatch_IsSet:
+		return matchNodeIsSet(nodes, getNodeErr)
+	case *tpb.PathValueMatch_IsUnset:
+		return matchNodeIsUnset(nodes, getNodeErr)
+	default:
+		return false, fmt.Errorf("invalid criteria type specified %T", v)
+	}
+}
+
+// matchNodeEqual determines whether the single node in the nodes slice
+// supplied is equal to testVal. If there is more than one node in the slice an
+// error is returned. The getNodeStatus supplied is used to handle the response
+// of ytypes.GetNode specifically in the context of testing for equality. It
+// returns a bool indicating whether the values are equal, and an error if they
+// are not equal and an error was encountered whilst trying to test for
+// equality.
+func matchNodeEqual(nodes []*ytypes.TreeNode, getNodeStatus *status.Status, testVal *gpb.TypedValue) (bool, error) {
+	switch {
+	case getNodeStatus.Code() != codes.OK:
+		// All errors for GetNode are fatal when checking for equality.
+		return false, fmt.Errorf("could not query path, %s", getNodeStatus.Proto())
+	case len(nodes) == 0:
+		// No nodes were found, so this cannot be equal.
+		return false, fmt.Errorf("no data tree node")
+	case len(nodes) > 1:
+		// Too many nodes returned for an equality check to be relevant.
+		return false, fmt.Errorf("query criteria was invalid, %d nodes returned", len(nodes))
+	default:
+		typedVal, err := ygot.EncodeTypedValue(nodes[0].Data, gpb.Encoding_JSON_IETF)
+		if err != nil {
+			return false, fmt.Errorf("cannot encode received value %v as TypedValue, %v", nodes[0], err)
+		}
+		return proto.Equal(typedVal, testVal), nil
+	}
+}
+
+// matchNodeIsSet determines whether the single node in the nodes slice supplied is
+// set to a non-nil value. If there is more than one value in the nodes slice, the
+// an error is returned. The getNodeStatus supplied is used to handle the response
+// of ytypes.GetNode in the context of testing for a non-nil returned node. A bool
+// indicating whether the node is set is returned, along with an error indicating
+// if invalid input data was supplied.
+func matchNodeIsSet(nodes []*ytypes.TreeNode, getNodeStatus *status.Status) (bool, error) {
+	switch {
+	case getNodeStatus.Code() != codes.OK:
+		// All errors are fatal when checking for a set node.
+		return false, fmt.Errorf("could not retrieve query path, %s", getNodeStatus.Proto())
+	case len(nodes) == 0:
+		// The node cannot be set if there is no value returned.
+		return false, fmt.Errorf("no data tree node")
+	case len(nodes) > 1:
+		// Too many nodes returned for a set check to be valid.
+		return false, fmt.Errorf("query criteria was invalid, %d nodes returned", len(nodes))
+	default:
+		return !util.IsValueNilOrDefault(nodes[0].Data), nil
+	}
+}
+
+// modeNodesIsUnset determines whether the single node in the nodes slice supplied
+// is set to a nil value, or there are no supplied nodes. The supplied getNodeStatus
+// is used to perform handling of the return of ytypes.GetNodes in the context
+// of testing for a nil value. A bool indicating whether the node is unset is returned,
+// along with an error if it is not possible to check whether the node is nil.
+func matchNodeIsUnset(nodes []*ytypes.TreeNode, getNodeStatus *status.Status) (bool, error) {
+	switch {
+	case getNodeStatus.Code() != codes.OK:
+		// codes.NotFound is an OK return status if the node is not set.
+		if getNodeStatus.Code() == codes.NotFound {
+			return true, nil
+		}
+		return false, fmt.Errorf("could not retrieve query path, %s", getNodeStatus.Proto())
+	case len(nodes) == 0:
+		return true, nil
+	case len(nodes) > 1:
+		return false, fmt.Errorf("query criteria was invalid, %d nodes returned", len(nodes))
+	default:
+		return util.IsValueNilOrDefault(nodes[0].Data), nil
+	}
 }
 
 // keyQuery is a type that can be used to store a set of key specifications

@@ -34,11 +34,11 @@ func TestSingleSchema(t *testing.T) {
 	key := "oc"
 	rootStruct := &gostructs.Device{}
 	schemaTree := map[string]*yang.Entry{
-		"x": &yang.Entry{},
+		"x": {},
 	}
 	schemaTreeFn := func() (map[string]*yang.Entry, error) {
 		return map[string]*yang.Entry{
-			"x": &yang.Entry{},
+			"x": {},
 		}, nil
 	}
 

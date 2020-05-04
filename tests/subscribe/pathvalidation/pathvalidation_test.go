@@ -109,7 +109,7 @@ func TestPathValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.inDesc, func(t *testing.T) {
-			subscribeTest, err := newTest(&tpb.Test{Schema: openconfig.Key})
+			subscribeTest, err := NewTest(&tpb.Test{Schema: openconfig.Key})
 			if err != nil {
 				t.Fatalf("got %v", err)
 			}

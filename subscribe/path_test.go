@@ -17,9 +17,9 @@ limitations under the License.
 package subscribe
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
@@ -60,7 +60,7 @@ func TestJoinPath(t *testing.T) {
 
 	for _, tt := range tests {
 		got := joinPath(tt.prefix, tt.path)
-		if !reflect.DeepEqual(got, tt.want) {
+		if !proto.Equal(got, tt.want) {
 			t.Errorf("desc: %s : got %v, want %v gNMI Path", tt.desc, got, tt.want)
 		}
 	}

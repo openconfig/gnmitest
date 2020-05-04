@@ -17,10 +17,10 @@ limitations under the License.
 package haskeys
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/google/go-cmp/cmp"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmitest/schemas/openconfig/register"
 	"github.com/openconfig/goyang/pkg/yang"
@@ -186,7 +186,7 @@ func TestCompletePaths(t *testing.T) {
 				t.Fatalf("did not get expected error, %s", diff)
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
+			if !cmp.Equal(got, tt.want, cmp.Comparer(proto.Equal)) {
 				t.Fatalf("did not get expected paths, got: %v, want: %v", got, tt.want)
 			}
 		})

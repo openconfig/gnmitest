@@ -43,14 +43,14 @@ type test struct {
 
 // init registers the factory function of the test to global tests registry.
 func init() {
-	register.NewSubscribeTest(&tpb.SubscribeTest_PathValidation{}, newTest)
+	register.NewSubscribeTest(&tpb.SubscribeTest_PathValidation{}, NewTest)
 }
 
-// newTest is used as a callback by registry to instantiate the test when needed.
+// NewTest is used as a callback by registry to instantiate the test when needed.
 // It receives the SubscribeTest proto which contains the arguments to the test
 // as well gNMI SubscribeRequest. This test uses neither any arguments nor the
 // subscription request.
-func newTest(st *tpb.Test) (subscribe.Subscribe, error) {
+func NewTest(st *tpb.Test) (subscribe.Subscribe, error) {
 	goStruct, err := schema.Get(st.GetSchema())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get %v schema; %v", st.GetSchema(), err)

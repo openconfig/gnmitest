@@ -81,7 +81,7 @@ func TestValueValidation(t *testing.T) {
 				"",
 				&gpb.TypedValue{Value: &gpb.TypedValue_StringVal{StringVal: "TESTING"}},
 			),
-			wantErr: `path elem:<name:"interfaces" >  points to a node with non-leaf schema`,
+			wantErr: `path ` + (&gpb.Path{Elem: []*gpb.PathElem{{Name: "interfaces"}}}).String() + ` points to a node with non-leaf schema`,
 		},
 		{
 			desc: "fail unmarshallling container node which belongs to a keyed list",
@@ -90,7 +90,7 @@ func TestValueValidation(t *testing.T) {
 				"interface[name=arbitrary_key]",
 				&gpb.TypedValue{Value: &gpb.TypedValue_StringVal{StringVal: "TESTING"}},
 			),
-			wantErr: `path elem:<name:"interfaces" > elem:<name:"interface" key:<key:"name" value:"arbitrary_key" > >  points to a node with non-leaf schema`,
+			wantErr: `path ` + (&gpb.Path{Elem: []*gpb.PathElem{{Name: "interfaces"}, {Name: "interface", Key: map[string]string{"name": "arbitrary_key"}}}}).String() + ` points to a node with non-leaf schema`,
 		},
 	}
 

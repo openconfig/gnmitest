@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -24,6 +23,7 @@ import (
 	"github.com/openconfig/ygot/testutil"
 	"github.com/openconfig/ygot/ytypes"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/testing/protocmp"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
 	fpb "github.com/openconfig/gnmi/testing/fake/proto"
@@ -173,12 +173,14 @@ func TestIntegration(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(got, want, cmp.FilterPath(func(p cmp.Path) bool {
-				if p.Last().Type() == reflect.TypeOf(&gpb.GetResponse{}) {
-					return true
-				}
-				return false
-			}, cmp.Comparer(func(a, b *gpb.GetResponse) bool { return testutil.GetResponseEqual(a, b) }))); diff != "" {
+			if diff := cmp.Diff(got, want, protocmp.FilterMessage(proto.MessageV2(&gpb.GetResponse{}),
+				cmp.Comparer(func(ma, mb protocmp.Message) bool {
+					a := new(gpb.GetResponse)
+					proto.Merge(a, ma)
+					b := new(gpb.GetResponse)
+					proto.Merge(b, mb)
+					return testutil.GetResponseEqual(a, b)
+				})), protocmp.Transform()); diff != "" {
 				t.Fatalf("did not get expected report proto, diff(-got,+want):\n%s", diff)
 			}
 		})
@@ -359,12 +361,22 @@ func TestIntegrationWithFakeGNMIAgent(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(got, want, cmp.FilterPath(func(p cmp.Path) bool {
-				if p.Last().Type() == reflect.TypeOf(&gpb.GetResponse{}) {
-					return true
-				}
-				return false
-			}, cmp.Comparer(func(a, b *gpb.GetResponse) bool { return testutil.GetResponseEqual(a, b) }))); diff != "" {
+			if diff := cmp.Diff(got, want, protocmp.FilterField(proto.MessageV2(&rpb.TestError{}), "message",
+				cmp.Comparer(func(a, b string) bool {
+					// If the error was produced by rpc, avoid direct string
+					// comparison since there is no guarantee of output stability.
+					if strings.HasPrefix(a, "rpc error:") || strings.HasPrefix(b, "rpc error:") {
+						return strings.HasPrefix(a, "rpc error:") && strings.HasPrefix(b, "rpc error:")
+					}
+					return a == b
+				})), protocmp.FilterMessage(proto.MessageV2(&gpb.GetResponse{}),
+				cmp.Comparer(func(ma, mb protocmp.Message) bool {
+					a := new(gpb.GetResponse)
+					proto.Merge(a, ma)
+					b := new(gpb.GetResponse)
+					proto.Merge(b, mb)
+					return testutil.GetResponseEqual(a, b)
+				})), protocmp.Transform()); diff != "" {
 				t.Fatalf("did not get expected report proto, diff(-got,+want):\n%s", diff)
 			}
 		})

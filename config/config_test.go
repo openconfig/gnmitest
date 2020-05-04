@@ -20,7 +20,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kylelemons/godebug/pretty"
+	"github.com/golang/protobuf/proto"
+	"github.com/google/go-cmp/cmp"
 	"github.com/openconfig/gnmitest/schemas/openconfig/register"
 
 	spb "github.com/openconfig/gnmitest/proto/suite"
@@ -241,7 +242,7 @@ func TestSetOverridden(t *testing.T) {
 		if tt.wantErr {
 			continue
 		}
-		if diff := pretty.Compare(tt.outSuite, tt.inSuite); diff != "" {
+		if diff := cmp.Diff(tt.outSuite, tt.inSuite, cmp.Comparer(proto.Equal)); diff != "" {
 			t.Errorf("test %s: setOverridden() returned diff (want -> got): %s", tt.desc, diff)
 		}
 	}
