@@ -38,9 +38,6 @@ jobs:
     - name: Test
       run: go test -v -coverprofile=profile.cov  ./... 
     
-    - name: Race Test
-      run: go test -race ./...
-    
     - name: Send Coverage
       uses: shogo82148/actions-goveralls@v1
       with:
