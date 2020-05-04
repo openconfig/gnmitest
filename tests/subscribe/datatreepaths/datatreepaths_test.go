@@ -948,8 +948,8 @@ func TestMakeQuery(t *testing.T) {
 		}},
 		inKnownVars: keyQuery{
 			"%%vars%%": []map[string]string{
-				map[string]string{"val": "one"},
-				map[string]string{"val": "two"},
+				{"val": "one"},
+				{"val": "two"},
 			},
 		},
 		want: []*gpb.Path{
@@ -967,12 +967,12 @@ func TestMakeQuery(t *testing.T) {
 		}},
 		inKnownVars: keyQuery{
 			"%%keyone%%": []map[string]string{
-				map[string]string{"v1": "one"},
-				map[string]string{"v1": "two"},
+				{"v1": "one"},
+				{"v1": "two"},
 			},
 			"%%keytwo%%": []map[string]string{
-				map[string]string{"v2": "one"},
-				map[string]string{"v2": "two"},
+				{"v2": "one"},
+				{"v2": "two"},
 			},
 		},
 		want: []*gpb.Path{
