@@ -41,7 +41,7 @@ func noti(prefixPath string, updatePath string) *gpb.SubscribeResponse {
 			Update: &gpb.Notification{
 				Prefix: path(prefixPath),
 				Update: []*gpb.Update{
-					&gpb.Update{
+					{
 						Path: path(updatePath),
 					},
 				},

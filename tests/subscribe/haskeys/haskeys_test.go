@@ -44,7 +44,7 @@ func noti(prefixPath string, updatePath string) *gpb.SubscribeResponse {
 			Update: &gpb.Notification{
 				Prefix: path(prefixPath),
 				Update: []*gpb.Update{
-					&gpb.Update{
+					{
 						Path: path(updatePath),
 					},
 				},
@@ -283,7 +283,7 @@ func TestCheckKeys(t *testing.T) {
 		inSchema: rootSchema,
 		inDataTree: &Root{
 			MultiKeyList: map[MultiKey]*ListChild{
-				MultiKey{String: "foo", Integer: 42}: {String: ygot.String("foo"), Integer: ygot.Int32(42)},
+				{String: "foo", Integer: 42}: {String: ygot.String("foo"), Integer: ygot.Int32(42)},
 			},
 		},
 		inPaths: []*gpb.Path{

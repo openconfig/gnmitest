@@ -52,7 +52,7 @@ func noti(target, origin, prefixPath, updatePath string, v *gpb.TypedValue, slic
 			Update: &gpb.Notification{
 				Prefix: prefix,
 				Update: []*gpb.Update{
-					&gpb.Update{
+					{
 						Path: mustPath(updatePath, slicePath),
 						Val:  v,
 					},
