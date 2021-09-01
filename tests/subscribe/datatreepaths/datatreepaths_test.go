@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/openconfig/gnmi/errdiff"
-	"github.com/openconfig/gnmitest/schemas"
+	schema "github.com/openconfig/gnmitest/schemas"
 	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/exampleoc"
 	"github.com/openconfig/ygot/testutil"
@@ -370,7 +370,7 @@ func TestCheck(t *testing.T) {
 				),
 			},
 		}},
-		wantCheckErrSubstring: "enum type exampleoc.E_OpenconfigInterfaces_Interface_OperStatus was UNSET",
+		wantCheckErrSubstring: "enum type exampleoc.E_Interface_OperStatus was UNSET",
 	}, {
 		name: "iterative test",
 		inSpec: &tpb.Test{
@@ -783,13 +783,9 @@ func TestQueries(t *testing.T) {
 		inDevice: func() *exampleoc.Device {
 			d := &exampleoc.Device{}
 			x := d.GetOrCreateComponent("xcvr1")
-			x.Type = &exampleoc.Component_Type_Union_E_OpenconfigPlatformTypes_OPENCONFIG_HARDWARE_COMPONENT{
-				exampleoc.OpenconfigPlatformTypes_OPENCONFIG_HARDWARE_COMPONENT_TRANSCEIVER,
-			}
+			x.Type = exampleoc.PlatformTypes_OPENCONFIG_HARDWARE_COMPONENT_TRANSCEIVER
 			e := d.GetOrCreateComponent("cpu0")
-			e.Type = &exampleoc.Component_Type_Union_E_OpenconfigPlatformTypes_OPENCONFIG_HARDWARE_COMPONENT{
-				exampleoc.OpenconfigPlatformTypes_OPENCONFIG_HARDWARE_COMPONENT_CPU,
-			}
+			e.Type = exampleoc.PlatformTypes_OPENCONFIG_HARDWARE_COMPONENT_CPU
 			return d
 		}(),
 		want: &resolvedOperation{
@@ -1594,7 +1590,7 @@ func TestValueMatched(t *testing.T) {
 			Data: func() *exampleoc.Device {
 				d := &exampleoc.Device{}
 				e := d.GetOrCreateInterface("eth0").GetOrCreateEthernet()
-				e.PortSpeed = exampleoc.OpenconfigIfEthernet_ETHERNET_SPEED_SPEED_10GB
+				e.PortSpeed = exampleoc.IfEthernet_ETHERNET_SPEED_SPEED_10GB
 				return d
 			}(),
 		},
@@ -1612,7 +1608,7 @@ func TestValueMatched(t *testing.T) {
 				d := &exampleoc.Device{}
 				e := d.GetOrCreateInterface("eth0").GetOrCreateEthernet()
 				// This sets config/port-speed with path compression enabled.
-				e.PortSpeed = exampleoc.OpenconfigIfEthernet_ETHERNET_SPEED_SPEED_10GB
+				e.PortSpeed = exampleoc.IfEthernet_ETHERNET_SPEED_SPEED_10GB
 				return d
 			}(),
 		},
@@ -1630,7 +1626,7 @@ func TestValueMatched(t *testing.T) {
 				d := &exampleoc.Device{}
 				// This sets config/port-speed with path compression enabled.
 				e := d.GetOrCreateInterface("eth0").GetOrCreateEthernet()
-				e.PortSpeed = exampleoc.OpenconfigIfEthernet_ETHERNET_SPEED_SPEED_10GB
+				e.PortSpeed = exampleoc.IfEthernet_ETHERNET_SPEED_SPEED_10GB
 				return d
 			}(),
 		},
@@ -1648,7 +1644,7 @@ func TestValueMatched(t *testing.T) {
 				d := &exampleoc.Device{}
 				e := d.GetOrCreateInterface("eth0").GetOrCreateEthernet()
 				// This sets config/port-speed with path compression enabled.
-				e.PortSpeed = exampleoc.OpenconfigIfEthernet_ETHERNET_SPEED_SPEED_10GB
+				e.PortSpeed = exampleoc.IfEthernet_ETHERNET_SPEED_SPEED_10GB
 				return d
 			}(),
 		},
@@ -1665,7 +1661,7 @@ func TestValueMatched(t *testing.T) {
 			Data: func() *exampleoc.Device {
 				d := &exampleoc.Device{}
 				// This sets config/port-speed with path compression enabled.
-				d.GetOrCreateInterface("eth0").GetOrCreateEthernet().PortSpeed = exampleoc.OpenconfigIfEthernet_ETHERNET_SPEED_SPEED_10GB
+				d.GetOrCreateInterface("eth0").GetOrCreateEthernet().PortSpeed = exampleoc.IfEthernet_ETHERNET_SPEED_SPEED_10GB
 				return d
 			}(),
 		},
@@ -1715,7 +1711,7 @@ func TestValueMatched(t *testing.T) {
 				d := &exampleoc.Device{}
 				e := d.GetOrCreateInterface("eth0").GetOrCreateEthernet()
 				// This sets config/port-speed with path compression enabled.
-				e.PortSpeed = exampleoc.OpenconfigIfEthernet_ETHERNET_SPEED_SPEED_10GB
+				e.PortSpeed = exampleoc.IfEthernet_ETHERNET_SPEED_SPEED_10GB
 				return d
 			}(),
 		},
@@ -1751,7 +1747,7 @@ func TestValueMatched(t *testing.T) {
 			Path:   mustPath("/"),
 			Data: func() *exampleoc.Device {
 				d := &exampleoc.Device{}
-				d.GetOrCreateInterface("eth0").OperStatus = exampleoc.OpenconfigInterfaces_Interface_OperStatus_UP
+				d.GetOrCreateInterface("eth0").OperStatus = exampleoc.Interface_OperStatus_UP
 				return d
 			}(),
 		},
@@ -1804,7 +1800,7 @@ func TestValueMatched(t *testing.T) {
 			Data: func() *exampleoc.Device {
 				d := &exampleoc.Device{}
 				i := d.GetOrCreateInterface("eth0")
-				i.OperStatus = exampleoc.OpenconfigInterfaces_Interface_OperStatus_UP
+				i.OperStatus = exampleoc.Interface_OperStatus_UP
 				i.Description = ygot.String("fish")
 				return d
 			}(),
