@@ -38,22 +38,14 @@ jobs:
     - name: Test
       run: go test -v -coverprofile=profile.cov ./... 
     
-    - name: Race Test
-      run: go test -race ./...
-
     - name: Coveralls
       if: ${{ matrix.go == '1.x' }}
       uses: shogo82148/actions-goveralls@v1
       with:
         path-to-profile: profile.cov
   
+    - name: Race Test
+      run: go test -race ./...
+
     - name: Check gofmt
       run: diff -u <(echo -n) <(gofmt -d -s .)
-
-  finish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: shogo82148/actions-goveralls@v1
-        with:
-          path-to-profile: profile.cov
