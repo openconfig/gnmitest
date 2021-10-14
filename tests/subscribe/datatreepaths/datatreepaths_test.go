@@ -28,14 +28,6 @@ func mustPath(s string) *gpb.Path {
 	return p
 }
 
-func noti(p ...string) *gpb.Notification {
-	n := &gpb.Notification{}
-	for _, s := range p {
-		n.Update = append(n.Update, &gpb.Update{Path: mustPath(s)})
-	}
-	return n
-}
-
 type pathVal struct {
 	p *gpb.Path
 	v *gpb.TypedValue
@@ -104,9 +96,15 @@ func TestCheck(t *testing.T) {
 		},
 		inSubscribeResponses: []*gpb.SubscribeResponse{{
 			Response: &gpb.SubscribeResponse_Update{
-				noti(
-					"/interfaces/interface[name=eth0]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth0]/state/counters/out-pkts",
+				notiVal(42, mustPath("/interfaces/interface[name=eth0]/state/counters"),
+					pathVal{
+						p: mustPath("in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{42}},
+					},
+					pathVal{
+						p: mustPath("out-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{84}},
+					},
 				),
 			},
 		}},
@@ -142,10 +140,19 @@ func TestCheck(t *testing.T) {
 		},
 		inSubscribeResponses: []*gpb.SubscribeResponse{{
 			Response: &gpb.SubscribeResponse_Update{
-				noti(
-					"/interfaces/interface[name=eth0]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth0]/state/counters/out-pkts",
-					"/interfaces/interface[name=eth0]/qos/state/invalid-path",
+				notiVal(42, mustPath("/interfaces/interface[name=eth0]"),
+					pathVal{
+						p: mustPath("state/counters/in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{42}},
+					},
+					pathVal{
+						p: mustPath("state/counters/out-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{84}},
+					},
+					pathVal{
+						p: mustPath("/qos/state/invalid-path"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{126}},
+					},
 				),
 			},
 		}},
@@ -180,10 +187,19 @@ func TestCheck(t *testing.T) {
 		},
 		inSubscribeResponses: []*gpb.SubscribeResponse{{
 			Response: &gpb.SubscribeResponse_Update{
-				noti(
-					"/interfaces/interface[name=eth0]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth0]/state/counters/out-pkts",
-					"/interfaces/interface[name=eth0]/qos/state/invalid-path",
+				notiVal(42, mustPath("/interfaces/interface[name=eth0]"),
+					pathVal{
+						p: mustPath("state/counters/in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{42}},
+					},
+					pathVal{
+						p: mustPath("state/counters/out-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{84}},
+					},
+					pathVal{
+						p: mustPath("/qos/state/invalid-path"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{126}},
+					},
 				),
 			},
 		}},
@@ -415,11 +431,23 @@ func TestCheck(t *testing.T) {
 		},
 		inSubscribeResponses: []*gpb.SubscribeResponse{{
 			Response: &gpb.SubscribeResponse_Update{
-				noti(
-					"/interfaces/interface[name=eth0]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth0]/state/counters/out-pkts",
-					"/interfaces/interface[name=eth1]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth1]/state/counters/out-pkts",
+				notiVal(42, nil,
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth0]/state/counters/in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{42}},
+					},
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth0]/state/counters/out-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{84}},
+					},
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth1]/state/counters/in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{126}},
+					},
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth1]/state/counters/out-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{168}},
+					},
 				),
 			},
 		}},
@@ -467,10 +495,19 @@ func TestCheck(t *testing.T) {
 		},
 		inSubscribeResponses: []*gpb.SubscribeResponse{{
 			Response: &gpb.SubscribeResponse_Update{
-				noti(
-					"/interfaces/interface[name=eth0]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth1]/state/counters/in-pkts",
-					"/interfaces/interface[name=eth1]/state/counters/out-pkts",
+				notiVal(42, nil,
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth0]/state/counters/in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{42}},
+					},
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth1]/state/counters/in-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{126}},
+					},
+					pathVal{
+						p: mustPath("/interfaces/interface[name=eth1]/state/counters/out-pkts"),
+						v: &gpb.TypedValue{Value: &gpb.TypedValue_UintVal{168}},
+					},
 				),
 			},
 		}},
