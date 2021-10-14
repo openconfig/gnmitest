@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/openconfig/gnmi/errdiff"
-	"github.com/openconfig/gnmitest/schemas/openconfig/register"
+	openconfig "github.com/openconfig/gnmitest/schemas/openconfig/register"
 	"github.com/openconfig/ygot/ygot"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
@@ -41,7 +41,7 @@ func noti(prefixPath string, updatePath string) *gpb.SubscribeResponse {
 			Update: &gpb.Notification{
 				Prefix: path(prefixPath),
 				Update: []*gpb.Update{
-					&gpb.Update{
+					{
 						Path: path(updatePath),
 					},
 				},
@@ -72,7 +72,7 @@ func TestPathValidation(t *testing.T) {
 			inDesc:           "fail path doesn't match due to incorrect key name for the interface",
 			inPrefixPath:     "interfaces",
 			inUpdatePath:     "interface[INCORRECT=arbitrary_key]/state",
-			wantErrSubstring: "missing name key in map[INCORRECT:arbitrary_key]",
+			wantErrSubstring: "missing \"name\" key in map[INCORRECT:arbitrary_key]",
 		},
 		{
 			inDesc:           "fail path points to a non-leaf node",
@@ -90,7 +90,7 @@ func TestPathValidation(t *testing.T) {
 			inDesc:           "fail path uses a struct key type with incorrect enum",
 			inPrefixPath:     "network-instances",
 			inUpdatePath:     "network-instance[name=arbitrary_key]/protocols/protocol[name=arbitrary_name][identifier=INCORRECT_ENUM]",
-			wantErrSubstring: "no enum matching with INCORRECT_ENUM",
+			wantErrSubstring: "INCORRECT_ENUM is not a valid value for enum field Identifier",
 		},
 		{
 			inDesc:       "success path points to a leaf node",

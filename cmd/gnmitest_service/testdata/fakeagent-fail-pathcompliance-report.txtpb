@@ -35,7 +35,7 @@ results: <
       result: FAIL
       subscribe: <
         errors: <
-          message: "failed to create map value for insert, root map[string]*gostructs.OpenconfigInterfaces_Interfaces_Interface, keys map[SHOULD_BE_name:eth0]: missing name key in map[SHOULD_BE_name:eth0]"
+          message: "failed to create map value for insert, root map[string]*gostructs.OpenconfigInterfaces_Interfaces_Interface, keys map[SHOULD_BE_name:eth0]: missing \"name\" key in map[SHOULD_BE_name:eth0]"
         >
         status: EARLY_FINISHED
       >
@@ -112,7 +112,7 @@ results: <
           >
         >
         errors: <
-          message: "failed to create map value for insert, root map[string]*gostructs.OpenconfigInterfaces_Interfaces_Interface, keys map[SHOULD_BE_name:eth0]: missing name key in map[SHOULD_BE_name:eth0]"
+          message: "failed to create map value for insert, root map[string]*gostructs.OpenconfigInterfaces_Interfaces_Interface, keys map[SHOULD_BE_name:eth0]: missing \"name\" key in map[SHOULD_BE_name:eth0]"
         >
         status: EARLY_FINISHED
       >

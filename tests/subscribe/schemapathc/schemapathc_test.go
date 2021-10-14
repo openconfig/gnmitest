@@ -41,7 +41,7 @@ func noti(prefixPath string, updatePath string) *gpb.SubscribeResponse {
 			Update: &gpb.Notification{
 				Prefix: mustPath(prefixPath),
 				Update: []*gpb.Update{
-					&gpb.Update{
+					{
 						Path: mustPath(updatePath),
 					},
 				},
@@ -171,7 +171,7 @@ func TestSchemaPathComplete(t *testing.T) {
 			Response: &gpb.SubscribeResponse_Update{
 				Update: &gpb.Notification{
 					Update: []*gpb.Update{
-						&gpb.Update{},
+						{},
 					},
 				},
 			},

@@ -29,7 +29,7 @@ PACKAGE_NAME=gostructs
 git clone --depth 1 https://github.com/openconfig/public.git
 
 go get -u github.com/openconfig/ygot
-go get -t -d $GOPATH/src/github.com/openconfig/ygot/...
+go get -t -d github.com/openconfig/ygot/...
 
 mkdir deps
 cp  $GOPATH/src/github.com/openconfig/ygot/demo/getting_started/yang/{ietf,iana}* deps

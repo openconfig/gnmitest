@@ -12,13 +12,13 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
-	"github.com/openconfig/gnmi/client/gnmi"
+	client "github.com/openconfig/gnmi/client/gnmi"
 	"github.com/openconfig/gnmi/errdiff"
 	"github.com/openconfig/gnmi/testing/fake/gnmi"
 	"github.com/openconfig/gnmi/value"
 	"github.com/openconfig/gnmitest/common"
 	"github.com/openconfig/gnmitest/schemafake"
-	"github.com/openconfig/gnmitest/schemas/openconfig"
+	gostructs "github.com/openconfig/gnmitest/schemas/openconfig"
 	"github.com/openconfig/gnmitest/service"
 	"github.com/openconfig/ygot/testutil"
 	"github.com/openconfig/ygot/ytypes"
@@ -161,7 +161,7 @@ func TestIntegration(t *testing.T) {
 			}
 
 			cl := gtpb.NewGNMITestClient(conn)
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 			defer cancel()
 
 			got, err := cl.Run(ctx, in)
